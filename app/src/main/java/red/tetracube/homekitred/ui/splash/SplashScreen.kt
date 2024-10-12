@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -31,12 +35,19 @@ fun SplashScreenUI() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                "HomeKit RED",
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                        append("HomeKit")
+                    }
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
+                        append(" RED")
+                    }
+                },
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.error
             )
             Spacer(modifier = Modifier.height(64.dp))
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.error)
+            LinearProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     }
 }

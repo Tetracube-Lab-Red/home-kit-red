@@ -13,6 +13,8 @@ navigation = "2.8.2"
 pluginKotlinxSerialization = "2.0.21"
 kotlinxSerialization = "1.7.3"
 ktor = "3.0.0"
+ksp = "2.0.21-1.0.25"
+room = "2.6.1"
 
 [libraries]
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
@@ -40,10 +42,14 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-kotlin = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "pluginKotlinxSerialization" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
