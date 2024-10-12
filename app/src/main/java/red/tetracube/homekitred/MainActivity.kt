@@ -1,47 +1,32 @@
 package red.tetracube.homekitred
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
+import androidx.core.animation.doOnEnd
+import red.tetracube.homekitred.ui.shell.ShellScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            HomeKitRedTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val fadeOut = ObjectAnimator.ofFloat(
+                splashScreenView,
+                View.ALPHA,
+                1f,
+                0f
+            )
+            fadeOut.duration = 600L
+            fadeOut.doOnEnd { splashScreenView.remove() }
+            fadeOut.start()
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HomeKitRedTheme {
-        Greeting("Android")
+        enableEdgeToEdge()
+        setContent {
+            ShellScreen()
+        }
     }
 }
