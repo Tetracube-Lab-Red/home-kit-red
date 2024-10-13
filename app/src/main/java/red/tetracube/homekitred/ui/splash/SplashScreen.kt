@@ -12,15 +12,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import kotlinx.coroutines.delay
+import red.tetracube.homekitred.app.behaviour.routing.Routes
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navHostController: NavHostController) {
+    LaunchedEffect(Unit) {
+        delay(1000)
+        navHostController.navigate(Routes.Login) {
+            popUpTo<Routes.Splash>() { inclusive = true }
+        }
+    }
     SplashScreenUI()
 }
 

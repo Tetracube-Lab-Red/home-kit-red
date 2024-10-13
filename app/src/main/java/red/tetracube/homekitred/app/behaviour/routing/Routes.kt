@@ -8,4 +8,7 @@ sealed class Routes {
     @Serializable
     data object Splash : Routes()
 
+    @Serializable
+    data object Login : Routes()
+
 }
