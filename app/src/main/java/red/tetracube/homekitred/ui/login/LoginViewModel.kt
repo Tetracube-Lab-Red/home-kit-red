@@ -40,7 +40,7 @@ class LoginViewModel : ViewModel() {
                             hubAddressField = _loginUIModel.value.hubAddressField.copy(
                                 value = fieldInputEvent.fieldValue,
                                 hasError = _loginUIModel.value.hubAddressField.isTouched
-                                        && (fieldInputEvent.fieldValue.isEmpty()
+                                        && (fieldInputEvent.fieldValue.isBlank()
                                         || !URLUtil.isValidUrl(fieldInputEvent.fieldValue))
                             ),
                         )
@@ -49,7 +49,7 @@ class LoginViewModel : ViewModel() {
                             hubNameField = _loginUIModel.value.hubNameField.copy(
                                 value = fieldInputEvent.fieldValue,
                                 hasError = _loginUIModel.value.hubNameField.isTouched
-                                        && fieldInputEvent.fieldValue.isEmpty()
+                                        && fieldInputEvent.fieldValue.isBlank()
                             )
                         )
 
@@ -57,7 +57,7 @@ class LoginViewModel : ViewModel() {
                             hubPasswordField = _loginUIModel.value.hubPasswordField.copy(
                                 value = fieldInputEvent.fieldValue,
                                 hasError = _loginUIModel.value.hubPasswordField.isTouched
-                                        && fieldInputEvent.fieldValue.isEmpty()
+                                        && fieldInputEvent.fieldValue.isBlank()
                             )
                         )
                     }

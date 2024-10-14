@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.ui.login.LoginScreen
 import red.tetracube.homekitred.ui.login.LoginViewModel
+import red.tetracube.homekitred.ui.setup.HubSetupScreen
+import red.tetracube.homekitred.ui.setup.HubSetupViewModel
 import red.tetracube.homekitred.ui.splash.SplashScreen
 import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
 
@@ -37,6 +39,10 @@ fun ShellUI(navController: NavHostController) {
             composable<Routes.Login> {
                 val viewModel: LoginViewModel = viewModel()
                 LoginScreen(navController, viewModel)
+            }
+            composable<Routes.HubSetup> {
+                val viewModel: HubSetupViewModel = viewModel()
+                HubSetupScreen(navController, viewModel)
             }
         }
     }

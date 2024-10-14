@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.ui.login
+package red.tetracube.homekitred.ui.setup
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,7 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,45 +38,41 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent.FieldName
-import red.tetracube.homekitred.ui.login.models.LoginUIModel
+import red.tetracube.homekitred.ui.setup.models.HubSetupUIModel
 
 @Composable
-fun LoginScreen(
+fun HubSetupScreen(
     navHostController: NavHostController,
-    loginViewModel: LoginViewModel
+    hubSetupViewModel: HubSetupViewModel
 ) {
-    val formStatus = loginViewModel.loginUIModel.value
-
-    LoginScreenUI(
+    val formStatus = hubSetupViewModel.hubSetupModel.value
+    HubSetupScreenUI(
         formStatus = formStatus,
         onInputFocus = { fieldName: FieldName ->
-            loginViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
+            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
         },
         onTextInput = { fieldName: FieldName, value: String ->
-            loginViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
+            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
         },
         onFieldTrailingIconClick = {
-            loginViewModel.onInputEvent(FieldInputEvent.FieldTrailingButtonClick(FieldName.PASSWORD))
+            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldTrailingButtonClick(FieldName.PASSWORD))
         },
-        onSetupHuButtonClick = {
-            navHostController.navigate(Routes.HubSetup) {
-                launchSingleTop = true
-            }
+        onBackButtonClick = {
+            navHostController.popBackStack()
         }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreenUI(
-    formStatus: LoginUIModel,
+fun HubSetupScreenUI(
+    formStatus: HubSetupUIModel,
     onInputFocus: (FieldName) -> Unit,
     onTextInput: (FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
-    onSetupHuButtonClick: () -> Unit
+    onBackButtonClick: () -> Unit
 ) {
     val focusRequester = LocalFocusManager.current
     Scaffold(
@@ -88,20 +84,20 @@ fun LoginScreenUI(
                 }
             ) { focusRequester.clearFocus() },
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
-                        buildAnnotatedString {
-                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                                append("HomeKit")
-                            }
-                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                                append(" RED")
-                            }
-                        },
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.tertiary
+                        "Setup new hub"
                     )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            onBackButtonClick()
+                        }
+                    ) {
+                        Icon(painter = painterResource(R.drawable.arrow_back_ios_24px), contentDescription = null)
+                    }
                 }
             )
         }
@@ -114,16 +110,6 @@ fun LoginScreenUI(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Sign In",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -264,20 +250,8 @@ fun LoginScreenUI(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
                     enabled = formStatus.formIsValid,
-                    onClick = {}
-                ) {
-                    Text("Sign in")
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Absolute.Right
-            ) {
-                TextButton(
-                    modifier = Modifier,
-                    onClick = { onSetupHuButtonClick() }
-                ) {
-                    Text(" Setup a new Hub")
+                    onClick = {}) {
+                    Text("Setup")
                 }
             }
         }
