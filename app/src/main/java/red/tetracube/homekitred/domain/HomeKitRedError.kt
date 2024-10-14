@@ -1,18 +1,36 @@
 package red.tetracube.homekitred.domain
 
+import kotlinx.serialization.Serializable
 
-sealed class HomeKitRedError {
+@Serializable
+sealed class HomeKitRedError : Throwable() {
 
-    data object RemoteUnreachable : HomeKitRedError()
+    data object UnreachableService : HomeKitRedError() {
+        private fun readResolve(): Any = UnreachableService
+    }
 
-    data object RemoteError : HomeKitRedError()
+    data object ServiceError : HomeKitRedError() {
+        private fun readResolve(): Any = ServiceError
+    }
 
-    data object Unauthorized : HomeKitRedError()
+    data object Unauthorized : HomeKitRedError() {
+        private fun readResolve(): Any = Unauthorized
+    }
 
-    data object ClientError : HomeKitRedError()
+    data object ClientError : HomeKitRedError() {
+        private fun readResolve(): Any = ClientError
+    }
 
-    data object Conflict : HomeKitRedError()
+    data object Conflict : HomeKitRedError() {
+        private fun readResolve(): Any = Conflict
+    }
 
-    data object UnprocessableResult : HomeKitRedError()
+    data object UnprocessableResult : HomeKitRedError() {
+        private fun readResolve(): Any = UnprocessableResult
+    }
+
+    data object GenericError : HomeKitRedError() {
+        private fun readResolve(): Any = GenericError
+    }
 
 }

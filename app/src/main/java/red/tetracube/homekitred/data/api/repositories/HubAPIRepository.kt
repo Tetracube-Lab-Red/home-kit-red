@@ -7,6 +7,7 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.SerializationException
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
@@ -23,26 +24,29 @@ class HubAPIRepository(
         const val GET_HUB_INFO_URL = "/hub/info"
     }
 
-    suspend fun createHub(hubAddress: String, name: String, password: String) {
+    suspend fun createHub(hubAddress: String, name: String, password: String): Result<HubInfo> {
         val request = HubCreateRequest(name, password)
-        val hubCreateResult = try {
-            tetraCubeAPIClient.client.post("$hubAddress$CREATE_HUB")
+        try {
+            val hubInfo = tetraCubeAPIClient.client.post("$hubAddress$CREATE_HUB")
             {
-                request
+                setBody(request)
             }
                 .body<HubInfo>()
+            return Result.success(hubInfo)
         } catch (clientException: ClientRequestException) {
-            if (clientException.response.status == HttpStatusCode.Conflict) {
-                APIError.EntityConflicts
+            return if (clientException.response.status == HttpStatusCode.Conflict) {
+                Result.failure(APIError.EntityConflicts)
             } else {
-                APIError.ClientError
+                Result.failure(APIError.ClientError)
             }
         } catch (serverException: ServerResponseException) {
-            APIError.ServerError
+            return Result.failure(APIError.ServerError)
         } catch (connectionException: SerializationException) {
-            APIError.UnprocessableReply
+            return Result.failure(APIError.UnprocessableReply)
         } catch (timeoutException: ConnectTimeoutException) {
-            APIError.RemoteUnreachable
+            return Result.failure(APIError.RemoteUnreachable)
+        } catch (exception: Exception) {
+            return Result.failure(APIError.GenericAPIError)
         }
     }
 

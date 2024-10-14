@@ -14,4 +14,7 @@ sealed class Routes {
     @Serializable
     data object HubSetup: Routes()
 
+    @Serializable
+    data class ErrorDialog(val errorType: String) : Routes()
+
 }

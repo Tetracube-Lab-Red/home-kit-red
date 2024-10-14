@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,15 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
+import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.ui.setup.models.HubSetupUIModel
@@ -48,7 +46,16 @@ fun HubSetupScreen(
     hubSetupViewModel: HubSetupViewModel
 ) {
     val formStatus = hubSetupViewModel.hubSetupModel.value
+    val uiState = hubSetupViewModel.uiState.value
+
+    if (uiState is UIState.FinishedWithError<*>) {
+        navHostController.navigate(
+            Routes.ErrorDialog(uiState.error.toString())
+        )
+    }
+
     HubSetupScreenUI(
+        uiState = uiState,
         formStatus = formStatus,
         onInputFocus = { fieldName: FieldName ->
             hubSetupViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
@@ -61,6 +68,9 @@ fun HubSetupScreen(
         },
         onBackButtonClick = {
             navHostController.popBackStack()
+        },
+        onSetupButtonClick = {
+            hubSetupViewModel.onSetupButtonClick()
         }
     )
 }
@@ -68,11 +78,13 @@ fun HubSetupScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HubSetupScreenUI(
+    uiState: UIState,
     formStatus: HubSetupUIModel,
     onInputFocus: (FieldName) -> Unit,
     onTextInput: (FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
-    onBackButtonClick: () -> Unit
+    onBackButtonClick: () -> Unit,
+    onSetupButtonClick: () -> Unit
 ) {
     val focusRequester = LocalFocusManager.current
     Scaffold(
@@ -96,7 +108,10 @@ fun HubSetupScreenUI(
                             onBackButtonClick()
                         }
                     ) {
-                        Icon(painter = painterResource(R.drawable.arrow_back_ios_24px), contentDescription = null)
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back_ios_24px),
+                            contentDescription = null
+                        )
                     }
                 }
             )
@@ -109,6 +124,9 @@ fun HubSetupScreenUI(
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (uiState is UIState.Loading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -245,12 +263,14 @@ fun HubSetupScreenUI(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 FilledTonalButton(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = formStatus.formIsValid,
-                    onClick = {}) {
+                    enabled = formStatus.formIsValid && uiState !is UIState.Loading,
+                    onClick = { onSetupButtonClick() }
+                ) {
                     Text("Setup")
                 }
             }
