@@ -5,10 +5,18 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent
 import red.tetracube.homekitred.ui.setup.models.HubSetupUIModel
+import red.tetracube.homekitred.usecases.hub.CreateHub
 
-class HubSetupViewModel : ViewModel() {
+class HubSetupViewModel(
+    private val createHubUseCase: CreateHub
+) : ViewModel() {
     private val _hubSetupModel: MutableState<HubSetupUIModel> = mutableStateOf(HubSetupUIModel())
     val hubSetupModel: State<HubSetupUIModel>
         get() = _hubSetupModel
@@ -86,5 +94,20 @@ class HubSetupViewModel : ViewModel() {
                     && (!_hubSetupModel.value.hubNameField.hasError && _hubSetupModel.value.hubNameField.isTouched)
                     && (!_hubSetupModel.value.hubPasswordField.hasError && _hubSetupModel.value.hubPasswordField.isTouched)
         )
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val homeKitRedContainer =
+                    (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
+                val createHubUseCase = CreateHub(
+                    hubAPIRepository = homeKitRedContainer.hubAPIRepository
+                )
+                HubSetupViewModel(
+                    createHubUseCase = createHubUseCase
+                )
+            }
+        }
     }
 }

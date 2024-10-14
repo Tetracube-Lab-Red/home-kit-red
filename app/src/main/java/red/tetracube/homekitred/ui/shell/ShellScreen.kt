@@ -41,7 +41,7 @@ fun ShellUI(navController: NavHostController) {
                 LoginScreen(navController, viewModel)
             }
             composable<Routes.HubSetup> {
-                val viewModel: HubSetupViewModel = viewModel()
+                val viewModel: HubSetupViewModel = viewModel(factory = HubSetupViewModel.Factory)
                 HubSetupScreen(navController, viewModel)
             }
         }
