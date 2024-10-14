@@ -11,4 +11,7 @@ sealed class Routes {
     @Serializable
     data object Login : Routes()
 
+    @Serializable
+    data object HubSetup: Routes()
+
 }
