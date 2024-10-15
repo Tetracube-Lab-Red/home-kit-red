@@ -7,9 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent
 import red.tetracube.homekitred.ui.setup.models.HubSetupUIModel
 import red.tetracube.homekitred.usecases.hub.CreateHub
@@ -20,6 +24,10 @@ class HubSetupViewModel(
     private val _hubSetupModel: MutableState<HubSetupUIModel> = mutableStateOf(HubSetupUIModel())
     val hubSetupModel: State<HubSetupUIModel>
         get() = _hubSetupModel
+
+    private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
+    val uiState: State<UIState>
+        get() = _uiState
 
     fun onInputEvent(fieldInputEvent: FieldInputEvent) {
         when (fieldInputEvent) {
@@ -66,7 +74,8 @@ class HubSetupViewModel(
                             hubPasswordField = _hubSetupModel.value.hubPasswordField.copy(
                                 value = fieldInputEvent.fieldValue,
                                 hasError = _hubSetupModel.value.hubPasswordField.isTouched
-                                        && fieldInputEvent.fieldValue.isBlank()
+                                        && (fieldInputEvent.fieldValue.isBlank()
+                                        || !(5..25).contains(fieldInputEvent.fieldValue.length))
                             )
                         )
                     }
@@ -94,6 +103,25 @@ class HubSetupViewModel(
                     && (!_hubSetupModel.value.hubNameField.hasError && _hubSetupModel.value.hubNameField.isTouched)
                     && (!_hubSetupModel.value.hubPasswordField.hasError && _hubSetupModel.value.hubPasswordField.isTouched)
         )
+    }
+
+    fun onSetupButtonClick() {
+        _uiState.value = UIState.Loading
+        viewModelScope.launch {
+            val createHubResult = createHubUseCase.invoke(
+                hubAddress = _hubSetupModel.value.hubAddressField.value,
+                hubName = _hubSetupModel.value.hubNameField.value,
+                hubPassword = _hubSetupModel.value.hubPasswordField.value
+            )
+            if (createHubResult.isFailure) {
+                _uiState.value = createHubResult.exceptionOrNull()
+                    ?.let { it as HomeKitRedError }
+                    ?.let { UIState.FinishedWithError(it) }
+                    ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
+            } else {
+                _uiState.value = UIState.FinishedWithSuccess
+            }
+        }
     }
 
     companion object {

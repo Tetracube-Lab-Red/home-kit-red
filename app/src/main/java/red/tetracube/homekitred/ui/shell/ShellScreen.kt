@@ -1,14 +1,16 @@
 package red.tetracube.homekitred.ui.shell
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.ui.core.dialogs.HomeKitRedErrorDialog
 import red.tetracube.homekitred.ui.login.LoginScreen
 import red.tetracube.homekitred.ui.login.LoginViewModel
 import red.tetracube.homekitred.ui.setup.HubSetupScreen
@@ -33,6 +35,10 @@ fun ShellUI(navController: NavHostController) {
             startDestination = Routes.Splash,
             navController = navController
         ) {
+            dialog<Routes.ErrorDialog> { backStackEntry ->
+                val error: String = backStackEntry.toRoute()
+                HomeKitRedErrorDialog(error, navController)
+            }
             composable<Routes.Splash> {
                 SplashScreen(navController)
             }
