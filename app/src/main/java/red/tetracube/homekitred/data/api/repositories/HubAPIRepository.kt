@@ -3,6 +3,7 @@ package red.tetracube.homekitred.data.api.repositories
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -39,13 +40,15 @@ class HubAPIRepository(
             } else {
                 Result.failure(APIError.ClientError)
             }
-        } catch (serverException: ServerResponseException) {
+        } catch (_: ServerResponseException) {
             return Result.failure(APIError.ServerError)
-        } catch (connectionException: SerializationException) {
+        } catch (_: SerializationException) {
             return Result.failure(APIError.UnprocessableReply)
-        } catch (timeoutException: ConnectTimeoutException) {
+        } catch (_: ConnectTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
-        } catch (exception: Exception) {
+        }  catch (_: HttpRequestTimeoutException) {
+            return Result.failure(APIError.RemoteUnreachable)
+        } catch (_: Exception) {
             return Result.failure(APIError.GenericAPIError)
         }
     }

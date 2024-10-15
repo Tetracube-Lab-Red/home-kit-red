@@ -35,10 +35,6 @@ fun ShellUI(navController: NavHostController) {
             startDestination = Routes.Splash,
             navController = navController
         ) {
-            dialog<Routes.ErrorDialog> { backStackEntry ->
-                val error: String = backStackEntry.toRoute()
-                HomeKitRedErrorDialog(error, navController)
-            }
             composable<Routes.Splash> {
                 SplashScreen(navController)
             }

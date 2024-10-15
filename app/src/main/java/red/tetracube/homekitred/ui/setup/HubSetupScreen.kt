@@ -19,10 +19,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -33,8 +38,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent
 import red.tetracube.homekitred.ui.login.models.FieldInputEvent.FieldName
@@ -47,11 +53,29 @@ fun HubSetupScreen(
 ) {
     val formStatus = hubSetupViewModel.hubSetupModel.value
     val uiState = hubSetupViewModel.uiState.value
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    if (uiState is UIState.FinishedWithError<*>) {
-        navHostController.navigate(
-            Routes.ErrorDialog(uiState.error.toString())
-        )
+
+    LaunchedEffect(uiState) {
+        if (uiState is UIState.FinishedWithError<*>) {
+            val message = when (uiState.error) {
+                HomeKitRedError.ClientError -> "There was an error in the hub creation"
+                HomeKitRedError.Conflict -> "There is another Hub configured"
+                HomeKitRedError.GenericError -> "There was an error in the hub creation"
+                HomeKitRedError.ServiceError -> "Cannot create an hub for a hub platform error"
+                HomeKitRedError.Unauthorized -> "You are not authorized to create an hub"
+                HomeKitRedError.UnprocessableResult -> "The hub creation is returned in unexpected response"
+                HomeKitRedError.UnreachableService -> "The hub platform is unreachable"
+            }
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Long
+                )
+            }
+        }
     }
 
     HubSetupScreenUI(
@@ -71,7 +95,8 @@ fun HubSetupScreen(
         },
         onSetupButtonClick = {
             hubSetupViewModel.onSetupButtonClick()
-        }
+        },
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -84,7 +109,8 @@ fun HubSetupScreenUI(
     onTextInput: (FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
     onBackButtonClick: () -> Unit,
-    onSetupButtonClick: () -> Unit
+    onSetupButtonClick: () -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     val focusRequester = LocalFocusManager.current
     Scaffold(
@@ -115,13 +141,16 @@ fun HubSetupScreenUI(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (uiState is UIState.Loading) {
@@ -269,7 +298,10 @@ fun HubSetupScreenUI(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
                     enabled = formStatus.formIsValid && uiState !is UIState.Loading,
-                    onClick = { onSetupButtonClick() }
+                    onClick = {
+                        focusRequester.clearFocus()
+                        onSetupButtonClick()
+                    }
                 ) {
                     Text("Setup")
                 }
