@@ -10,22 +10,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
@@ -55,7 +64,7 @@ fun HubSetupScreen(
     val uiState = hubSetupViewModel.uiState.value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val shouldShowDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
         if (uiState is UIState.FinishedWithError<*>) {
@@ -75,6 +84,8 @@ fun HubSetupScreen(
                     duration = SnackbarDuration.Long
                 )
             }
+        } else if (uiState is UIState.FinishedWithSuccess) {
+            shouldShowDialog.value = true
         }
     }
 
@@ -96,7 +107,11 @@ fun HubSetupScreen(
         onSetupButtonClick = {
             hubSetupViewModel.onSetupButtonClick()
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        shouldShowDialog = shouldShowDialog.value,
+        onDialogConfirm = {
+            navHostController.popBackStack()
+        }
     )
 }
 
@@ -110,7 +125,9 @@ fun HubSetupScreenUI(
     onFieldTrailingIconClick: () -> Unit,
     onBackButtonClick: () -> Unit,
     onSetupButtonClick: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    shouldShowDialog: Boolean,
+    onDialogConfirm: () -> Unit
 ) {
     val focusRequester = LocalFocusManager.current
     Scaffold(
@@ -304,6 +321,65 @@ fun HubSetupScreenUI(
                     }
                 ) {
                     Text("Setup")
+                }
+            }
+        }
+
+        if (shouldShowDialog) {
+            BasicAlertDialog(
+                onDismissRequest = { },
+                properties = DialogProperties (
+                    dismissOnClickOutside = false,
+                    dismissOnBackPress = false
+                )
+            ) {
+                Surface(
+                    modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                    shape = MaterialTheme.shapes.large,
+                    tonalElevation = AlertDialogDefaults.TonalElevation
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.check_circle_24px),
+                                contentDescription = null
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                "Hub created",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                "The hub is created correctly, now you will be redirected to the Sign in page to proceed with login in the brand new hub"
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = onDialogConfirm
+                            ) {
+                                Text("Return to Sign in")
+                            }
+                        }
+                    }
                 }
             }
         }
