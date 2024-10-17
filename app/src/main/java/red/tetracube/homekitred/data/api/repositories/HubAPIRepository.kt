@@ -25,7 +25,7 @@ class HubAPIRepository(
     companion object {
         const val CREATE_HUB = "/hub"
         const val GET_HUB_INFO_URL = "/hub/info"
-        const val HUB_AUTH_URL = "/hub/auth"
+        const val HUB_AUTH_URL = "/hub/auth/login"
     }
 
     suspend fun createHub(hubAddress: String, name: String, password: String): Result<HubInfo> {

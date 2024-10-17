@@ -17,10 +17,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
@@ -85,6 +88,8 @@ fun LoginScreen(
 
     LoginScreenUI(
         formStatus = formStatus,
+        snackbarHostState = snackbarHostState,
+        uiState = uiState,
         onInputFocus = { fieldName: FieldName ->
             loginViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
         },
@@ -98,6 +103,9 @@ fun LoginScreen(
             navHostController.navigate(Routes.HubSetup) {
                 launchSingleTop = true
             }
+        },
+        onDialogConfirm = {
+            loginViewModel.onLoginButtonClick()
         }
     )
 }
@@ -109,7 +117,10 @@ fun LoginScreenUI(
     onInputFocus: (FieldName) -> Unit,
     onTextInput: (FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
-    onSetupHuButtonClick: () -> Unit
+    onSetupHuButtonClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+    onDialogConfirm: () -> Unit,
+    uiState: UIState
 ) {
     val focusRequester = LocalFocusManager.current
     Scaffold(
@@ -137,6 +148,9 @@ fun LoginScreenUI(
                     )
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
         Column(
@@ -146,6 +160,9 @@ fun LoginScreenUI(
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (uiState is UIState.Loading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -296,8 +313,11 @@ fun LoginScreenUI(
                 FilledTonalButton(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = formStatus.formIsValid,
-                    onClick = {}
+                    enabled = formStatus.formIsValid && uiState !is UIState.Loading,
+                    onClick = {
+                        focusRequester.clearFocus()
+                        onDialogConfirm()
+                    }
                 ) {
                     Text("Sign in")
                 }
@@ -308,9 +328,11 @@ fun LoginScreenUI(
             ) {
                 TextButton(
                     modifier = Modifier,
-                    onClick = { onSetupHuButtonClick() }
+                    onClick = {
+                        onSetupHuButtonClick()
+                    }
                 ) {
-                    Text(" Setup a new Hub")
+                    Text("Setup a new Hub")
                 }
             }
         }

@@ -103,7 +103,7 @@ class LoginViewModel(
         )
     }
 
-    fun onSetupButtonClick() {
+    fun onLoginButtonClick() {
         _uiState.value = UIState.Loading
         viewModelScope.launch {
             val createHubResult = hubLogin.invoke(
