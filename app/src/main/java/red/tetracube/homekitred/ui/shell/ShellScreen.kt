@@ -39,7 +39,7 @@ fun ShellUI(navController: NavHostController) {
                 SplashScreen(navController)
             }
             composable<Routes.Login> {
-                val viewModel: LoginViewModel = viewModel()
+                val viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory)
                 LoginScreen(navController, viewModel)
             }
             composable<Routes.HubSetup> {

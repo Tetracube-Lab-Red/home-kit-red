@@ -15,6 +15,8 @@ import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.api.payloads.hub.HubCreateRequest
 import red.tetracube.homekitred.data.api.payloads.hub.HubInfo
+import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadReply
+import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadRequest
 
 class HubAPIRepository(
     private val tetraCubeAPIClient: TetraCubeAPIClient
@@ -23,6 +25,7 @@ class HubAPIRepository(
     companion object {
         const val CREATE_HUB = "/hub"
         const val GET_HUB_INFO_URL = "/hub/info"
+        const val HUB_AUTH_URL = "/hub/auth"
     }
 
     suspend fun createHub(hubAddress: String, name: String, password: String): Result<HubInfo> {
@@ -37,6 +40,34 @@ class HubAPIRepository(
         } catch (clientException: ClientRequestException) {
             return if (clientException.response.status == HttpStatusCode.Conflict) {
                 Result.failure(APIError.EntityConflicts)
+            } else {
+                Result.failure(APIError.ClientError)
+            }
+        } catch (_: ServerResponseException) {
+            return Result.failure(APIError.ServerError)
+        } catch (_: SerializationException) {
+            return Result.failure(APIError.UnprocessableReply)
+        } catch (_: ConnectTimeoutException) {
+            return Result.failure(APIError.RemoteUnreachable)
+        }  catch (_: HttpRequestTimeoutException) {
+            return Result.failure(APIError.RemoteUnreachable)
+        } catch (_: Exception) {
+            return Result.failure(APIError.GenericAPIError)
+        }
+    }
+
+    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<LoginPayloadReply> {
+        val request = LoginPayloadRequest(name, password)
+        try {
+            val loginReply = tetraCubeAPIClient.client.post("$hubAddress$HUB_AUTH_URL")
+            {
+                setBody(request)
+            }
+                .body<LoginPayloadReply>()
+            return Result.success(loginReply)
+        } catch (clientException: ClientRequestException) {
+            return if (clientException.response.status == HttpStatusCode.Unauthorized) {
+                Result.failure(APIError.Unauthorized)
             } else {
                 Result.failure(APIError.ClientError)
             }
