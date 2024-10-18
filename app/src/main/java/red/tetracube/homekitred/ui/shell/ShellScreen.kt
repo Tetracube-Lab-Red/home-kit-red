@@ -6,16 +6,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import red.tetracube.homekitred.app.behaviour.routing.Routes
-import red.tetracube.homekitred.ui.core.dialogs.HomeKitRedErrorDialog
+import red.tetracube.homekitred.ui.iot.home.addIoTNavigation
 import red.tetracube.homekitred.ui.login.LoginScreen
 import red.tetracube.homekitred.ui.login.LoginViewModel
 import red.tetracube.homekitred.ui.setup.HubSetupScreen
 import red.tetracube.homekitred.ui.setup.HubSetupViewModel
 import red.tetracube.homekitred.ui.splash.SplashScreen
+import red.tetracube.homekitred.ui.splash.SplashViewModel
 import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
 
 @Composable
@@ -36,7 +35,8 @@ fun ShellUI(navController: NavHostController) {
             navController = navController
         ) {
             composable<Routes.Splash> {
-                SplashScreen(navController)
+                val viewModel: SplashViewModel = viewModel(factory = SplashViewModel.Factory)
+                SplashScreen(navController, viewModel)
             }
             composable<Routes.Login> {
                 val viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory)
@@ -46,6 +46,7 @@ fun ShellUI(navController: NavHostController) {
                 val viewModel: HubSetupViewModel = viewModel(factory = HubSetupViewModel.Factory)
                 HubSetupScreen(navController, viewModel)
             }
+            addIoTNavigation()
         }
     }
 }

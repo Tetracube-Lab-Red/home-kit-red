@@ -45,8 +45,7 @@ class HubLogin(
             token = hubDataAPI.token,
             apiURI = hubAddress,
             websocketURI = websocketURI,
-            active = true,
-            id = null
+            active = true
         )
         hubDataSource.insert(hubData)
         return Result.success(Unit)

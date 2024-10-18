@@ -7,8 +7,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "hubs")
 class HubEntity(
     @PrimaryKey
-    var id: Long?,
-
     @ColumnInfo(name = "slug")
     var slug: String = "",
 

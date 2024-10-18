@@ -14,4 +14,10 @@ sealed class Routes {
     @Serializable
     data object HubSetup: Routes()
 
+    @Serializable
+    data object IoT : Routes()
+
+    @Serializable
+    data object IoTHome: Routes()
+
 }

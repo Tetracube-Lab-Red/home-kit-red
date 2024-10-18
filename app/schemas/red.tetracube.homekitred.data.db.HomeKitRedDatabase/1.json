@@ -2,18 +2,12 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9b8b43092bd54a1a42000d7861f7c8c6",
+    "identityHash": "fe1b5c2d4f2237f3503931c2806bbbd2",
     "entities": [
       {
         "tableName": "hubs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `active` INTEGER NOT NULL, `token` TEXT NOT NULL, `api_uri` TEXT NOT NULL, `websocket_uri` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`slug` TEXT NOT NULL, `name` TEXT NOT NULL, `active` INTEGER NOT NULL, `token` TEXT NOT NULL, `api_uri` TEXT NOT NULL, `websocket_uri` TEXT NOT NULL, PRIMARY KEY(`slug`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
           {
             "fieldPath": "slug",
             "columnName": "slug",
@@ -54,7 +48,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id"
+            "slug"
           ]
         },
         "indices": [],
@@ -102,7 +96,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b8b43092bd54a1a42000d7861f7c8c6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe1b5c2d4f2237f3503931c2806bbbd2')"
     ]
   }
 }

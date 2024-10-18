@@ -19,15 +19,32 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.delay
 import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.ui.core.models.UIState
 
 @Composable
-fun SplashScreen(navHostController: NavHostController) {
+fun SplashScreen(
+    navHostController: NavHostController,
+    viewModel: SplashViewModel
+) {
+    val uiState = viewModel.uiState.value
+    val hubExists = viewModel.hubActiveExists.value
     LaunchedEffect(Unit) {
-        delay(1000)
-        navHostController.navigate(Routes.Login) {
-            popUpTo<Routes.Splash>() { inclusive = true }
+        viewModel.checkDefaultHub()
+    }
+    LaunchedEffect(uiState, hubExists) {
+        if (uiState is UIState.FinishedWithSuccess) {
+            if (hubExists != null) {
+                if (!hubExists) {
+                    navHostController.navigate(Routes.Login) {
+                        popUpTo<Routes.Splash>() { inclusive = true }
+                    }
+                } else {
+                    navHostController.navigate(Routes.IoT) {
+                        popUpTo<Routes.Splash>() { inclusive = true }
+                    }
+                }
+            }
         }
     }
     SplashScreenUI()

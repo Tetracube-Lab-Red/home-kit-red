@@ -42,7 +42,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
@@ -82,7 +81,9 @@ fun LoginScreen(
                 )
             }
         } else if (uiState is UIState.FinishedWithSuccess) {
-            navHostController.popBackStack()
+            navHostController.navigate(Routes.IoT) {
+                popUpTo<Routes.Login>() { inclusive = true }
+            }
         }
     }
 
