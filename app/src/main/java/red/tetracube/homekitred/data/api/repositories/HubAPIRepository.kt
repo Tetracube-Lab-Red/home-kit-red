@@ -14,8 +14,8 @@ import kotlinx.serialization.SerializationException
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.api.payloads.hub.HubCreateRequest
+import red.tetracube.homekitred.data.api.payloads.hub.HubDataAPI
 import red.tetracube.homekitred.data.api.payloads.hub.HubInfo
-import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadReply
 import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadRequest
 
 class HubAPIRepository(
@@ -56,14 +56,14 @@ class HubAPIRepository(
         }
     }
 
-    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<LoginPayloadReply> {
+    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<HubDataAPI> {
         val request = LoginPayloadRequest(name, password)
         try {
             val loginReply = tetraCubeAPIClient.client.post("$hubAddress$HUB_AUTH_URL")
             {
                 setBody(request)
             }
-                .body<LoginPayloadReply>()
+                .body<HubDataAPI>()
             return Result.success(loginReply)
         } catch (clientException: ClientRequestException) {
             return if (clientException.response.status == HttpStatusCode.Unauthorized) {

@@ -6,6 +6,8 @@ import kotlinx.serialization.json.JsonNames
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-data class LoginPayloadReply(
+data class HubDataAPI(
+    @JsonNames("slug") val slug: String,
+    @JsonNames("name") val name: String,
     @JsonNames("token") val token: String
 )
