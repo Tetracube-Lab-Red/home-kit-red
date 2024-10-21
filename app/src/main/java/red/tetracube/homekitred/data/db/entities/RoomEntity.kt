@@ -15,6 +15,6 @@ data class RoomEntity(
     @ColumnInfo(name = "name")
     var name: String = "",
 
-    @ColumnInfo(name = "hub_id")
-    var hubId: Long,
+    @ColumnInfo(name = "hub_slug")
+    var hubSlug: String,
 )

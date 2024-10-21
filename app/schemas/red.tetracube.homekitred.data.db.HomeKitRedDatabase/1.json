@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fe1b5c2d4f2237f3503931c2806bbbd2",
+    "identityHash": "8565690ceb7d69015fa093a8ede55e32",
     "entities": [
       {
         "tableName": "hubs",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "rooms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `hub_id` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `hub_slug` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -77,9 +77,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "hubId",
-            "columnName": "hub_id",
-            "affinity": "INTEGER",
+            "fieldPath": "hubSlug",
+            "columnName": "hub_slug",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -96,7 +96,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe1b5c2d4f2237f3503931c2806bbbd2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8565690ceb7d69015fa093a8ede55e32')"
     ]
   }
 }

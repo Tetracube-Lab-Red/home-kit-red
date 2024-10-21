@@ -8,8 +8,8 @@ data class HubWithRoomsEntity (
     val hub: HubEntity,
 
     @Relation(
-        parentColumn = "id",
-        entityColumn = "hub_id"
+        parentColumn = "slug",
+        entityColumn = "hub_slug"
     )
     val rooms: List<RoomEntity>
 )
