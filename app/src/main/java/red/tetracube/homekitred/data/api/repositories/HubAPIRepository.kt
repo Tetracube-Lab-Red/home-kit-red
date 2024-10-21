@@ -14,8 +14,9 @@ import kotlinx.serialization.SerializationException
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.api.payloads.hub.HubCreateRequest
-import red.tetracube.homekitred.data.api.payloads.hub.HubDataAPI
-import red.tetracube.homekitred.data.api.payloads.hub.HubInfo
+import red.tetracube.homekitred.data.api.payloads.hub.HubLoginAPI
+import red.tetracube.homekitred.data.api.payloads.hub.HubBase
+import red.tetracube.homekitred.data.api.payloads.hub.HubDetailsAPI
 import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadRequest
 
 class HubAPIRepository(
@@ -28,15 +29,15 @@ class HubAPIRepository(
         const val HUB_AUTH_URL = "/hub/auth/login"
     }
 
-    suspend fun createHub(hubAddress: String, name: String, password: String): Result<HubInfo> {
+    suspend fun createHub(hubAddress: String, name: String, password: String): Result<HubBase> {
         val request = HubCreateRequest(name, password)
         try {
-            val hubInfo = tetraCubeAPIClient.client.post("$hubAddress$CREATE_HUB")
+            val hubBase = tetraCubeAPIClient.client.post("$hubAddress$CREATE_HUB")
             {
                 setBody(request)
             }
-                .body<HubInfo>()
-            return Result.success(hubInfo)
+                .body<HubBase>()
+            return Result.success(hubBase)
         } catch (clientException: ClientRequestException) {
             return if (clientException.response.status == HttpStatusCode.Conflict) {
                 Result.failure(APIError.EntityConflicts)
@@ -49,21 +50,21 @@ class HubAPIRepository(
             return Result.failure(APIError.UnprocessableReply)
         } catch (_: ConnectTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
-        }  catch (_: HttpRequestTimeoutException) {
+        } catch (_: HttpRequestTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
         } catch (_: Exception) {
             return Result.failure(APIError.GenericAPIError)
         }
     }
 
-    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<HubDataAPI> {
+    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<HubLoginAPI> {
         val request = LoginPayloadRequest(name, password)
         try {
             val loginReply = tetraCubeAPIClient.client.post("$hubAddress$HUB_AUTH_URL")
             {
                 setBody(request)
             }
-                .body<HubDataAPI>()
+                .body<HubLoginAPI>()
             return Result.success(loginReply)
         } catch (clientException: ClientRequestException) {
             return if (clientException.response.status == HttpStatusCode.Unauthorized) {
@@ -77,35 +78,35 @@ class HubAPIRepository(
             return Result.failure(APIError.UnprocessableReply)
         } catch (_: ConnectTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
-        }  catch (_: HttpRequestTimeoutException) {
+        } catch (_: HttpRequestTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
         } catch (_: Exception) {
             return Result.failure(APIError.GenericAPIError)
         }
     }
 
-    suspend fun getHubInfo(hubAddress: String, authToken: String) {
-        val requestResult =
-            tetraCubeAPIClient.client.get("$hubAddress$GET_HUB_INFO_URL")
-            {
-                headers {
-                    append("Authorization", "Bearer $authToken")
+    suspend fun getHubInfo(hubAddress: String, authToken: String): Result<HubDetailsAPI> {
+        try {
+            val requestResult =
+                tetraCubeAPIClient.client.get("$hubAddress$GET_HUB_INFO_URL")
+                {
+                    headers {
+                        append("Authorization", "Bearer $authToken")
+                    }
                 }
-            }
-        //.body() as HubInfo
-        /* } catch (clientException: ClientRequestException) {
-             APIDatasourceErrors.Unauthorized
-         } catch (serverException: ServerResponseException) {
-             APIDatasourceErrors.ServerError
-         } catch (connectionException: Exception) {
-             APIDatasourceErrors.RemoteUnreachable
-         }
-
-         return if (requestResult is APIDatasourceErrors) {
-             Result.failure(requestResult)
-         } else {
-             Result.success(requestResult as HubInfo)
-         }*/
+                    .body<HubDetailsAPI>()
+            return Result.success(requestResult)
+        } catch (_: ClientRequestException) {
+            return Result.failure(APIError.ClientError)
+        } catch (_: ServerResponseException) {
+            return Result.failure(APIError.ServerError)
+        } catch (_: ConnectTimeoutException) {
+            return Result.failure(APIError.RemoteUnreachable)
+        } catch (_: HttpRequestTimeoutException) {
+            return Result.failure(APIError.RemoteUnreachable)
+        } catch (_: Exception) {
+            return Result.failure(APIError.GenericAPIError)
+        }
     }
 
 }

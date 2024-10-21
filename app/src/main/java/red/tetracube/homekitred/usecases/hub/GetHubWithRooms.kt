@@ -8,7 +8,7 @@ class GetHubWithRooms(
     private val hubDatasource: HubDatasource
 ) {
 
-    operator fun invoke(): HubWithRooms =
+    suspend operator fun invoke(): HubWithRooms =
         hubDatasource.getHubAndRooms().toDomain()
 
 }

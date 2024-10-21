@@ -7,6 +7,13 @@ import red.tetracube.homekitred.domain.Room
 fun HubWithRoomsEntity.toDomain() =
     HubWithRooms(
         slug = this.hub.slug,
+        avatarName = if (this.hub.name.contains(" ")) {
+            this.hub.name.split(" ")
+                .map { it.first() }
+                .joinToString("")
+        } else {
+            this.hub.name.take(2)
+        },
         name = this.hub.name,
         rooms = this.rooms.map {
             Room(

@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.domain.HubWithRooms
 import red.tetracube.homekitred.usecases.hub.GetHubWithRooms
@@ -20,7 +22,9 @@ class IoTHomeViewModel(
         get() = _hub
 
     fun loadHubData() {
-        _hub.value = getHubWithRooms.invoke()
+        viewModelScope.launch() {
+            _hub.value = getHubWithRooms.invoke()
+        }
     }
 
     companion object {

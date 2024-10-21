@@ -10,9 +10,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.usecases.hub.CheckDefaultHub
+import red.tetracube.homekitred.usecases.hub.GetLatestHubData
 
 class SplashViewModel(
-    private val checkDefaultHub: CheckDefaultHub
+    private val checkDefaultHub: CheckDefaultHub,
+    private val getLatestHubData: GetLatestHubData
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
@@ -25,7 +27,11 @@ class SplashViewModel(
 
     suspend fun checkDefaultHub() {
         _uiState.value = UIState.Loading
-        _hubActiveExists.value = checkDefaultHub.invoke()
+        val defaultHubConnectInfo = checkDefaultHub.invoke()
+        _hubActiveExists.value = defaultHubConnectInfo != null
+        if (_hubActiveExists.value == true) {
+            getLatestHubData.invoke(defaultHubConnectInfo!!)
+        }
         _uiState.value = UIState.FinishedWithSuccess
     }
 
@@ -37,8 +43,13 @@ class SplashViewModel(
                 val createHubUseCase = CheckDefaultHub(
                     hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository()
                 )
+                val getLatestHubData = GetLatestHubData(
+                    hubAPI = homeKitRedContainer.hubAPIRepository,
+                    roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository()
+                )
                 SplashViewModel(
-                    checkDefaultHub = createHubUseCase
+                    checkDefaultHub = createHubUseCase,
+                    getLatestHubData = getLatestHubData
                 )
             }
         }

@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
+import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 
@@ -19,6 +20,7 @@ import red.tetracube.homekitred.data.db.entities.RoomEntity
 )
 abstract class HomeKitRedDatabase : RoomDatabase() {
     abstract fun hubRepository(): HubDatasource
+    abstract fun roomRepository(): RoomDatasource
 
     companion object {
         private const val DATABASE_FILE_NAME = "home_kit_red.db"
