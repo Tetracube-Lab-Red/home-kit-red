@@ -5,8 +5,6 @@ import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
-import io.ktor.client.request.get
-import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
@@ -14,9 +12,8 @@ import kotlinx.serialization.SerializationException
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.api.payloads.hub.HubCreateRequest
-import red.tetracube.homekitred.data.api.payloads.hub.HubLoginAPI
 import red.tetracube.homekitred.data.api.payloads.hub.HubCreateResponse
-import red.tetracube.homekitred.data.api.payloads.hub.HubDetailsAPI
+import red.tetracube.homekitred.data.api.payloads.hub.HubLoginAPI
 import red.tetracube.homekitred.data.api.payloads.hub.LoginPayloadRequest
 
 class HubAPIRepository(
@@ -25,7 +22,6 @@ class HubAPIRepository(
 
     companion object {
         const val CREATE_HUB = "/hub"
-        const val GET_HUB_INFO_URL = "/hub/info"
         const val HUB_AUTH_URL = "/hub/auth/login"
     }
 
