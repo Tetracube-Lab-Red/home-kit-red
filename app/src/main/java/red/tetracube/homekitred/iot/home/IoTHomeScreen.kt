@@ -51,6 +51,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 import red.tetracube.homekitred.ui.core.models.UIState
 
@@ -82,7 +83,10 @@ fun IoTHomeScreen(
             MenuBottomSheet(
                 sheetState = sheetState,
                 onModalDismissRequest = toggleBottomSheet,
-                onAddRoomClick = { /*navController.navigate()*/ }
+                onAddRoomClick = {
+                    toggleBottomSheet()
+                    navController.navigate(Routes.RoomAdd)
+                }
             )
         },
         showBottomSheet = showBottomSheet.value,

@@ -13,6 +13,7 @@ import red.tetracube.homekitred.hubcentral.login.LoginScreen
 import red.tetracube.homekitred.hubcentral.setup.HubSetupScreen
 import red.tetracube.homekitred.hubcentral.setup.HubSetupViewModel
 import red.tetracube.homekitred.hubcentral.login.LoginViewModel
+import red.tetracube.homekitred.hubcentral.room.create.RoomCreateDialog
 import red.tetracube.homekitred.splash.SplashScreen
 import red.tetracube.homekitred.splash.SplashViewModel
 import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
@@ -45,6 +46,9 @@ fun ShellUI(navController: NavHostController) {
             composable<Routes.HubSetup> {
                 val viewModel: HubSetupViewModel = viewModel(factory = HubSetupViewModel.Factory)
                 HubSetupScreen(navController, viewModel)
+            }
+            composable<Routes.RoomAdd> {
+                RoomCreateDialog(navController)
             }
             addIoTNavigation(navController = navController)
         }

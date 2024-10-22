@@ -20,4 +20,7 @@ sealed class Routes {
     @Serializable
     data object IoTHome: Routes()
 
+    @Serializable
+    data object RoomAdd: Routes()
+
 }
