@@ -11,18 +11,25 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
+import red.tetracube.homekitred.ui.core.models.UIState
 
 class IoTHomeViewModel(
     private val ioTHomeUseCases: IoTHomeUseCases
 ) : ViewModel() {
+
+    private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
+    val uiState: State<UIState>
+        get() = _uiState
 
     private val _hub = mutableStateOf<HubWithRooms?>(null)
     val hub: State<HubWithRooms?>
         get() = _hub
 
     fun loadHubData() {
-        viewModelScope.launch() {
-            _hub.value = ioTHomeUseCases.invoke()
+        viewModelScope.launch {
+            _uiState.value = UIState.Loading
+            val hub = ioTHomeUseCases.getHubWithRooms()
+            _uiState.value = UIState.FinishedWithSuccessContent(hub)
         }
     }
 

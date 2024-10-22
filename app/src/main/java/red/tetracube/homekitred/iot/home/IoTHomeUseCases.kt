@@ -8,7 +8,7 @@ class IoTHomeUseCases(
     private val hubDatasource: HubDatasource
 ) {
 
-    suspend fun invoke(): HubWithRooms =
+    suspend fun getHubWithRooms(): HubWithRooms =
         hubDatasource.getHubAndRooms().toDomain()
 
 }

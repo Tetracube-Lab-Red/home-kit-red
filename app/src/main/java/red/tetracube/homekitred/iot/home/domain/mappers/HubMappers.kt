@@ -15,7 +15,12 @@ fun HubWithRoomsEntity.toDomain() =
             this.hub.name.take(2)
         },
         name = this.hub.name,
-        rooms = this.rooms.map {
+        rooms = listOf<Room>(
+            Room(
+                slug = "all",
+                name = "House"
+            )
+        ) + this.rooms.map {
             Room(
                 slug = it.slug,
                 name = it.name

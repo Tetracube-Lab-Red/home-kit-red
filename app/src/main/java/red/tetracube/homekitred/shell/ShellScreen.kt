@@ -46,7 +46,7 @@ fun ShellUI(navController: NavHostController) {
                 val viewModel: HubSetupViewModel = viewModel(factory = HubSetupViewModel.Factory)
                 HubSetupScreen(navController, viewModel)
             }
-            addIoTNavigation()
+            addIoTNavigation(navController = navController)
         }
     }
 }
