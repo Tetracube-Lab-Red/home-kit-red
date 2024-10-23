@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
@@ -28,8 +29,10 @@ class IoTHomeViewModel(
     fun loadHubData() {
         viewModelScope.launch {
             _uiState.value = UIState.Loading
-            val hub = ioTHomeUseCases.getHubWithRooms()
-            _uiState.value = UIState.FinishedWithSuccessContent(hub)
+            ioTHomeUseCases.getHubWithRooms()
+                .collect {
+                    _uiState.value = UIState.FinishedWithSuccessContent(it)
+                }
         }
     }
 

@@ -23,6 +23,6 @@ interface HubDatasource {
 
     @Transaction
     @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
-    suspend fun getHubAndRooms(): HubWithRoomsEntity
+    fun getHubAndRooms(): Flow<HubWithRoomsEntity>
 
 }

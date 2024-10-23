@@ -5,15 +5,17 @@ import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
 import kotlinx.serialization.SerializationException
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.models.APIError
+import red.tetracube.homekitred.data.api.payloads.room.GetRoomsResponse
 import red.tetracube.homekitred.data.api.payloads.room.RoomCreateRequest
-import red.tetracube.homekitred.data.api.payloads.room.RoomCreateResponse
+import red.tetracube.homekitred.data.api.payloads.room.RoomResponse
 
 class RoomAPIRepository(
     private val tetraCubeAPIClient: TetraCubeAPIClient
@@ -21,17 +23,24 @@ class RoomAPIRepository(
 
     companion object {
         const val CREATE_ROOM = "/hub/rooms"
+        const val GET_ROOMS = "/hub/rooms"
     }
 
-    suspend fun createRoom(hubAddress: String, token: String, name: String): Result<RoomCreateResponse> {
+    suspend fun createRoom(
+        hubAddress: String,
+        token: String,
+        name: String
+    ): Result<RoomResponse> {
         val request = RoomCreateRequest(name)
         try {
             val hubBase = tetraCubeAPIClient.client.post("$hubAddress$CREATE_ROOM")
             {
-                headersOf("Authorization", "Bearer $token")
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
                 setBody(request)
             }
-                .body<RoomCreateResponse>()
+                .body<RoomResponse>()
             return Result.success(hubBase)
         } catch (clientException: ClientRequestException) {
             return if (clientException.response.status == HttpStatusCode.Conflict) {
@@ -47,6 +56,24 @@ class RoomAPIRepository(
             return Result.failure(APIError.RemoteUnreachable)
         } catch (_: HttpRequestTimeoutException) {
             return Result.failure(APIError.RemoteUnreachable)
+        } catch (_: Exception) {
+            return Result.failure(APIError.GenericAPIError)
+        }
+    }
+
+    suspend fun getRooms(
+        hubAddress: String,
+        token: String,
+    ): Result<GetRoomsResponse> {
+        try {
+            val hubBase = tetraCubeAPIClient.client.get("$hubAddress$GET_ROOMS")
+            {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+            }
+                .body<GetRoomsResponse>()
+            return Result.success(hubBase)
         } catch (_: Exception) {
             return Result.failure(APIError.GenericAPIError)
         }

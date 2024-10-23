@@ -34,6 +34,7 @@ class RoomCreateUseCases(
             hubSlug = hub.slug
         )
         roomDatasource.insert(roomEntity)
+        return Result.success(Unit)
     }
 
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
@@ -41,6 +43,12 @@ fun RoomCreateDialog(
 ) {
     val formState = viewModel.roomCreateState
     val uiState = viewModel.uiState
+
+    LaunchedEffect(uiState.value) {
+        if (uiState.value is UIState.FinishedWithSuccess) {
+            navController.popBackStack()
+        }
+    }
 
     RoomCreateDialogUI(
         formState = formState.value,
@@ -109,6 +117,8 @@ fun RoomCreateDialogUI(
                     supportingText = {
                         val supportingTextValue = if (formState.roomNameField.hasError) {
                             "Invalid Room Name"
+                        } else if (formState.roomNameField.isTouched && !formState.roomNameField.hasError) {
+                            "✅ The name is valid"
                         } else {
                             "Required"
                         }
@@ -121,13 +131,28 @@ fun RoomCreateDialogUI(
                     )
                 )
 
+                if (uiState is UIState.FinishedWithError<*>) {
+                    val message = when (uiState.error) {
+                        HomeKitRedError.Conflict -> "This room already exists"
+                        HomeKitRedError.ServiceError -> "Cannot create the room for an hub platform error"
+                        HomeKitRedError.Unauthorized -> "You are not authorized to create a room in this hub"
+                        HomeKitRedError.UnprocessableResult -> "The room creation returned in unexpected response"
+                        HomeKitRedError.UnreachableService -> "The hub platform is unreachable"
+                        else -> "There was an error in the room creation"
+                    }
+                    Text(
+                        text = message,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
-                        enabled = uiState is UIState.Neutral,
+                        enabled = uiState is UIState.Neutral || uiState is UIState.FinishedWithError<*>,
                         onClick = onDismissRequest
                     ) {
                         Text("Cancel")

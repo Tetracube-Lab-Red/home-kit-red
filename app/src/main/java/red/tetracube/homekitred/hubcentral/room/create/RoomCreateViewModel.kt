@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
 import red.tetracube.homekitred.ui.core.models.UIState
@@ -19,7 +20,8 @@ class RoomCreateViewModel(
     private val roomCreateUseCases: RoomCreateUseCases
 ) : ViewModel() {
 
-    private val _roomCreateState: MutableState<RoomCreateUIModel> = mutableStateOf(RoomCreateUIModel())
+    private val _roomCreateState: MutableState<RoomCreateUIModel> =
+        mutableStateOf(RoomCreateUIModel())
     val roomCreateState: State<RoomCreateUIModel>
         get() = _roomCreateState
 
@@ -65,8 +67,15 @@ class RoomCreateViewModel(
     fun onRoomSubmit() {
         viewModelScope.launch {
             _uiState.value = UIState.Loading
-            roomCreateUseCases.createRoom(_roomCreateState.value.roomNameField.value)
-            _uiState.value = UIState.FinishedWithSuccess
+            val roomCreateResult =
+                roomCreateUseCases.createRoom(_roomCreateState.value.roomNameField.value)
+            _uiState.value = if (roomCreateResult.isSuccess) {
+                UIState.FinishedWithSuccess
+            } else {
+                UIState.FinishedWithError(
+                    roomCreateResult.exceptionOrNull()?.let { it as HomeKitRedError }!!
+                )
+            }
         }
     }
 
