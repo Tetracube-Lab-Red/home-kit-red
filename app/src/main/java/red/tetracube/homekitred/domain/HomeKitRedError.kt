@@ -17,6 +17,10 @@ sealed class HomeKitRedError : Throwable() {
         private fun readResolve(): Any = Unauthorized
     }
 
+    data object NotFound : HomeKitRedError() {
+        private fun readResolve(): Any = Unauthorized
+    }
+
     data object ClientError : HomeKitRedError() {
         private fun readResolve(): Any = ClientError
     }

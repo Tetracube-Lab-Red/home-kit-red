@@ -57,6 +57,7 @@ fun LoginScreen(
     loginViewModel: LoginViewModel
 ) {
     val formStatus = loginViewModel.loginUIModel.value
+
     val uiState = loginViewModel.uiState.value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,9 +91,6 @@ fun LoginScreen(
         formStatus = formStatus,
         snackbarHostState = snackbarHostState,
         uiState = uiState,
-        onInputFocus = { fieldName: FieldInputEvent.FieldName ->
-            loginViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
-        },
         onTextInput = { fieldName: FieldInputEvent.FieldName, value: String ->
             loginViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
         },
@@ -114,7 +112,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenUI(
     formStatus: LoginUIModel,
-    onInputFocus: (FieldInputEvent.FieldName) -> Unit,
     onTextInput: (FieldInputEvent.FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
     onSetupHuButtonClick: () -> Unit,
@@ -183,11 +180,7 @@ fun LoginScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (!it.isFocused) onInputFocus(FieldInputEvent.FieldName.HUB_ADDRESS)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub host address") },
                         value = formStatus.hubAddressField.value,
                         onValueChange = { value: String ->
@@ -199,14 +192,9 @@ fun LoginScreenUI(
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubAddressField.hasError) {
-                                "Invalid HUB Address"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubAddressField.validationMessage)
                         },
-                        isError = formStatus.hubAddressField.hasError,
+                        isError = formStatus.hubAddressField.isDirty && !formStatus.hubAddressField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Uri
@@ -223,25 +211,21 @@ fun LoginScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (it.isFocused) onInputFocus(FieldInputEvent.FieldName.HUB_NAME)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub name") },
                         value = formStatus.hubNameField.value,
-                        onValueChange = { value: String -> onTextInput(FieldInputEvent.FieldName.HUB_NAME, value) },
+                        onValueChange = { value: String ->
+                            onTextInput(
+                                FieldInputEvent.FieldName.HUB_NAME,
+                                value
+                            )
+                        },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubNameField.hasError) {
-                                "Invalid HUB Name"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubNameField.validationMessage)
                         },
-                        isError = formStatus.hubNameField.hasError,
+                        isError = formStatus.hubNameField.isDirty && !formStatus.hubNameField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text
@@ -258,25 +242,21 @@ fun LoginScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (it.isFocused) onInputFocus(FieldInputEvent.FieldName.PASSWORD)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Password") },
                         value = formStatus.hubPasswordField.value,
-                        onValueChange = { value: String -> onTextInput(FieldInputEvent.FieldName.PASSWORD, value) },
+                        onValueChange = { value: String ->
+                            onTextInput(
+                                FieldInputEvent.FieldName.PASSWORD,
+                                value
+                            )
+                        },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubPasswordField.hasError) {
-                                "Invalid password"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubPasswordField.validationMessage)
                         },
-                        isError = formStatus.hubPasswordField.hasError,
+                        isError = formStatus.hubPasswordField.isDirty && !formStatus.hubPasswordField.isValid,
                         visualTransformation =
                         if (formStatus.hubPasswordField.clearPassword) {
                             VisualTransformation.None

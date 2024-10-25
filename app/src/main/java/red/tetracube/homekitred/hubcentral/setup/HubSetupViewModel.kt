@@ -30,23 +30,6 @@ class HubSetupViewModel(
 
     fun onInputEvent(fieldInputEvent: FieldInputEvent) {
         when (fieldInputEvent) {
-            is FieldInputEvent.FieldFocusAcquire -> {
-                _hubSetupModel.value =
-                    when (fieldInputEvent.fieldName) {
-                        FieldInputEvent.FieldName.HUB_ADDRESS -> _hubSetupModel.value.copy(
-                            hubAddressField = _hubSetupModel.value.hubAddressField.copy(isTouched = true)
-                        )
-
-                        FieldInputEvent.FieldName.HUB_NAME -> hubSetupModel.value.copy(
-                            hubNameField = _hubSetupModel.value.hubNameField.copy(isTouched = true)
-                        )
-
-                        FieldInputEvent.FieldName.PASSWORD -> hubSetupModel.value.copy(
-                            hubPasswordField = _hubSetupModel.value.hubPasswordField.copy(isTouched = true)
-                        )
-                    }
-            }
-
             is FieldInputEvent.FieldValueInput -> {
                 _hubSetupModel.value =
                     when (fieldInputEvent.fieldName) {

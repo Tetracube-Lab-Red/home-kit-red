@@ -15,11 +15,14 @@ import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
+import red.tetracube.homekitred.hubcentral.login.models.FormValidationUsecase
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
 
 class LoginViewModel(
     private val loginUseCases: LoginUseCases
 ) : ViewModel() {
+
+    val formValidationUsecase = FormValidationUsecase()
 
     private val _loginUIModel: MutableState<LoginUIModel> = mutableStateOf(LoginUIModel())
     val loginUIModel: State<LoginUIModel>
@@ -31,48 +34,27 @@ class LoginViewModel(
 
     fun onInputEvent(fieldInputEvent: FieldInputEvent) {
         when (fieldInputEvent) {
-            is FieldInputEvent.FieldFocusAcquire -> {
-                _loginUIModel.value =
-                    when (fieldInputEvent.fieldName) {
-                        FieldInputEvent.FieldName.HUB_ADDRESS -> _loginUIModel.value.copy(
-                            hubAddressField = _loginUIModel.value.hubAddressField.copy(isTouched = true)
-                        )
-
-                        FieldInputEvent.FieldName.HUB_NAME -> loginUIModel.value.copy(
-                            hubNameField = _loginUIModel.value.hubNameField.copy(isTouched = true)
-                        )
-
-                        FieldInputEvent.FieldName.PASSWORD -> loginUIModel.value.copy(
-                            hubPasswordField = _loginUIModel.value.hubPasswordField.copy(isTouched = true)
-                        )
-                    }
-            }
-
             is FieldInputEvent.FieldValueInput -> {
                 _loginUIModel.value =
                     when (fieldInputEvent.fieldName) {
                         FieldInputEvent.FieldName.HUB_ADDRESS -> _loginUIModel.value.copy(
                             hubAddressField = _loginUIModel.value.hubAddressField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _loginUIModel.value.hubAddressField.isTouched
-                                        && (fieldInputEvent.fieldValue.isBlank()
-                                        || !URLUtil.isValidUrl(fieldInputEvent.fieldValue))
+                                isDirty = true
                             ),
                         )
 
                         FieldInputEvent.FieldName.HUB_NAME -> loginUIModel.value.copy(
                             hubNameField = _loginUIModel.value.hubNameField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _loginUIModel.value.hubNameField.isTouched
-                                        && fieldInputEvent.fieldValue.isBlank()
+                                isDirty = true
                             )
                         )
 
                         FieldInputEvent.FieldName.PASSWORD -> loginUIModel.value.copy(
                             hubPasswordField = _loginUIModel.value.hubPasswordField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _loginUIModel.value.hubPasswordField.isTouched
-                                        && fieldInputEvent.fieldValue.isBlank()
+                                isDirty = true
                             )
                         )
                     }
@@ -95,10 +77,37 @@ class LoginViewModel(
     }
 
     private fun validateForm() {
+        if (_loginUIModel.value.hubAddressField.isDirty) {
+            val (isValid, message) = formValidationUsecase.validateHostAddress(_loginUIModel.value.hubAddressField.value)
+            _loginUIModel.value = _loginUIModel.value.copy(
+                hubAddressField = _loginUIModel.value.hubAddressField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
+        if (_loginUIModel.value.hubNameField.isDirty) {
+            val (isValid, message) = formValidationUsecase.validateHubName(_loginUIModel.value.hubNameField.value)
+            _loginUIModel.value = _loginUIModel.value.copy(
+                hubNameField = _loginUIModel.value.hubNameField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
+        if (_loginUIModel.value.hubPasswordField.isDirty) {
+            val (isValid, message) = formValidationUsecase.validatePassword(_loginUIModel.value.hubPasswordField.value)
+            _loginUIModel.value = _loginUIModel.value.copy(
+                hubPasswordField = _loginUIModel.value.hubPasswordField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
         _loginUIModel.value = _loginUIModel.value.copy(
-            formIsValid = (!_loginUIModel.value.hubAddressField.hasError && _loginUIModel.value.hubAddressField.isTouched)
-                    && (!_loginUIModel.value.hubNameField.hasError && _loginUIModel.value.hubNameField.isTouched)
-                    && (!_loginUIModel.value.hubPasswordField.hasError && _loginUIModel.value.hubPasswordField.isTouched)
+            formIsValid = (_loginUIModel.value.hubAddressField.isValid && _loginUIModel.value.hubAddressField.isDirty)
+                    && (_loginUIModel.value.hubNameField.isValid && _loginUIModel.value.hubNameField.isDirty)
+                    && (_loginUIModel.value.hubPasswordField.isValid && _loginUIModel.value.hubPasswordField.isDirty)
         )
     }
 

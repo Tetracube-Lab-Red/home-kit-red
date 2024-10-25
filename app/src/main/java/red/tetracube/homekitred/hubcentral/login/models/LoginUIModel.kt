@@ -8,20 +8,23 @@ data class LoginUIModel(
 )
 
 data class HubAddressField(
-    val isTouched: Boolean = false,
-    val hasError: Boolean = false,
+    val isDirty: Boolean = false,
+    val isValid: Boolean = false,
+    val validationMessage: String = "Required",
     val value: String = ""
 )
 
 data class HubNameField(
-    val isTouched: Boolean = false,
-    val hasError: Boolean = false,
+    val isDirty: Boolean = false,
+    val isValid: Boolean = false,
+    val validationMessage: String = "Required",
     val value: String = ""
 )
 
 data class HubPasswordField(
-    val isTouched: Boolean = false,
-    val hasError: Boolean = false,
+    val isDirty: Boolean = false,
+    val isValid: Boolean = false,
     val clearPassword: Boolean = false,
+    val validationMessage: String = "Required",
     val value: String = ""
 )

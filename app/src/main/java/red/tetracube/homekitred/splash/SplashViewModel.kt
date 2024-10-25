@@ -25,9 +25,11 @@ class SplashViewModel(
     suspend fun loadDefaultHub() {
         _uiState.value = UIState.Loading
         val defaultHubConnectInfo = splashUseCases.getHubConnectInfo()
-        _hubActiveExists.value = defaultHubConnectInfo != null
-        if (_hubActiveExists.value == true) {
-            splashUseCases.retrieveLatestHubInfo()
+        if (defaultHubConnectInfo != null) {
+            _hubActiveExists.value = true
+            splashUseCases.retrieveLatestHubInfo(defaultHubConnectInfo)
+        } else {
+            _hubActiveExists.value = false
         }
         _uiState.value = UIState.FinishedWithSuccess
     }
@@ -41,7 +43,8 @@ class SplashViewModel(
                     splashUseCases = SplashUseCases(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
                         hubAPI = homeKitRedContainer.hubAPIRepository,
-                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository()
+                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                        roomAPIRepository = homeKitRedContainer.roomAPIRepository
                     )
                 )
             }

@@ -76,6 +76,7 @@ fun HubSetupScreen(
                 HomeKitRedError.Unauthorized -> "You are not authorized to create an hub"
                 HomeKitRedError.UnprocessableResult -> "The hub creation is returned in unexpected response"
                 HomeKitRedError.UnreachableService -> "The hub platform is unreachable"
+                HomeKitRedError.NotFound -> "Not found"
             }
             scope.launch {
                 snackbarHostState.showSnackbar(
@@ -92,9 +93,6 @@ fun HubSetupScreen(
     HubSetupScreenUI(
         uiState = uiState,
         formStatus = formStatus,
-        onInputFocus = { fieldName: FieldName ->
-            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
-        },
         onTextInput = { fieldName: FieldName, value: String ->
             hubSetupViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
         },
@@ -120,7 +118,6 @@ fun HubSetupScreen(
 fun HubSetupScreenUI(
     uiState: UIState,
     formStatus: HubSetupUIModel,
-    onInputFocus: (FieldName) -> Unit,
     onTextInput: (FieldName, String) -> Unit,
     onFieldTrailingIconClick: () -> Unit,
     onBackButtonClick: () -> Unit,
@@ -183,11 +180,7 @@ fun HubSetupScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (!it.isFocused) onInputFocus(FieldName.HUB_ADDRESS)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub host address") },
                         value = formStatus.hubAddressField.value,
                         onValueChange = { value: String ->
@@ -223,11 +216,7 @@ fun HubSetupScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (it.isFocused) onInputFocus(FieldName.HUB_NAME)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub name") },
                         value = formStatus.hubNameField.value,
                         onValueChange = { value: String -> onTextInput(FieldName.HUB_NAME, value) },
@@ -258,11 +247,7 @@ fun HubSetupScreenUI(
                 }
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                if (it.isFocused) onInputFocus(FieldName.PASSWORD)
-                            },
+                        modifier = Modifier.fillMaxWidth(),
                         label = { Text("Password") },
                         value = formStatus.hubPasswordField.value,
                         onValueChange = { value: String -> onTextInput(FieldName.PASSWORD, value) },
