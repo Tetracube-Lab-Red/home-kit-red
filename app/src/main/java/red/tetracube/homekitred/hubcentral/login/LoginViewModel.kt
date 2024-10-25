@@ -1,6 +1,5 @@
 package red.tetracube.homekitred.hubcentral.login
 
-import android.webkit.URLUtil
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -13,10 +12,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.domain.HomeKitRedError
-import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.FormValidationUsecase
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
+import red.tetracube.homekitred.ui.core.models.UIState
 
 class LoginViewModel(
     private val loginUseCases: LoginUseCases

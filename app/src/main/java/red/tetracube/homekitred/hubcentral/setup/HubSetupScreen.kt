@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,10 +49,10 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.domain.HomeKitRedError
-import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
-import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent.FieldName
+import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
+import red.tetracube.homekitred.ui.core.models.UIState
 
 @Composable
 fun HubSetupScreen(
