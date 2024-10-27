@@ -74,7 +74,8 @@ class RoomAPIRepository(
             }
                 .body<GetRoomsResponse>()
             return Result.success(hubBase)
-        } catch (_: Exception) {
+        } catch (ex: Exception) {
+            ex.printStackTrace()
             return Result.failure(APIError.GenericAPIError)
         }
     }

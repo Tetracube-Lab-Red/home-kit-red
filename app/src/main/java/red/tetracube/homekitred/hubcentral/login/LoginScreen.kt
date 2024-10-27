@@ -46,7 +46,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.app.behaviour.routing.Routes
-import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
 import red.tetracube.homekitred.ui.core.models.UIState

@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
 import red.tetracube.homekitred.ui.core.models.UIState
@@ -19,6 +19,8 @@ import red.tetracube.homekitred.ui.core.models.UIState
 class RoomCreateViewModel(
     private val roomCreateUseCases: RoomCreateUseCases
 ) : ViewModel() {
+
+    private val formValidationUseCases = FormValidationUseCases()
 
     private val _roomCreateState: MutableState<RoomCreateUIModel> =
         mutableStateOf(RoomCreateUIModel())
@@ -46,10 +48,7 @@ class RoomCreateViewModel(
                         FieldInputEvent.FieldName.ROOM_NAME -> _roomCreateState.value.copy(
                             roomNameField = _roomCreateState.value.roomNameField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _roomCreateState.value.roomNameField.isTouched
-                                        && (fieldInputEvent.fieldValue.isBlank()
-                                        || !(5..25).contains(fieldInputEvent.fieldValue.length)
-                                        || !fieldInputEvent.fieldValue.matches("^[ \\w]+\$".toRegex()))
+                                isDirty = true
                             ),
                         )
                     }
@@ -59,8 +58,19 @@ class RoomCreateViewModel(
     }
 
     private fun validateForm() {
+        if (_roomCreateState.value.roomNameField.isDirty) {
+            val validationPair =
+                formValidationUseCases.roomNameHasError(_roomCreateState.value.roomNameField.value)
+            _roomCreateState.value = roomCreateState.value.copy(
+                roomNameField = _roomCreateState.value.roomNameField.copy(
+                    isValid = validationPair.component1(),
+                    supportingText = validationPair.component2()
+                )
+            )
+        }
+
         _roomCreateState.value = _roomCreateState.value.copy(
-            formIsValid = (!_roomCreateState.value.roomNameField.hasError && _roomCreateState.value.roomNameField.isTouched)
+            formIsValid = (_roomCreateState.value.roomNameField.isDirty && _roomCreateState.value.roomNameField.isValid)
         )
     }
 

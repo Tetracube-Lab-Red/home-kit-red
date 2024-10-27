@@ -4,13 +4,15 @@ import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.api.repositories.HubAPIRepository
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity
-import red.tetracube.homekitred.domain.HomeKitRedError
-import red.tetracube.homekitred.domain.mappers.toDomainError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.mappers.toDomainError
+import red.tetracube.homekitred.data.services.HubLocalDataService
 import kotlin.String
 
 class LoginUseCases(
     private val hubAPIRepository: HubAPIRepository,
-    private val hubDataSource: HubDatasource
+    private val hubDataSource: HubDatasource,
+    private val hubLocalDataService: HubLocalDataService
 ) {
 
     suspend fun login(
@@ -48,6 +50,11 @@ class LoginUseCases(
             active = true
         )
         hubDataSource.insert(hubData)
+        hubLocalDataService.updateLocalHubData(
+            hubData.slug,
+            hubData.apiURI,
+            hubData.token
+        )
         return Result.success(Unit)
     }
 

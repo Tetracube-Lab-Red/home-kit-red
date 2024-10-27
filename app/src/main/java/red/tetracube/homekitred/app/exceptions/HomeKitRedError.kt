@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.domain
+package red.tetracube.homekitred.app.exceptions
 
 import kotlinx.serialization.Serializable
 
