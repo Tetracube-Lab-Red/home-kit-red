@@ -5,9 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.data.services.HubLocalDataService
 import red.tetracube.homekitred.ui.core.models.UIState
 
 class SplashViewModel(
@@ -22,16 +25,18 @@ class SplashViewModel(
     val hubActiveExists: State<Boolean?>
         get() = _hubActiveExists
 
-    suspend fun loadDefaultHub() {
-        _uiState.value = UIState.Loading
-        val defaultHubConnectInfo = splashUseCases.getHubConnectInfo()
-        if (defaultHubConnectInfo != null) {
-            _hubActiveExists.value = true
-            splashUseCases.retrieveLatestHubInfo(defaultHubConnectInfo)
-        } else {
-            _hubActiveExists.value = false
+    fun loadDefaultHub() {
+        viewModelScope.launch() {
+            _uiState.value = UIState.Loading
+            val defaultHubConnectInfo = splashUseCases.getHubConnectInfo()
+            if (defaultHubConnectInfo != null) {
+                _hubActiveExists.value = true
+                splashUseCases.retrieveLatestHubInfo(defaultHubConnectInfo)
+            } else {
+                _hubActiveExists.value = false
+            }
+            _uiState.value = UIState.FinishedWithSuccess
         }
-        _uiState.value = UIState.FinishedWithSuccess
     }
 
     companion object {
@@ -42,9 +47,10 @@ class SplashViewModel(
                 SplashViewModel(
                     splashUseCases = SplashUseCases(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                        hubAPI = homeKitRedContainer.hubAPIRepository,
-                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
-                        roomAPIRepository = homeKitRedContainer.roomAPIRepository
+                        hubLocalDataService = HubLocalDataService(
+                            roomAPIRepository = homeKitRedContainer.roomAPIRepository,
+                            roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                        )
                     )
                 )
             }

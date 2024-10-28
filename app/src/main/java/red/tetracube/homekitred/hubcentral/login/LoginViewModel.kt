@@ -12,6 +12,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.data.services.HubLocalDataService
+import red.tetracube.homekitred.ui.core.models.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
 import red.tetracube.homekitred.ui.core.models.UIState
@@ -135,7 +138,11 @@ class LoginViewModel(
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 val loginUseCases = LoginUseCases(
                     homeKitRedContainer.hubAPIRepository,
-                    homeKitRedContainer.homeKitRedDatabase.hubRepository()
+                    homeKitRedContainer.homeKitRedDatabase.hubRepository(),
+                    hubLocalDataService = HubLocalDataService(
+                        roomAPIRepository = homeKitRedContainer.roomAPIRepository,
+                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                    )
                 )
                 LoginViewModel(loginUseCases)
             }

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
-import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
@@ -115,16 +115,9 @@ fun RoomCreateDialogUI(
                     singleLine = true,
                     maxLines = 1,
                     supportingText = {
-                        val supportingTextValue = if (formState.roomNameField.hasError) {
-                            "Invalid Room Name"
-                        } else if (formState.roomNameField.isTouched && !formState.roomNameField.hasError) {
-                            "✅ The name is valid"
-                        } else {
-                            "Required"
-                        }
-                        Text(supportingTextValue)
+                        Text(formState.roomNameField.supportingText)
                     },
-                    isError = formState.roomNameField.hasError,
+                    isError = formState.roomNameField.isDirty && !formState.roomNameField.isValid,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         autoCorrectEnabled = true,
                         keyboardType = KeyboardType.Text

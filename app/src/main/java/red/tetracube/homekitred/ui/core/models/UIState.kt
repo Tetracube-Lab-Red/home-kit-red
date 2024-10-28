@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.ui.core.models
 
-import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 
 sealed class UIState {
     

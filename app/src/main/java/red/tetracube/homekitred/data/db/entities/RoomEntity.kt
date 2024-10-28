@@ -7,8 +7,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "rooms")
 data class RoomEntity(
     @PrimaryKey
-    var id: Long?,
-
     @ColumnInfo(name = "slug")
     var slug: String = "",
 

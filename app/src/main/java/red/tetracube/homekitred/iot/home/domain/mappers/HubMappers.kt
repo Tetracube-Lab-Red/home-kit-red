@@ -1,7 +1,7 @@
 package red.tetracube.homekitred.iot.home.domain.mappers
 
 import red.tetracube.homekitred.data.db.entities.HubWithRoomsEntity
-import red.tetracube.homekitred.domain.Room
+import red.tetracube.homekitred.iot.home.domain.models.Room
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 fun HubWithRoomsEntity.toDomain() =

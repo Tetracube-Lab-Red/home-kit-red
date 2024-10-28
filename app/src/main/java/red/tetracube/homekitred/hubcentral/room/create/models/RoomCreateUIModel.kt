@@ -7,6 +7,8 @@ data class RoomCreateUIModel(
 
 data class RoomNameField(
     val isTouched: Boolean = false,
-    val hasError: Boolean = false,
+    val isDirty: Boolean = false,
+    val isValid: Boolean = false,
+    val supportingText: String = "Required",
     val value: String = ""
 )

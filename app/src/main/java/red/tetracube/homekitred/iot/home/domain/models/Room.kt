@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.domain
+package red.tetracube.homekitred.iot.home.domain.models
 
 data class Room(
     val slug: String,
