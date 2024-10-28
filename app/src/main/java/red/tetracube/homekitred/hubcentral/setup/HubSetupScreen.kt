@@ -48,7 +48,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
@@ -192,12 +191,7 @@ fun HubSetupScreenUI(
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubAddressField.hasError) {
-                                "Invalid HUB Address"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubAddressField.validationMessage)
                         },
                         isError = formStatus.hubAddressField.isDirty && !formStatus.hubAddressField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -223,12 +217,7 @@ fun HubSetupScreenUI(
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubNameField.hasError) {
-                                "Invalid HUB Name"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubNameField.validationMessage)
                         },
                         isError = formStatus.hubNameField.isDirty && !formStatus.hubNameField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -254,12 +243,7 @@ fun HubSetupScreenUI(
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            val supportingTextValue = if (formStatus.hubPasswordField.hasError) {
-                                "Invalid password"
-                            } else {
-                                "Required"
-                            }
-                            Text(supportingTextValue)
+                            Text(formStatus.hubPasswordField.validationMessage)
                         },
                         isError = formStatus.hubPasswordField.isDirty && !formStatus.hubPasswordField.isValid,
                         visualTransformation =

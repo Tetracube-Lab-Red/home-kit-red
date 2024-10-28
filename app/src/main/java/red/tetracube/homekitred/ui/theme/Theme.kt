@@ -244,10 +244,6 @@ data class ColorFamily(
     val onColorContainer: Color
 )
 
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
-
 @Composable
 fun HomeKitRedTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

@@ -19,7 +19,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import red.tetracube.homekitred.domain.HomeKitRedError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 
 class TetraCubeAPIClient {
 
