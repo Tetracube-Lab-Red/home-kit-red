@@ -20,6 +20,8 @@ import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 class HubSetupViewModel(
     private val hubSetupUseCases: HubSetupUseCases
 ) : ViewModel() {
+    private val formValidationUseCase = FormValidationUseCase()
+
     private val _hubSetupModel: MutableState<HubSetupUIModel> = mutableStateOf(HubSetupUIModel())
     val hubSetupModel: State<HubSetupUIModel>
         get() = _hubSetupModel
@@ -36,28 +38,21 @@ class HubSetupViewModel(
                         FieldInputEvent.FieldName.HUB_ADDRESS -> _hubSetupModel.value.copy(
                             hubAddressField = _hubSetupModel.value.hubAddressField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _hubSetupModel.value.hubAddressField.isTouched
-                                        && (fieldInputEvent.fieldValue.isBlank()
-                                        || !URLUtil.isValidUrl(fieldInputEvent.fieldValue))
+                                isDirty = true
                             ),
                         )
 
                         FieldInputEvent.FieldName.HUB_NAME -> hubSetupModel.value.copy(
                             hubNameField = _hubSetupModel.value.hubNameField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _hubSetupModel.value.hubNameField.isTouched
-                                        && (fieldInputEvent.fieldValue.isBlank()
-                                        || !(5..25).contains(fieldInputEvent.fieldValue.length)
-                                        || !fieldInputEvent.fieldValue.matches("^[ \\w]+\$".toRegex()))
+                                isDirty = true
                             )
                         )
 
                         FieldInputEvent.FieldName.PASSWORD -> hubSetupModel.value.copy(
                             hubPasswordField = _hubSetupModel.value.hubPasswordField.copy(
                                 value = fieldInputEvent.fieldValue,
-                                hasError = _hubSetupModel.value.hubPasswordField.isTouched
-                                        && (fieldInputEvent.fieldValue.isBlank()
-                                        || !(5..25).contains(fieldInputEvent.fieldValue.length))
+                                isDirty = true
                             )
                         )
                     }
@@ -80,10 +75,38 @@ class HubSetupViewModel(
     }
 
     private fun validateForm() {
+        if (_hubSetupModel.value.hubAddressField.isDirty) {
+            val (isValid, message) = formValidationUseCase.validateHostAddress(_hubSetupModel.value.hubAddressField.value)
+            _hubSetupModel.value = _hubSetupModel.value.copy(
+                hubAddressField = _hubSetupModel.value.hubAddressField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
+        if (_hubSetupModel.value.hubNameField.isDirty) {
+            val (isValid, message) = formValidationUseCase.validateHubName(_hubSetupModel.value.hubNameField.value)
+            _hubSetupModel.value = _hubSetupModel.value.copy(
+                hubNameField = _hubSetupModel.value.hubNameField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
+        if (_hubSetupModel.value.hubPasswordField.isDirty) {
+            val (isValid, message) = formValidationUseCase.validatePassword(_hubSetupModel.value.hubPasswordField.value)
+            _hubSetupModel.value = _hubSetupModel.value.copy(
+                hubPasswordField = _hubSetupModel.value.hubPasswordField.copy(
+                    isValid = isValid,
+                    validationMessage = message
+                )
+            )
+        }
+
         _hubSetupModel.value = _hubSetupModel.value.copy(
-            formIsValid = (!_hubSetupModel.value.hubAddressField.hasError && _hubSetupModel.value.hubAddressField.isTouched)
-                    && (!_hubSetupModel.value.hubNameField.hasError && _hubSetupModel.value.hubNameField.isTouched)
-                    && (!_hubSetupModel.value.hubPasswordField.hasError && _hubSetupModel.value.hubPasswordField.isTouched)
+            formIsValid = (_hubSetupModel.value.hubAddressField.isValid && _hubSetupModel.value.hubAddressField.isDirty)
+                    && (_hubSetupModel.value.hubNameField.isValid && _hubSetupModel.value.hubNameField.isDirty)
+                    && (_hubSetupModel.value.hubPasswordField.isValid && _hubSetupModel.value.hubPasswordField.isDirty)
         )
     }
 

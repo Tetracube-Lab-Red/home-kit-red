@@ -1,8 +1,8 @@
-package red.tetracube.homekitred.hubcentral.login.models
+package red.tetracube.homekitred.hubcentral.login
 
 import android.webkit.URLUtil
 
-class FormValidationUsecase {
+class FormValidationUseCase {
 
     fun validateHostAddress(hostAddress: String) =
         if (hostAddress.isBlank()) {
@@ -13,15 +13,15 @@ class FormValidationUsecase {
             true to "✅ OK"
         }
 
-    fun validateHubName(hostAddress: String) =
-        if (hostAddress.isBlank()) {
+    fun validateHubName(name: String) =
+        if (name.isBlank()) {
             false to "Required"
         } else {
             true to "✅ OK"
         }
 
-    fun validatePassword(hostAddress: String) =
-        if (hostAddress.isBlank()) {
+    fun validatePassword(password: String) =
+        if (password.isBlank()) {
             false to "Required"
         } else {
             true to "✅ OK"

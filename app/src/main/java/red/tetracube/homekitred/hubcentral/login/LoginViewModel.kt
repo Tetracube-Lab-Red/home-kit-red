@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.domain.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
-import red.tetracube.homekitred.hubcentral.login.models.FormValidationUsecase
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
 import red.tetracube.homekitred.ui.core.models.UIState
 
@@ -21,7 +20,7 @@ class LoginViewModel(
     private val loginUseCases: LoginUseCases
 ) : ViewModel() {
 
-    val formValidationUsecase = FormValidationUsecase()
+    val formValidationUseCase = FormValidationUseCase()
 
     private val _loginUIModel: MutableState<LoginUIModel> = mutableStateOf(LoginUIModel())
     val loginUIModel: State<LoginUIModel>
@@ -77,7 +76,7 @@ class LoginViewModel(
 
     private fun validateForm() {
         if (_loginUIModel.value.hubAddressField.isDirty) {
-            val (isValid, message) = formValidationUsecase.validateHostAddress(_loginUIModel.value.hubAddressField.value)
+            val (isValid, message) = formValidationUseCase.validateHostAddress(_loginUIModel.value.hubAddressField.value)
             _loginUIModel.value = _loginUIModel.value.copy(
                 hubAddressField = _loginUIModel.value.hubAddressField.copy(
                     isValid = isValid,
@@ -86,7 +85,7 @@ class LoginViewModel(
             )
         }
         if (_loginUIModel.value.hubNameField.isDirty) {
-            val (isValid, message) = formValidationUsecase.validateHubName(_loginUIModel.value.hubNameField.value)
+            val (isValid, message) = formValidationUseCase.validateHubName(_loginUIModel.value.hubNameField.value)
             _loginUIModel.value = _loginUIModel.value.copy(
                 hubNameField = _loginUIModel.value.hubNameField.copy(
                     isValid = isValid,
@@ -95,7 +94,7 @@ class LoginViewModel(
             )
         }
         if (_loginUIModel.value.hubPasswordField.isDirty) {
-            val (isValid, message) = formValidationUsecase.validatePassword(_loginUIModel.value.hubPasswordField.value)
+            val (isValid, message) = formValidationUseCase.validatePassword(_loginUIModel.value.hubPasswordField.value)
             _loginUIModel.value = _loginUIModel.value.copy(
                 hubPasswordField = _loginUIModel.value.hubPasswordField.copy(
                     isValid = isValid,

@@ -198,7 +198,7 @@ fun HubSetupScreenUI(
                             }
                             Text(supportingTextValue)
                         },
-                        isError = formStatus.hubAddressField.hasError,
+                        isError = formStatus.hubAddressField.isDirty && !formStatus.hubAddressField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Uri
@@ -229,7 +229,7 @@ fun HubSetupScreenUI(
                             }
                             Text(supportingTextValue)
                         },
-                        isError = formStatus.hubNameField.hasError,
+                        isError = formStatus.hubNameField.isDirty && !formStatus.hubNameField.isValid,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text
@@ -260,7 +260,7 @@ fun HubSetupScreenUI(
                             }
                             Text(supportingTextValue)
                         },
-                        isError = formStatus.hubPasswordField.hasError,
+                        isError = formStatus.hubPasswordField.isDirty && !formStatus.hubPasswordField.isValid,
                         visualTransformation =
                         if (formStatus.hubPasswordField.clearPassword) {
                             VisualTransformation.None
