@@ -1,11 +1,9 @@
 package red.tetracube.homekitred.hubcentral.login
 
-import red.tetracube.homekitred.data.api.models.APIError
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.api.repositories.HubAPIRepository
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.app.exceptions.mappers.toDomainError
 import red.tetracube.homekitred.data.services.HubLocalDataService
 import kotlin.String
 
@@ -20,20 +18,15 @@ class LoginUseCases(
         hubName: String,
         hubPassword: String
     ): Result<Unit> {
-        val getHubDataResult = hubAPIRepository.hubLogin(
-            hubAddress,
-            hubName,
-            hubPassword
-        )
-        if (getHubDataResult.isFailure) {
-            return Result.failure(
-                getHubDataResult.exceptionOrNull()
-                    ?.let { it as APIError }
-                    ?.toDomainError()
-                    ?: HomeKitRedError.UnprocessableResult
+        val hubDataAPI = try {
+            hubAPIRepository.hubLogin(
+                hubAddress,
+                hubName,
+                hubPassword
             )
+        } catch (ex: HomeKitRedError) {
+            return Result.failure(ex)
         }
-        val hubDataAPI = getHubDataResult.getOrThrow()
         val websocketURI = if (hubAddress.startsWith("https")) {
             hubAddress.replace("https", "wss")
         } else if (hubAddress.startsWith("http")) {

@@ -32,14 +32,13 @@ class HubAPIRepository(
         return Result.success(hubBase)
     }
 
-    suspend fun hubLogin(hubAddress: String, name: String, password: String): Result<HubLoginAPI> {
+    suspend fun hubLogin(hubAddress: String, name: String, password: String): HubLoginAPI {
         val request = LoginPayloadRequest(name, password)
-        val loginReply = tetraCubeAPIClient.client.post("$hubAddress$HUB_AUTH_URL")
+        return tetraCubeAPIClient.client.post("$hubAddress$HUB_AUTH_URL")
         {
             setBody(request)
         }
             .body<HubLoginAPI>()
-        return Result.success(loginReply)
     }
 
 }
