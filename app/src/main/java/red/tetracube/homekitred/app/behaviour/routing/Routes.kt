@@ -23,4 +23,7 @@ sealed class Routes {
     @Serializable
     data object RoomAdd: Routes()
 
+    @Serializable
+    data object DeviceProvisioning: Routes()
+
 }

@@ -3,6 +3,7 @@ package red.tetracube.homekitred.data.db.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import red.tetracube.homekitred.data.enumerations.DeviceType
 
 @Entity(tableName = "devices")
 class DeviceEntity(
@@ -22,10 +23,4 @@ class DeviceEntity(
     @ColumnInfo(name = "room_slug")
     var roomSlug: String? = null,
 ) {
-    enum class DeviceType {
-        NONE,
-        UPS,
-        SWITCH,
-        HUE
-    }
 }

@@ -76,6 +76,9 @@ fun IoTHomeScreen(
                 onAddRoomClick = {
                     toggleBottomSheet()
                     navController.navigate(Routes.RoomAdd)
+                },
+                onAddDeviceClick = {
+                    navController.navigate(Routes.DeviceProvisioning)
                 }
             )
         },
