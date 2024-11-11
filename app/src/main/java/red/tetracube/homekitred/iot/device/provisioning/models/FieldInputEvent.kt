@@ -7,7 +7,10 @@ sealed class FieldInputEvent {
 
     enum class FieldName {
         DEVICE_NAME,
-        DEVICE_TYPE
+        DEVICE_TYPE,
+        NUT_HOST,
+        NUT_PORT,
+        NUT_UPS_ALIAS
     }
 
 }

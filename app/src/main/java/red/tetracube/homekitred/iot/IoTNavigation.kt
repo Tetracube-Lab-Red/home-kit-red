@@ -31,7 +31,7 @@ fun NavGraphBuilder.addIoTNavigation(
             val viewModel: DeviceProvisioningViewModel =
                 viewModel(factory = DeviceProvisioningViewModel.Companion.Factory)
             DeviceProvisioningScreen(
-                viewmodel = viewModel,
+                viewModel = viewModel,
                 navHostController = navController
             )
         }
