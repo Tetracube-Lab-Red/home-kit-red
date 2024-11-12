@@ -192,7 +192,7 @@ fun DevicesGrid(index: Int) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2)
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
+        item(span = StaggeredGridItemSpan.SingleLane) {
             UPSCard()
         }
     }
