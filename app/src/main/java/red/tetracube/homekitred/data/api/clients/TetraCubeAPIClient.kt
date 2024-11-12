@@ -75,7 +75,11 @@ class TetraCubeAPIClient {
                             HomeKitRedError.ClientError
                         }
                     } else if (serverException != null) {
-                        HomeKitRedError.ServiceError
+                        if (serverException.response.status == HttpStatusCode.NotImplemented) {
+                            HomeKitRedError.ModuleNotAvailable
+                        } else {
+                            HomeKitRedError.ServiceError
+                        }
                     } else if (timeoutException != null) {
                         HomeKitRedError.UnreachableService
                     } else {

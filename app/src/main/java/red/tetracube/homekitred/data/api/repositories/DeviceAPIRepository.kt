@@ -5,8 +5,9 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
+import red.tetracube.homekitred.data.api.payloads.device.DeviceProvisioningRequest
 
-class IoTSenseAPIRepository(
+class DeviceAPIRepository(
     private val tetraCubeAPIClient: TetraCubeAPIClient
 ) {
 
@@ -17,7 +18,8 @@ class IoTSenseAPIRepository(
     suspend fun deviceProvisioning(
         hubAddress: String,
         token: String,
-    ): Result<Void> {
+        request: DeviceProvisioningRequest
+    ) {
         tetraCubeAPIClient.client.post("$hubAddress$DEVICE_PROVISIONING")
         {
             headers {
@@ -25,8 +27,6 @@ class IoTSenseAPIRepository(
             }
             setBody(request)
         }
-            .body()
-        return Result.success(hubBase)
     }
 
 }

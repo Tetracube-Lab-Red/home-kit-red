@@ -113,13 +113,13 @@ class LoginViewModel(
     fun onLoginButtonClick() {
         _uiState.value = UIState.Loading
         viewModelScope.launch {
-            val createHubResult = loginUseCases.login(
+            val loginResult = loginUseCases.login(
                 hubAddress = _loginUIModel.value.hubAddressField.value,
                 hubName = _loginUIModel.value.hubNameField.value,
                 hubPassword = _loginUIModel.value.hubPasswordField.value
             )
-            if (createHubResult.isFailure) {
-                _uiState.value = createHubResult.exceptionOrNull()
+            if (loginResult.isFailure) {
+                _uiState.value = loginResult.exceptionOrNull()
                     ?.let { it as HomeKitRedError }
                     ?.let { UIState.FinishedWithError(it) }
                     ?: UIState.FinishedWithError(HomeKitRedError.GenericError)

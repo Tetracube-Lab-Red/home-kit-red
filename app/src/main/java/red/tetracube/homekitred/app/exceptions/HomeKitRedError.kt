@@ -6,6 +6,10 @@ sealed class HomeKitRedError : Throwable() {
         private fun readResolve(): Any = UnreachableService
     }
 
+    data object ModuleNotAvailable : HomeKitRedError() {
+        private fun readResolve(): Any = ModuleNotAvailable
+    }
+
     data object ServiceError : HomeKitRedError() {
         private fun readResolve(): Any = ServiceError
     }

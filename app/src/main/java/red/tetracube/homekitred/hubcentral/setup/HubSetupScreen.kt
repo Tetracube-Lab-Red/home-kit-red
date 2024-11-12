@@ -68,14 +68,8 @@ fun HubSetupScreen(
     LaunchedEffect(uiState) {
         if (uiState is UIState.FinishedWithError<*>) {
             val message = when (uiState.error) {
-                HomeKitRedError.ClientError -> "There was an error in the hub creation"
                 HomeKitRedError.Conflict -> "There is another Hub configured"
-                HomeKitRedError.GenericError -> "There was an error in the hub creation"
-                HomeKitRedError.ServiceError -> "Cannot create an hub for a hub platform error"
-                HomeKitRedError.Unauthorized -> "You are not authorized to create an hub"
-                HomeKitRedError.UnprocessableResult -> "The hub creation is returned in unexpected response"
-                HomeKitRedError.UnreachableService -> "The hub platform is unreachable"
-                HomeKitRedError.NotFound -> "Not found"
+                else -> "Hub error"
             }
             scope.launch {
                 snackbarHostState.showSnackbar(

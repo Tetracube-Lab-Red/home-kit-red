@@ -5,15 +5,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
 import red.tetracube.homekitred.iot.device.provisioning.models.FieldInputEvent
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
+import red.tetracube.homekitred.ui.core.models.UIState
 
-class DeviceProvisioningViewModel : ViewModel() {
+class DeviceProvisioningViewModel(
+    private val deviceProvisioningUseCase: DeviceProvisioningUseCase
+) : ViewModel() {
 
     private val _deviceProvisioningFormState = mutableStateOf(DeviceProvisioningFormModel())
     val deviceProvisioningFormSate: State<DeviceProvisioningFormModel>
@@ -23,7 +29,29 @@ class DeviceProvisioningViewModel : ViewModel() {
     val upsProvisioningFormState: State<UPSProvisioningFormModel>
         get() = _upsProvisioningFormState
 
+    private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
+    val uiState: State<UIState>
+        get() = _uiState
+
     private val formValidationUseCase = FormValidationUseCase()
+
+    fun onSaveClick() {
+        viewModelScope.launch {
+            _uiState.value = UIState.Loading
+            val deviceProvisioningResult = deviceProvisioningUseCase.sendDeviceProvisioningRequest(
+                _deviceProvisioningFormState.value,
+                _upsProvisioningFormState.value
+            )
+            if (deviceProvisioningResult.isSuccess) {
+                _uiState.value = UIState.FinishedWithSuccess
+            } else {
+                _uiState.value = deviceProvisioningResult.exceptionOrNull()
+                    ?.let { it as HomeKitRedError }
+                    ?.let { UIState.FinishedWithError(it) }
+                    ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
+            }
+        }
+    }
 
     fun onInputEvent(fieldInputEvent: FieldInputEvent) {
         when (fieldInputEvent) {
@@ -167,7 +195,12 @@ class DeviceProvisioningViewModel : ViewModel() {
             initializer {
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
-                DeviceProvisioningViewModel()
+                DeviceProvisioningViewModel(
+                    deviceProvisioningUseCase = DeviceProvisioningUseCase(
+                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
+                        deviceAPIRepository = homeKitRedContainer.deviceAPIRepository
+                    )
+                )
             }
         }
     }
