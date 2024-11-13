@@ -136,17 +136,8 @@ fun IoTHomeScreenUI(
                 .padding(innerPadding)
         ) {
             if (uiState is UIState.Loading) {
-                Popup(
-                    alignment = Alignment.TopCenter,
-                    properties = PopupProperties(
-                        dismissOnBackPress = false,
-                        dismissOnClickOutside = false,
-                        clippingEnabled = true,
-                    )
-                ) {
-                    ElevatedCard {
-                        LinearProgressIndicator()
-                    }
+                ElevatedCard {
+                    LinearProgressIndicator()
                 }
             }
 
@@ -178,11 +169,11 @@ fun IoTHomeScreenUI(
                 HorizontalPager(state = pagerState) { index ->
                     DevicesGrid(index)
                 }
-
-                if (showBottomSheet) {
-                    menuBottomSheet()
-                }
             }
+        }
+
+        if (showBottomSheet) {
+            menuBottomSheet()
         }
     }
 }
