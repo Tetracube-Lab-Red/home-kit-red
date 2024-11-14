@@ -14,7 +14,7 @@ import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
-import red.tetracube.homekitred.ui.core.models.UIState
+import red.tetracube.homekitred.app.models.UIState
 
 class RoomCreateViewModel(
     private val roomCreateUseCases: RoomCreateUseCases

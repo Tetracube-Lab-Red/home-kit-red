@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.ui.core.models
+package red.tetracube.homekitred.app.models
 
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 

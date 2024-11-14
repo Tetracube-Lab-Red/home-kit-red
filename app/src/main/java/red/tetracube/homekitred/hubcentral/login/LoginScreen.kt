@@ -48,7 +48,7 @@ import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
-import red.tetracube.homekitred.ui.core.models.UIState
+import red.tetracube.homekitred.app.models.UIState
 
 @Composable
 fun LoginScreen(
@@ -64,13 +64,8 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         if (uiState is UIState.FinishedWithError<*>) {
             val message = when (uiState.error) {
-                HomeKitRedError.ClientError -> "There was an error in the hub login"
-                HomeKitRedError.GenericError -> "There was an error in the hub login"
-                HomeKitRedError.ServiceError -> "Cannot login in the hub for an hub platform error"
                 HomeKitRedError.Unauthorized -> "You are not authorized to login in this hub"
-                HomeKitRedError.UnprocessableResult -> "The hub login returned in unexpected response"
-                HomeKitRedError.UnreachableService -> "The hub platform is unreachable"
-                else -> "Unhandled error"
+                else -> "There was a problem while contacting your hub, check the connectivity and hub status"
             }
             scope.launch {
                 snackbarHostState.showSnackbar(

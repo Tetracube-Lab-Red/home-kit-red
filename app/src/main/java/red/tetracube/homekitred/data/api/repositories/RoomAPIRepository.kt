@@ -39,15 +39,14 @@ class RoomAPIRepository(
     suspend fun getRooms(
         hubAddress: String,
         token: String,
-    ): Result<GetRoomsResponse> {
-        val hubBase = tetraCubeAPIClient.client.get("$hubAddress$GET_ROOMS")
+    ): GetRoomsResponse {
+        return tetraCubeAPIClient.client.get("$hubAddress$GET_ROOMS")
         {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
             .body<GetRoomsResponse>()
-        return Result.success(hubBase)
     }
 
 }

@@ -1,6 +1,5 @@
 package red.tetracube.homekitred.hubcentral.setup
 
-import android.webkit.URLUtil
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +12,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
-import red.tetracube.homekitred.ui.core.models.UIState
+import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
+import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
 
 class HubSetupViewModel(
     private val hubSetupUseCases: HubSetupUseCases

@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -33,17 +31,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
-import red.tetracube.homekitred.ui.core.models.UIState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,12 +177,25 @@ fun IoTHomeScreenUI(
 
 @Composable
 fun DevicesGrid(index: Int) {
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(2)
+    LazyColumn(
     ) {
-        item(span = StaggeredGridItemSpan.SingleLane) {
+        item() {
+            UPSCard()
+        }
+        item() {
+            UPSCard()
+        }
+        item() {
+            UPSCard()
+        }
+        item() {
             UPSCard()
         }
     }
 }
 
+@Preview
+@Composable
+fun DevicesGridPreview() {
+    DevicesGrid(1)
+}

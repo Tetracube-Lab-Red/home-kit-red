@@ -10,8 +10,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.services.HubLocalDataService
-import red.tetracube.homekitred.ui.core.models.UIState
+import red.tetracube.homekitred.app.models.UIState
 
 class SplashViewModel(
     private val splashUseCases: SplashUseCases
@@ -26,16 +27,24 @@ class SplashViewModel(
         get() = _hubActiveExists
 
     fun loadDefaultHub() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             _uiState.value = UIState.Loading
             val defaultHubConnectInfo = splashUseCases.getHubConnectInfo()
             if (defaultHubConnectInfo != null) {
                 _hubActiveExists.value = true
-                splashUseCases.retrieveLatestHubInfo(defaultHubConnectInfo)
+                val result = splashUseCases.retrieveLatestHubInfo(defaultHubConnectInfo)
+                if (result.isSuccess) {
+                    _uiState.value = UIState.FinishedWithSuccess
+                } else {
+                    _uiState.value = result.exceptionOrNull()
+                        ?.let { it as HomeKitRedError }
+                        ?.let { UIState.FinishedWithError(it) }
+                        ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
+                }
             } else {
                 _hubActiveExists.value = false
+                _uiState.value = UIState.FinishedWithSuccess
             }
-            _uiState.value = UIState.FinishedWithSuccess
         }
     }
 

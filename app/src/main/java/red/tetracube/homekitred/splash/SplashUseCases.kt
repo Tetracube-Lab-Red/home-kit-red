@@ -1,5 +1,6 @@
 package red.tetracube.homekitred.splash
 
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.services.HubLocalDataService
 import red.tetracube.homekitred.splash.domain.mappers.toConnectInfo
@@ -14,12 +15,16 @@ class SplashUseCases(
         return hubDatasource.getActiveHub()?.toConnectInfo()
     }
 
-    suspend fun retrieveLatestHubInfo(hubConnectionInfo: HubConnectionInfo) {
-        hubLocalDataService.updateLocalHubData(
-            hubConnectionInfo.slug,
-            hubConnectionInfo.apiURI,
-            hubConnectionInfo.token
-        )
-    }
+    suspend fun retrieveLatestHubInfo(hubConnectionInfo: HubConnectionInfo): Result<Unit> =
+        try {
+            hubLocalDataService.updateLocalHubData(
+                hubConnectionInfo.slug,
+                hubConnectionInfo.apiURI,
+                hubConnectionInfo.token
+            )
+            Result.success(Unit)
+        } catch (ex: HomeKitRedError) {
+            Result.failure(ex)
+        }
 
 }

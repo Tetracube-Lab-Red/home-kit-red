@@ -1,6 +1,5 @@
 package red.tetracube.homekitred.data.api.repositories
 
-import io.ktor.client.call.body
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

@@ -8,11 +8,10 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
-import red.tetracube.homekitred.ui.core.models.UIState
 
 class IoTHomeViewModel(
     private val ioTHomeUseCases: IoTHomeUseCases

@@ -56,7 +56,7 @@ import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisionin
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceTypeOptionModel
 import red.tetracube.homekitred.iot.device.provisioning.models.FieldInputEvent
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
-import red.tetracube.homekitred.ui.core.models.UIState
+import red.tetracube.homekitred.app.models.UIState
 
 @Composable
 fun DeviceProvisioningScreen(
