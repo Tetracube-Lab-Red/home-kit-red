@@ -3,16 +3,16 @@ package red.tetracube.homekitred.ui.previews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import red.tetracube.homekitred.data.enumerations.DeviceType
-import red.tetracube.homekitred.iot.home.components.UPSCard
+import red.tetracube.homekitred.iot.home.DevicesGrid
 import red.tetracube.homekitred.iot.home.domain.models.Device
-import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
 import java.time.Instant
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview
 @Composable
-fun UPSCardPreview() {
-    HomeKitRedTheme {
-        UPSCard(
+fun DevicesGridPreview() {
+    DevicesGrid(
+        1,
+        listOf(
             Device(
                 "slug",
                 "UPS device",
@@ -25,5 +25,5 @@ fun UPSCardPreview() {
                 Instant.now().toString()
             )
         )
-    }
+    )
 }

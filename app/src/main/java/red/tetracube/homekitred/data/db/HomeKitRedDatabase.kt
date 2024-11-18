@@ -1,14 +1,16 @@
 package red.tetracube.homekitred.data.db
 
 import android.content.Context
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
+import androidx.room.TypeConverters
+import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
+import red.tetracube.homekitred.data.db.datasource.DeviceScanTelemetryDatasource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
+import red.tetracube.homekitred.data.db.entities.DeviceScanTelemetryEntity
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 
@@ -16,17 +18,20 @@ import red.tetracube.homekitred.data.db.entities.RoomEntity
     entities = [
         HubEntity::class,
         RoomEntity::class,
-        DeviceEntity::class
+        DeviceEntity::class,
+        DeviceScanTelemetryEntity::class
     ],
-    version = 2,
+    version = 1,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2)
+        //AutoMigration(from = 1, to = 2)
     ]
 )
+@TypeConverters(Converters::class)
 abstract class HomeKitRedDatabase : RoomDatabase() {
     abstract fun hubRepository(): HubDatasource
     abstract fun roomRepository(): RoomDatasource
-    abstract fun deviceRepository(): DeviceDataSource
+    abstract fun deviceRepository(): DeviceDatasource
+    abstract fun deviceScanTelemetryDatasource(): DeviceScanTelemetryDatasource
 
     companion object {
         private const val DATABASE_FILE_NAME = "home_kit_red.db"

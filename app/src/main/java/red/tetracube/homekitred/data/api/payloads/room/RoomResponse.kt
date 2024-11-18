@@ -1,9 +1,8 @@
 package red.tetracube.homekitred.data.api.payloads.room
 
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
 
-@Serializable
-data class RoomResponse(
+data class RoomResponse @JsonCreator constructor(
     val slug: String,
     val name: String
 )

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -31,15 +32,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
+import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +56,7 @@ fun IoTHomeScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )
+    val devices = viewModel.devices
 
     LaunchedEffect(Unit) {
         viewModel.loadHubData()
@@ -80,7 +83,8 @@ fun IoTHomeScreen(
             )
         },
         showBottomSheet = showBottomSheet.value,
-        toggleBottomSheet = toggleBottomSheet
+        toggleBottomSheet = toggleBottomSheet,
+        devices = devices
     )
 }
 
@@ -91,7 +95,8 @@ fun IoTHomeScreenUI(
     screenScope: CoroutineScope,
     menuBottomSheet: @Composable () -> Unit,
     showBottomSheet: Boolean,
-    toggleBottomSheet: () -> Unit
+    toggleBottomSheet: () -> Unit,
+    devices: List<Device>
 ) {
     Scaffold(
         topBar = {
@@ -164,7 +169,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(index)
+                    DevicesGrid(index, devices)
                 }
             }
         }
@@ -176,26 +181,17 @@ fun IoTHomeScreenUI(
 }
 
 @Composable
-fun DevicesGrid(index: Int) {
+fun DevicesGrid(index: Int, devices: List<Device>) {
     LazyColumn(
     ) {
-        item() {
-            UPSCard()
-        }
-        item() {
-            UPSCard()
-        }
-        item() {
-            UPSCard()
-        }
-        item() {
-            UPSCard()
+        this.itemsIndexed(devices) { idx, device ->
+            when (device.type) {
+                DeviceType.UPS -> UPSCard(device)
+                DeviceType.SWITCH -> TODO()
+                DeviceType.HUE -> TODO()
+                else -> {}
+            }
         }
     }
 }
 
-@Preview
-@Composable
-fun DevicesGridPreview() {
-    DevicesGrid(1)
-}

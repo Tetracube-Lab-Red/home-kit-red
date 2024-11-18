@@ -1,12 +1,9 @@
 package red.tetracube.homekitred.data.api.payloads.hub
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializable
-data class LoginPayloadRequest(
-    @JsonNames("name") val name: String,
-    @JsonNames("accessCode") val accessCode: String
+data class LoginPayloadRequest @JsonCreator constructor(
+    @JsonProperty("name") val name: String,
+    @JsonProperty("accessCode") val accessCode: String
 )

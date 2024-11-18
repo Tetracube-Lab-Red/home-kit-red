@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b7a2ece517df8595526bf7d1bef6a16a",
+    "identityHash": "7e9f9fa3d24aaf2d28194530dab2720e",
     "entities": [
       {
         "tableName": "hubs",
@@ -129,12 +129,56 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "device_scan_telemetry",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `connectivity` TEXT NOT NULL, `telemetry_status` TEXT NOT NULL, `telemetry_ts` TEXT NOT NULL, `device_slug` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "connectivity",
+            "columnName": "connectivity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telemetryStatus",
+            "columnName": "telemetry_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telemetryTS",
+            "columnName": "telemetry_ts",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceSlug",
+            "columnName": "device_slug",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7a2ece517df8595526bf7d1bef6a16a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e9f9fa3d24aaf2d28194530dab2720e')"
     ]
   }
 }

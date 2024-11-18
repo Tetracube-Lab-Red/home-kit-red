@@ -1,9 +1,8 @@
 package red.tetracube.homekitred.data.api.payloads.hub
 
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
 
-@Serializable
-data class HubCreateResponse(
+data class HubCreateResponse @JsonCreator constructor(
     val slug: String,
     val name: String
 )

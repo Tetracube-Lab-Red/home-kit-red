@@ -1,5 +1,8 @@
 package red.tetracube.homekitred.data.api.clients
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
@@ -17,8 +20,7 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
+import io.ktor.serialization.jackson.jackson
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 
 class TetraCubeAPIClient {
@@ -38,13 +40,13 @@ class TetraCubeAPIClient {
             }
 
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        prettyPrint = true
-                        isLenient = true
-                    }
-                )
+                jackson {
+                    configure(SerializationFeature.INDENT_OUTPUT, true)
+                    setDefaultPrettyPrinter(DefaultPrettyPrinter().apply {
+                        indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
+                    })
+                    registerModule(JavaTimeModule())
+                }
             }
 
             install(DefaultRequest) {

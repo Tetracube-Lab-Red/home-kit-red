@@ -1,6 +1,7 @@
 package red.tetracube.homekitred.iot.home
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +12,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.data.services.DeviceService
+import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 class IoTHomeViewModel(
@@ -25,13 +28,26 @@ class IoTHomeViewModel(
     val hub: State<HubWithRooms?>
         get() = _hub
 
+    private val _devices = mutableStateListOf<Device>()
+    val devices: List<Device>
+        get() = _devices
+
     fun loadHubData() {
         viewModelScope.launch {
-            _uiState.value = UIState.Loading
-            ioTHomeUseCases.getHubWithRooms()
-                .collect {
-                    _uiState.value = UIState.FinishedWithSuccessContent(it)
-                }
+            launch {
+                _uiState.value = UIState.Loading
+                ioTHomeUseCases.getHubWithRooms()
+                    .collect {
+                        _uiState.value = UIState.FinishedWithSuccessContent(it)
+                    }
+            }
+
+            launch {
+                ioTHomeUseCases.getDevices(null)
+                    .collect { d ->
+                        _devices.add(d)
+                    }
+            }
         }
     }
 
@@ -42,7 +58,15 @@ class IoTHomeViewModel(
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 IoTHomeViewModel(
                     ioTHomeUseCases = IoTHomeUseCases(
-                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository()
+                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
+                        deviceDatasource = homeKitRedContainer.homeKitRedDatabase.deviceRepository(),
+                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                        deviceScanTelemetryDatasource = homeKitRedContainer.homeKitRedDatabase.deviceScanTelemetryDatasource(),
+                        deviceService = DeviceService(
+                            deviceAPIRepository = homeKitRedContainer.deviceAPIRepository,
+                            deviceDatasource = homeKitRedContainer.homeKitRedDatabase.deviceRepository(),
+                            deviceScanTelemetryDatasource = homeKitRedContainer.homeKitRedDatabase.deviceScanTelemetryDatasource()
+                        )
                     )
                 )
             }
