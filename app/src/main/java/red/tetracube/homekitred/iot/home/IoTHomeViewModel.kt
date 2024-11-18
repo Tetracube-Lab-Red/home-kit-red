@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.models.UIState
@@ -44,6 +45,7 @@ class IoTHomeViewModel(
 
             launch {
                 ioTHomeUseCases.getDevices(null)
+                    .filter { d -> !_devices.contains(d) }
                     .collect { d ->
                         _devices.add(d)
                     }
