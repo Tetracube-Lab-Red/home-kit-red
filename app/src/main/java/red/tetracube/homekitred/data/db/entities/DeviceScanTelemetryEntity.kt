@@ -2,14 +2,19 @@ package red.tetracube.homekitred.data.db.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import red.tetracube.homekitred.data.enumerations.ConnectivityStatus
 import red.tetracube.homekitred.data.enumerations.TelemetryStatus
 import java.time.Instant
 import java.util.UUID
 
-
-@Entity(tableName = "device_scan_telemetry")
+@Entity(
+    tableName = "device_scan_telemetry",
+    indices = [
+        Index(value = ["telemetry_ts", "device_slug"], unique = true)
+    ]
+)
 class DeviceScanTelemetryEntity {
     @PrimaryKey
     var id: UUID = UUID.randomUUID()
