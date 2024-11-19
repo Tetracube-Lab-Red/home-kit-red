@@ -10,20 +10,24 @@ import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
 import red.tetracube.homekitred.data.db.datasource.DeviceScanTelemetryDatasource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
+import red.tetracube.homekitred.data.db.datasource.UPSTelemetryDatasource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.data.db.entities.DeviceScanTelemetryEntity
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
+import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 
 @Database(
     entities = [
         HubEntity::class,
         RoomEntity::class,
         DeviceEntity::class,
-        DeviceScanTelemetryEntity::class
+        DeviceScanTelemetryEntity::class,
+        UPSTelemetryEntity::class
     ],
-    version = 2,
+    version = 3,
     autoMigrations = [
+        AutoMigration(from = 2, to = 3),
         AutoMigration(from = 1, to = 2)
     ]
 )
@@ -32,6 +36,7 @@ abstract class HomeKitRedDatabase : RoomDatabase() {
     abstract fun hubRepository(): HubDatasource
     abstract fun roomRepository(): RoomDatasource
     abstract fun deviceRepository(): DeviceDatasource
+    abstract fun upsTelemetryDatasource(): UPSTelemetryDatasource
     abstract fun deviceScanTelemetryDatasource(): DeviceScanTelemetryDatasource
 
     companion object {

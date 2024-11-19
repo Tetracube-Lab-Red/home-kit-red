@@ -61,13 +61,10 @@ class IoTHomeViewModel(
                 IoTHomeViewModel(
                     ioTHomeUseCases = IoTHomeUseCases(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                        deviceDatasource = homeKitRedContainer.homeKitRedDatabase.deviceRepository(),
-                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
-                        deviceScanTelemetryDatasource = homeKitRedContainer.homeKitRedDatabase.deviceScanTelemetryDatasource(),
+                        database = homeKitRedContainer.homeKitRedDatabase,
                         deviceService = DeviceService(
                             deviceAPIRepository = homeKitRedContainer.deviceAPIRepository,
-                            deviceDatasource = homeKitRedContainer.homeKitRedDatabase.deviceRepository(),
-                            deviceScanTelemetryDatasource = homeKitRedContainer.homeKitRedDatabase.deviceScanTelemetryDatasource()
+                            database = homeKitRedContainer.homeKitRedDatabase
                         )
                     )
                 )

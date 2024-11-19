@@ -3,10 +3,8 @@ package red.tetracube.homekitred.iot.home
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
-import red.tetracube.homekitred.data.db.datasource.DeviceScanTelemetryDatasource
+import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.services.DeviceService
 import red.tetracube.homekitred.iot.home.domain.mappers.toDomain
 import red.tetracube.homekitred.iot.home.domain.models.Device
@@ -17,9 +15,7 @@ import java.time.format.DateTimeFormatter
 class IoTHomeUseCases(
     private val hubDatasource: HubDatasource,
     private val deviceService: DeviceService,
-    private val deviceDatasource: DeviceDatasource,
-    private val roomDatasource: RoomDatasource,
-    private val deviceScanTelemetryDatasource: DeviceScanTelemetryDatasource
+    private val database: HomeKitRedDatabase
 ) {
 
     fun getHubWithRooms(): Flow<HubWithRooms> =
@@ -31,7 +27,7 @@ class IoTHomeUseCases(
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
             .withZone(ZoneId.systemDefault());
         deviceService.retrieveDevices(hub.slug, hub.apiURI, hub.token)
-        return deviceDatasource.getDevices(hub.slug)
+        return database.deviceRepository().getDevices(hub.slug)
             .filter { entity ->
                 if (roomSlug == null) {
                     true
@@ -40,14 +36,19 @@ class IoTHomeUseCases(
                 }
             }
             .map { entity ->
-                val connectivityStatus = deviceScanTelemetryDatasource.getLatestByDevice(entity.slug)
+                val connectivityStatus =
+                    database.deviceScanTelemetryDatasource().getLatestByDevice(entity.slug)
+                var telemetry =
+                    database.upsTelemetryDatasource().getLatest(entity.slug)
                 Device(
                     name = entity.name,
                     slug = entity.slug,
-                    roomName = entity.roomSlug?.let { roomDatasource.getBySlug(it).name },
+                    roomName = entity.roomSlug?.let {
+                        database.roomRepository().getBySlug(it).name
+                    },
                     roomSlug = entity.roomSlug,
                     notifications = 0,
-                    status = "",
+                    status = telemetry.primaryStatus.name + (telemetry.secondaryStatus?.let { " - ${it.name}" } ?: ""),
                     connectionStatus = "${connectivityStatus.connectivity} - ${connectivityStatus.telemetryStatus}",
                     type = entity.type,
                     telemetryTS = formatter.format(connectivityStatus.telemetryTS)
