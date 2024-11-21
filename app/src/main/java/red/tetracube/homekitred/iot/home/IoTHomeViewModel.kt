@@ -50,6 +50,10 @@ class IoTHomeViewModel(
                         _devices.add(d)
                     }
             }
+
+            launch {
+                ioTHomeUseCases.listenDevicesTelemetries()
+            }
         }
     }
 

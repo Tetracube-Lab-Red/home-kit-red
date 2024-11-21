@@ -49,6 +49,24 @@ class DeviceService(
             }
     }
 
+    suspend fun listenDeviceTelemetryStreams(
+        apiURI: String,
+        token: String
+    ) {
+        deviceAPIRepository.getTelemetryStreaming(apiURI)
+            .collect {
+                var deviceScanTelemetryEntity = DeviceScanTelemetryEntity()
+                deviceScanTelemetryEntity.deviceSlug = it.slug
+                deviceScanTelemetryEntity.telemetryTS = it.timestamp
+                deviceScanTelemetryEntity.telemetryStatus = it.telemetryTransmission
+                deviceScanTelemetryEntity.connectivity = it.connectivity
+                database.deviceScanTelemetryDatasource().insert(deviceScanTelemetryEntity)
 
+                if (it is UPSTelemetryData) {
+                    var telemetryEntity = it.asEntity()
+                    database.upsTelemetryDatasource().insert(telemetryEntity)
+                }
+            }
+    }
 
 }

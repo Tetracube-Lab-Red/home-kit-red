@@ -22,10 +22,15 @@ class IoTHomeUseCases(
         hubDatasource.getHubAndRooms()
             .map { it.toDomain() }
 
+    suspend fun listenDevicesTelemetries() {
+        val hub = hubDatasource.getActiveHub()!!
+        deviceService.listenDeviceTelemetryStreams(hub.apiURI, hub.token)
+    }
+
     suspend fun getDevices(roomSlug: String?): Flow<Device> {
         val hub = hubDatasource.getActiveHub()!!
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
-            .withZone(ZoneId.systemDefault());
+            .withZone(ZoneId.systemDefault())
         deviceService.retrieveDevices(hub.slug, hub.apiURI, hub.token)
         return database.deviceRepository().getDevices(hub.slug)
             .filter { entity ->

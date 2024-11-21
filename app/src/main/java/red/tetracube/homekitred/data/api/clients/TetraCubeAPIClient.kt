@@ -20,7 +20,7 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson.*
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 
 class TetraCubeAPIClient {
@@ -56,6 +56,7 @@ class TetraCubeAPIClient {
 
             install(WebSockets) {
                 pingIntervalMillis = 20_000
+                contentConverter = JacksonWebsocketContentConverter()
             }
 
             HttpResponseValidator {

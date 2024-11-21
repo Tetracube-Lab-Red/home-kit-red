@@ -1,10 +1,13 @@
 package red.tetracube.homekitred.data.api.repositories
 
 import io.ktor.client.call.body
+import io.ktor.client.plugins.websocket.receiveDeserialized
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.flow.flow
 import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
 import red.tetracube.homekitred.data.api.payloads.device.DeviceProvisioningRequest
 import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse
@@ -58,6 +61,17 @@ class DeviceAPIRepository(
             }
         }
             .body<DeviceTelemetryResponse>()
+    }
+
+    fun getTelemetryStreaming(hubAddress: String) = flow {
+        tetraCubeAPIClient.client.webSocket(
+            urlString = "$hubAddress$DEVICE_RESOURCES$TELEMETRY_RESOURCES"
+        ) {
+            while(true) {
+                val telemetry = receiveDeserialized<DeviceTelemetryResponse>()
+                emit(telemetry)
+            }
+        }
     }
 
 }
