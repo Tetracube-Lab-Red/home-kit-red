@@ -50,10 +50,10 @@ class DeviceService(
     }
 
     suspend fun listenDeviceTelemetryStreams(
-        apiURI: String,
+        streamingHubAddress: String,
         token: String
     ) {
-        deviceAPIRepository.getTelemetryStreaming(apiURI)
+        deviceAPIRepository.getTelemetryStreaming(streamingHubAddress)
             .collect {
                 var deviceScanTelemetryEntity = DeviceScanTelemetryEntity()
                 deviceScanTelemetryEntity.deviceSlug = it.slug

@@ -63,9 +63,9 @@ class DeviceAPIRepository(
             .body<DeviceTelemetryResponse>()
     }
 
-    fun getTelemetryStreaming(hubAddress: String) = flow {
+    fun getTelemetryStreaming(streamingHubAddress: String) = flow {
         tetraCubeAPIClient.client.webSocket(
-            urlString = "$hubAddress$DEVICE_RESOURCES$TELEMETRY_RESOURCES"
+            urlString = "$streamingHubAddress$DEVICE_RESOURCES$TELEMETRY_RESOURCES"
         ) {
             while(true) {
                 val telemetry = receiveDeserialized<DeviceTelemetryResponse>()

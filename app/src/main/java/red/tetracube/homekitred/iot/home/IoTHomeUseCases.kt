@@ -24,7 +24,7 @@ class IoTHomeUseCases(
 
     suspend fun listenDevicesTelemetries() {
         val hub = hubDatasource.getActiveHub()!!
-        deviceService.listenDeviceTelemetryStreams(hub.apiURI, hub.token)
+        deviceService.listenDeviceTelemetryStreams(hub.websocketURI, hub.token)
     }
 
     suspend fun getDevices(roomSlug: String?): Flow<Device> {
@@ -34,11 +34,7 @@ class IoTHomeUseCases(
         deviceService.retrieveDevices(hub.slug, hub.apiURI, hub.token)
         return database.deviceRepository().getDevices(hub.slug)
             .filter { entity ->
-                if (roomSlug == null) {
-                    true
-                } else {
-                    entity.roomSlug == roomSlug
-                }
+                if (roomSlug == null) true else entity.roomSlug == roomSlug
             }
             .map { entity ->
                 val connectivityStatus =
@@ -53,7 +49,8 @@ class IoTHomeUseCases(
                     },
                     roomSlug = entity.roomSlug,
                     notifications = 0,
-                    status = telemetry.primaryStatus.name + (telemetry.secondaryStatus?.let { " - ${it.name}" } ?: ""),
+                    status = telemetry.primaryStatus.name
+                            + (telemetry.secondaryStatus?.let { " - ${it.name}" } ?: ""),
                     connectionStatus = "${connectivityStatus.connectivity} - ${connectivityStatus.telemetryStatus}",
                     type = entity.type,
                     telemetryTS = formatter.format(connectivityStatus.telemetryTS)

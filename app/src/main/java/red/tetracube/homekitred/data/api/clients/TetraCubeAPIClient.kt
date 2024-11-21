@@ -3,6 +3,7 @@ package red.tetracube.homekitred.data.api.clients
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
@@ -56,7 +57,9 @@ class TetraCubeAPIClient {
 
             install(WebSockets) {
                 pingIntervalMillis = 20_000
-                contentConverter = JacksonWebsocketContentConverter()
+                contentConverter = JacksonWebsocketContentConverter(
+                    jacksonObjectMapper().registerModule(JavaTimeModule())
+                )
             }
 
             HttpResponseValidator {
