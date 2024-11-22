@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import red.tetracube.homekitred.data.enumerations.ConnectivityHealth
+import red.tetracube.homekitred.data.enumerations.TelemetryHealth
 import red.tetracube.homekitred.data.enumerations.UPSStatus
 import java.time.Instant
 import java.util.UUID
@@ -18,9 +20,6 @@ class UPSTelemetryEntity {
 
     @PrimaryKey
     var id: UUID = UUID.randomUUID()
-
-    @ColumnInfo(name = "telemetry_ts")
-    var telemetryTS: Instant = Instant.MAX
 
     @ColumnInfo(name = "out_frequency")
     var outFrequency: Float = Float.MIN_VALUE
@@ -63,5 +62,14 @@ class UPSTelemetryEntity {
 
     @ColumnInfo(name = "device_slug")
     var deviceSlug: String = ""
+
+    @ColumnInfo(name = "connectivity_health")
+    var connectivityHealth: ConnectivityHealth = ConnectivityHealth.UNREACHABLE
+
+    @ColumnInfo(name = "telemetry_health")
+    var telemetryHealth: TelemetryHealth = TelemetryHealth.NOT_TRANSMITTING
+
+    @ColumnInfo(name = "telemetry_ts")
+    var telemetryTS: Instant = Instant.MAX
 
 }

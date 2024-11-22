@@ -20,6 +20,8 @@ fun UPSTelemetryData.asEntity(): UPSTelemetryEntity {
     entity.batteryCharge = this.batteryCharge
     entity.primaryStatus = this.statuses.firstOrNull() ?: UPSStatus.NULL
     entity.secondaryStatus = this.statuses.lastOrNull()
-    entity.deviceSlug = this.slug
+    entity.deviceSlug = this.deviceSlug
+    entity.connectivityHealth = this.connectivityHealth
+    entity.telemetryHealth = this.telemetryHealth
     return entity
 }

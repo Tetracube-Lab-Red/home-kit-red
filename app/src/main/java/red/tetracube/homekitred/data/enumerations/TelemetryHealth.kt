@@ -1,6 +1,7 @@
 package red.tetracube.homekitred.data.enumerations
 
-enum class TelemetryStatus {
+enum class TelemetryHealth {
+    UNKNOWN,
     TRANSMITTING,
     INVALID_RESPONSE,
     NOT_TRANSMITTING

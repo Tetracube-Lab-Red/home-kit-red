@@ -52,7 +52,7 @@ class IoTHomeViewModel(
             }
 
             launch {
-                ioTHomeUseCases.listenDevicesTelemetries()
+                //ioTHomeUseCases.listenDevicesTelemetries()
             }
         }
     }

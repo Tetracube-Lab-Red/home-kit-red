@@ -4,7 +4,6 @@ import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse
 import red.tetracube.homekitred.data.api.repositories.DeviceAPIRepository
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
-import red.tetracube.homekitred.data.db.entities.DeviceScanTelemetryEntity
 import red.tetracube.homekitred.data.mappers.asEntity
 
 class DeviceService(
@@ -35,13 +34,6 @@ class DeviceService(
                 var deviceTelemetry =
                     deviceAPIRepository.getDeviceTelemetry(apiURI, token, deviceEntity.slug)
 
-                var deviceScanTelemetryEntity = DeviceScanTelemetryEntity()
-                deviceScanTelemetryEntity.deviceSlug = deviceEntity.slug
-                deviceScanTelemetryEntity.telemetryTS = deviceTelemetry.timestamp
-                deviceScanTelemetryEntity.telemetryStatus = deviceTelemetry.telemetryTransmission
-                deviceScanTelemetryEntity.connectivity = deviceTelemetry.connectivity
-                database.deviceScanTelemetryDatasource().insert(deviceScanTelemetryEntity)
-
                 if (deviceTelemetry is UPSTelemetryData) {
                     var telemetryEntity = deviceTelemetry.asEntity()
                     database.upsTelemetryDatasource().insert(telemetryEntity)
@@ -55,13 +47,6 @@ class DeviceService(
     ) {
         deviceAPIRepository.getTelemetryStreaming(streamingHubAddress)
             .collect {
-                var deviceScanTelemetryEntity = DeviceScanTelemetryEntity()
-                deviceScanTelemetryEntity.deviceSlug = it.slug
-                deviceScanTelemetryEntity.telemetryTS = it.timestamp
-                deviceScanTelemetryEntity.telemetryStatus = it.telemetryTransmission
-                deviceScanTelemetryEntity.connectivity = it.connectivity
-                database.deviceScanTelemetryDatasource().insert(deviceScanTelemetryEntity)
-
                 if (it is UPSTelemetryData) {
                     var telemetryEntity = it.asEntity()
                     database.upsTelemetryDatasource().insert(telemetryEntity)

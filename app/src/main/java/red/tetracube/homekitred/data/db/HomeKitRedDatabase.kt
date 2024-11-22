@@ -7,25 +7,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
-import red.tetracube.homekitred.data.db.datasource.DeviceScanTelemetryDatasource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.datasource.UPSTelemetryDatasource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
-import red.tetracube.homekitred.data.db.entities.DeviceScanTelemetryEntity
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
+import red.tetracube.homekitred.data.db.migrations.UnifyDeviceTelemetries
 
 @Database(
     entities = [
         HubEntity::class,
         RoomEntity::class,
         DeviceEntity::class,
-        DeviceScanTelemetryEntity::class,
         UPSTelemetryEntity::class
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 1, to = 2)
@@ -37,7 +35,6 @@ abstract class HomeKitRedDatabase : RoomDatabase() {
     abstract fun roomRepository(): RoomDatasource
     abstract fun deviceRepository(): DeviceDatasource
     abstract fun upsTelemetryDatasource(): UPSTelemetryDatasource
-    abstract fun deviceScanTelemetryDatasource(): DeviceScanTelemetryDatasource
 
     companion object {
         private const val DATABASE_FILE_NAME = "home_kit_red.db"
@@ -55,6 +52,8 @@ abstract class HomeKitRedDatabase : RoomDatabase() {
                         HomeKitRedDatabase::class.java,
                         DATABASE_FILE_NAME
                     )
+                        .fallbackToDestructiveMigration()
+                        .addMigrations(UnifyDeviceTelemetries)
                         .build()
 
                     HOME_KIT_RED_DATABASE_INSTANCE = instance

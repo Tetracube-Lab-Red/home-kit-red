@@ -22,7 +22,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import red.tetracube.homekitred.R
+import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry.UPSBasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun UPSCard(device: Device) {
@@ -84,7 +87,9 @@ fun UPSCard(device: Device) {
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle()) {
-                                append(device.status)
+                                if (device.basicTelemetry is UPSBasicTelemetry) {
+                                    "${device.basicTelemetry.primaryStatus} ${device.basicTelemetry.secondaryStatus ?: ""}"
+                                }
                             }
                         },
                         style = MaterialTheme.typography.titleLarge
@@ -132,7 +137,7 @@ fun UPSCard(device: Device) {
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle()) {
-                                append(device.connectionStatus)
+                                append("${device.basicTelemetry.connection} - ${device.basicTelemetry.telemetry}")
                             }
                         },
                         style = MaterialTheme.typography.titleSmall
@@ -154,7 +159,11 @@ fun UPSCard(device: Device) {
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle()) {
-                                append(device.telemetryTS)
+                                append(
+                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
+                                        .withZone(ZoneId.systemDefault())
+                                        .format(device.basicTelemetry.timestamp)
+                                )
                             }
                         },
                         style = MaterialTheme.typography.titleSmall
