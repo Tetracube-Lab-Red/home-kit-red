@@ -6,12 +6,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.data.mappers.asBasicTelemetry
 import red.tetracube.homekitred.data.services.DeviceService
 import red.tetracube.homekitred.iot.home.domain.mappers.toDomain
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
-import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry.UnknownBasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
@@ -30,14 +28,17 @@ class IoTHomeUseCases(
         deviceService.listenDeviceTelemetryStreams(hub.websocketURI, hub.token)
     }
 
+    suspend fun getLatestTelemetry(deviceSlug: String): BasicTelemetry {
+        return database.upsTelemetryDatasource().getLatestTelemetry(deviceSlug).asBasicTelemetry()
+    }
+
     fun listenDatabaseTelemetryStreaming(): Flow<List<BasicTelemetry>> {
-        var upsTelemetryFlow =
-            database.upsTelemetryDatasource().getLatestTelemetries()
-                .map { telemetries ->
-                    telemetries.map { telemetry ->
-                        telemetry.asBasicTelemetry()
-                    }
+        var upsTelemetryFlow = database.upsTelemetryDatasource().getLatestTelemetriesStream()
+            .map { telemetries ->
+                telemetries.map { telemetry ->
+                    telemetry.asBasicTelemetry()
                 }
+            }
         return merge(upsTelemetryFlow)
     }
 
@@ -57,19 +58,7 @@ class IoTHomeUseCases(
                     },
                     roomSlug = entity.roomSlug,
                     notifications = 0,
-                    type = entity.type,
-                    basicTelemetry = when (entity.type) {
-                        DeviceType.NONE -> UnknownBasicTelemetry()
-                        DeviceType.UPS -> BasicTelemetry.UPSBasicTelemetry()
-                        DeviceType.SWITCH -> UnknownBasicTelemetry()
-                        DeviceType.HUE -> UnknownBasicTelemetry()
-                    }
-
-                    /*status = telemetry.primaryStatus.name
-                            + (telemetry.secondaryStatus?.let { " - ${it.name}" } ?: ""),
-                    connectionStatus = "${connectivityStatus.connectivity} - ${connectivityStatus.telemetryStatus}",
-
-                    telemetryTS = formatter.format(connectivityStatus.telemetryTS)*/
+                    type = entity.type
                 )
             }
     }

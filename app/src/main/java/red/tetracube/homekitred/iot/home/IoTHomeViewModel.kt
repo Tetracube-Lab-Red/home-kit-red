@@ -1,7 +1,6 @@
 package red.tetracube.homekitred.iot.home
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -31,10 +30,6 @@ class IoTHomeViewModel(
     val hub: State<HubWithRooms?>
         get() = _hub
 
-    private val _devices = mutableStateListOf<Device>()
-    val devices: List<Device>
-        get() = _devices
-
     private val _devicesTelemetriesMap = mutableStateMapOf<String, Pair<Device, BasicTelemetry>>()
     val devicesTelemetriesMap: Map<String, Pair<Device, BasicTelemetry>>
         get() = _devicesTelemetriesMap
@@ -58,7 +53,7 @@ class IoTHomeViewModel(
             launch {
                 ioTHomeUseCases.getDevices(null)
                     .collect { d ->
-                        _devicesTelemetriesMap.putIfAbsent(d.slug, d to d.basicTelemetry)
+                        _devicesTelemetriesMap.putIfAbsent(d.slug, d to ioTHomeUseCases.getLatestTelemetry(d.slug))
                     }
             }
 

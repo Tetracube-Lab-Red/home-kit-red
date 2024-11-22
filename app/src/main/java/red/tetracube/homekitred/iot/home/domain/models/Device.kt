@@ -8,6 +8,5 @@ data class Device (
     val roomName: String?,
     val roomSlug: String?,
     val notifications: Int,
-    val type: DeviceType,
-    val basicTelemetry: BasicTelemetry
+    val type: DeviceType
 )

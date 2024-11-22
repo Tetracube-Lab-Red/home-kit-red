@@ -22,13 +22,14 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import red.tetracube.homekitred.R
+import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry.UPSBasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun UPSCard(device: Device) {
+fun UPSCard(device: Device, basicTelemetry: BasicTelemetry) {
     OutlinedCard(
         modifier = Modifier
             .padding(8.dp)
@@ -84,16 +85,12 @@ fun UPSCard(device: Device) {
                         tint = MaterialTheme.colorScheme.tertiary
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        buildAnnotatedString {
-                            withStyle(style = SpanStyle()) {
-                                if (device.basicTelemetry is UPSBasicTelemetry) {
-                                    "${device.basicTelemetry.primaryStatus} ${device.basicTelemetry.secondaryStatus ?: ""}"
-                                }
-                            }
-                        },
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    if (basicTelemetry is UPSBasicTelemetry) {
+                        Text(
+                            "${basicTelemetry.primaryStatus} ${basicTelemetry.secondaryStatus ?: ""}",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -137,7 +134,7 @@ fun UPSCard(device: Device) {
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle()) {
-                                append("${device.basicTelemetry.connection} - ${device.basicTelemetry.telemetry}")
+                                append("${basicTelemetry.connection} - ${basicTelemetry.telemetry}")
                             }
                         },
                         style = MaterialTheme.typography.titleSmall
@@ -162,7 +159,7 @@ fun UPSCard(device: Device) {
                                 append(
                                     DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
                                         .withZone(ZoneId.systemDefault())
-                                        .format(device.basicTelemetry.timestamp)
+                                        .format(basicTelemetry.timestamp)
                                 )
                             }
                         },

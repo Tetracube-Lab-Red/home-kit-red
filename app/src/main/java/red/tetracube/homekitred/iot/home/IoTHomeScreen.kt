@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,6 +43,7 @@ import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
+import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
@@ -60,7 +60,7 @@ fun IoTHomeScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )
-    val devices = viewModel.devices
+    val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
 
     LaunchedEffect(Unit) {
         viewModel.loadHubData()
@@ -94,7 +94,7 @@ fun IoTHomeScreen(
         },
         showBottomSheet = showBottomSheet.value,
         toggleBottomSheet = toggleBottomSheet,
-        devices = devices
+        devicesTelemetriesMap = devicesTelemetriesMap.map { t -> t.value }.toMap()
     )
 }
 
@@ -106,7 +106,7 @@ fun IoTHomeScreenUI(
     menuBottomSheet: @Composable () -> Unit,
     showBottomSheet: Boolean,
     toggleBottomSheet: () -> Unit,
-    devices: List<Device>
+    devicesTelemetriesMap: Map<Device, BasicTelemetry>
 ) {
     Scaffold(
         topBar = {
@@ -179,7 +179,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(index, devices)
+                    DevicesGrid(index, devicesTelemetriesMap)
                 }
             }
         }
@@ -191,15 +191,17 @@ fun IoTHomeScreenUI(
 }
 
 @Composable
-fun DevicesGrid(index: Int, devices: List<Device>) {
+fun DevicesGrid(index: Int, devicesTelemetriesMap: Map<Device, BasicTelemetry>) {
     LazyColumn(
     ) {
-        this.itemsIndexed(devices) { idx, device ->
-            when (device.type) {
-                DeviceType.UPS -> UPSCard(device)
-                DeviceType.SWITCH -> TODO()
-                DeviceType.HUE -> TODO()
-                else -> {}
+        devicesTelemetriesMap.map { deviceTelemetryEntry ->
+            item {
+                when (deviceTelemetryEntry.key.type) {
+                    DeviceType.UPS -> UPSCard(deviceTelemetryEntry.key, deviceTelemetryEntry.value)
+                    DeviceType.SWITCH -> TODO()
+                    DeviceType.HUE -> TODO()
+                    else -> {}
+                }
             }
         }
     }
