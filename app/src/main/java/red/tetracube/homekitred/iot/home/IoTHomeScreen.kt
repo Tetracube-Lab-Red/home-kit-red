@@ -25,6 +25,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -48,7 +51,8 @@ import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 @Composable
 fun IoTHomeScreen(
     viewModel: IoTHomeViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val uiState = viewModel.uiState
     val screenScope = rememberCoroutineScope()
@@ -60,6 +64,12 @@ fun IoTHomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadHubData()
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        onDispose {
+            viewModel.cancelListeners()
+        }
     }
 
     val toggleBottomSheet = {

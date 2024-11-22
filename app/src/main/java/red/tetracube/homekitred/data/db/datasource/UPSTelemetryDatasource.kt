@@ -13,7 +13,7 @@ interface UPSTelemetryDatasource {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(telemetry: UPSTelemetryEntity): Long
 
-    @Query("SELECT * FROM ups_telemetry ORDER BY telemetry_ts desc")
-    fun getLatest(): Flow<List<UPSTelemetryEntity>>
+    @Query("SELECT t.* FROM ups_telemetry t where t.telemetry_ts = (select max(t.telemetry_ts) from ups_telemetry t2 where t2.device_slug = t.device_slug)")
+    fun getLatestTelemetries(): Flow<List<UPSTelemetryEntity>>
 
 }

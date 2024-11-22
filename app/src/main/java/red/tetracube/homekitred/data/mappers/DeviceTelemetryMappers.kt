@@ -3,6 +3,7 @@ package red.tetracube.homekitred.data.mappers
 import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 import red.tetracube.homekitred.data.enumerations.UPSStatus
+import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 
 fun UPSTelemetryData.asEntity(): UPSTelemetryEntity {
     val entity = UPSTelemetryEntity()
@@ -24,4 +25,15 @@ fun UPSTelemetryData.asEntity(): UPSTelemetryEntity {
     entity.connectivityHealth = this.connectivityHealth
     entity.telemetryHealth = this.telemetryHealth
     return entity
+}
+
+fun UPSTelemetryEntity.asBasicTelemetry() : BasicTelemetry.UPSBasicTelemetry {
+    return  BasicTelemetry.UPSBasicTelemetry(
+        deviceSlug = this.deviceSlug,
+        primaryStatus = this.primaryStatus,
+        secondaryStatus = this.secondaryStatus,
+        connectivityHealth = this.connectivityHealth,
+        telemetryHealth = this.telemetryHealth,
+        telemetryTS = this.telemetryTS
+    )
 }

@@ -3,9 +3,11 @@ package red.tetracube.homekitred.iot.home
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.data.mappers.asBasicTelemetry
 import red.tetracube.homekitred.data.services.DeviceService
 import red.tetracube.homekitred.iot.home.domain.mappers.toDomain
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
@@ -28,10 +30,16 @@ class IoTHomeUseCases(
         deviceService.listenDeviceTelemetryStreams(hub.websocketURI, hub.token)
     }
 
-   /* suspend fun listenDatabaseTelemetryStreaming(): Flow<> {
-        var telemetry =
-            database.upsTelemetryDatasource().getLatest(entity.slug)
-    }*/
+    fun listenDatabaseTelemetryStreaming(): Flow<List<BasicTelemetry>> {
+        var upsTelemetryFlow =
+            database.upsTelemetryDatasource().getLatestTelemetries()
+                .map { telemetries ->
+                    telemetries.map { telemetry ->
+                        telemetry.asBasicTelemetry()
+                    }
+                }
+        return merge(upsTelemetryFlow)
+    }
 
     suspend fun getDevices(roomSlug: String?): Flow<Device> {
         val hub = hubDatasource.getActiveHub()!!
