@@ -5,11 +5,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import red.tetracube.homekitred.app.behaviour.routing.Routes.DeviceProvisioning
+import red.tetracube.homekitred.app.behaviour.routing.Routes.DeviceRoomJoin
 import red.tetracube.homekitred.app.behaviour.routing.Routes.IoT
 import red.tetracube.homekitred.app.behaviour.routing.Routes.IoTHome
 import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningScreen
 import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningViewModel
+import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog
+import red.tetracube.homekitred.iot.device.room.DeviceRoomViewModel
 import red.tetracube.homekitred.iot.home.IoTHomeScreen
 import red.tetracube.homekitred.iot.home.IoTHomeViewModel
 
@@ -34,6 +38,11 @@ fun NavGraphBuilder.addIoTNavigation(
                 viewModel = viewModel,
                 navHostController = navController
             )
+        }
+        composable<DeviceRoomJoin> { backStackEntry ->
+            val deviceSlug: String = backStackEntry.toRoute()
+            val viewModel: DeviceRoomViewModel = viewModel(factory = DeviceRoomViewModel.Factory(deviceSlug))
+            DeviceRoomDialog(viewModel, navController)
         }
     }
 }

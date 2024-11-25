@@ -38,14 +38,17 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
+import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
+import red.tetracube.homekitred.iot.home.domain.models.deviceMenuItems
+import red.tetracube.homekitred.iot.home.domain.models.globalMenuItems
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,12 +58,26 @@ fun IoTHomeScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val uiState = viewModel.uiState
+    val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
     val screenScope = rememberCoroutineScope()
     var showBottomSheet = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )
-    val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
+
+    val toggleBottomSheet = {
+        showBottomSheet.value = !showBottomSheet.value
+    }
+
+    val menuItems = remember { mutableListOf<BottomSheetItem>() }
+    val globalMenuItemsBuilder: () -> Unit = {
+        menuItems.clear()
+        menuItems.addAll(globalMenuItems(navController, toggleBottomSheet))
+    }
+    val deviceMenuItemsBuilder: (String) -> Unit = { deviceSlug ->
+        menuItems.clear()
+        menuItems.addAll(deviceMenuItems(deviceSlug, toggleBottomSheet))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadHubData()
@@ -72,10 +89,6 @@ fun IoTHomeScreen(
         }
     }
 
-    val toggleBottomSheet = {
-        showBottomSheet.value = !showBottomSheet.value
-    }
-
     IoTHomeScreenUI(
         uiState = uiState.value,
         screenScope = screenScope,
@@ -83,18 +96,13 @@ fun IoTHomeScreen(
             MenuBottomSheet(
                 sheetState = sheetState,
                 onModalDismissRequest = toggleBottomSheet,
-                onAddRoomClick = {
-                    toggleBottomSheet()
-                    navController.navigate(Routes.RoomAdd)
-                },
-                onAddDeviceClick = {
-                    navController.navigate(Routes.DeviceProvisioning)
-                }
+                menuItems = menuItems
             )
         },
         showBottomSheet = showBottomSheet.value,
-        toggleBottomSheet = toggleBottomSheet,
-        devicesTelemetriesMap = devicesTelemetriesMap.map { t -> t.value }.toMap()
+        onHubAvatarClick = globalMenuItemsBuilder,
+        devicesTelemetriesMap = devicesTelemetriesMap.map { t -> t.value }.toMap(),
+        onDeviceMenuRequest = deviceMenuItemsBuilder
     )
 }
 
@@ -105,8 +113,9 @@ fun IoTHomeScreenUI(
     screenScope: CoroutineScope,
     menuBottomSheet: @Composable () -> Unit,
     showBottomSheet: Boolean,
-    toggleBottomSheet: () -> Unit,
-    devicesTelemetriesMap: Map<Device, BasicTelemetry>
+    onHubAvatarClick: () -> Unit,
+    devicesTelemetriesMap: Map<Device, BasicTelemetry>,
+    onDeviceMenuRequest: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -120,7 +129,7 @@ fun IoTHomeScreenUI(
                     if (uiState is UIState.FinishedWithSuccessContent<*>) {
                         val hub = uiState.content as HubWithRooms
                         IconButton(
-                            onClick = { toggleBottomSheet() }
+                            onClick = { onHubAvatarClick() }
                         ) {
                             Box(
                                 modifier = Modifier
@@ -179,7 +188,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(index, devicesTelemetriesMap)
+                    DevicesGrid(index, devicesTelemetriesMap, onDeviceMenuRequest)
                 }
             }
         }
@@ -191,13 +200,21 @@ fun IoTHomeScreenUI(
 }
 
 @Composable
-fun DevicesGrid(index: Int, devicesTelemetriesMap: Map<Device, BasicTelemetry>) {
-    LazyColumn(
-    ) {
+fun DevicesGrid(
+    index: Int,
+    devicesTelemetriesMap: Map<Device, BasicTelemetry>,
+    onDeviceMenuRequest: (String) -> Unit
+) {
+    LazyColumn {
         devicesTelemetriesMap.map { deviceTelemetryEntry ->
             item {
                 when (deviceTelemetryEntry.key.type) {
-                    DeviceType.UPS -> UPSCard(deviceTelemetryEntry.key, deviceTelemetryEntry.value)
+                    DeviceType.UPS -> UPSCard(
+                        deviceTelemetryEntry.key,
+                        deviceTelemetryEntry.value,
+                        onDeviceMenuRequest
+                    )
+
                     DeviceType.SWITCH -> TODO()
                     DeviceType.HUE -> TODO()
                     else -> {}

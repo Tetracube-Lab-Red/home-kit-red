@@ -26,4 +26,7 @@ sealed class Routes {
     @Serializable
     data object DeviceProvisioning: Routes()
 
+    @Serializable
+    data class DeviceRoomJoin(val deviceSlug: String): Routes()
+
 }
