@@ -109,7 +109,7 @@ fun RoomCreateDialogUI(
                         .onFocusChanged {
                             if (it.isFocused) onInputFocus(FieldName.ROOM_NAME)
                         },
-                    label = { Text("Hub name") },
+                    label = { Text("Room name") },
                     value = formState.roomNameField.value,
                     onValueChange = { value: String -> onTextInput(FieldName.ROOM_NAME, value) },
                     singleLine = true,

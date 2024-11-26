@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
+import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,8 @@ fun MenuBottomSheet(
                         colors = ButtonDefaults.textButtonColors().copy(contentColor = MaterialTheme.colorScheme.tertiary),
                         onClick = {
                             if (menuItem is GlobalMenuItem) {
+                                menuItem.onClick()
+                            } else if (menuItem is DeviceMenuItem) {
                                 menuItem.onClick()
                             }
                         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import red.tetracube.homekitred.app.behaviour.routing.Routes
 import red.tetracube.homekitred.iot.addIoTNavigation
@@ -48,7 +49,7 @@ fun ShellUI(navController: NavHostController) {
                 val viewModel: HubSetupViewModel = viewModel(factory = HubSetupViewModel.Factory)
                 HubSetupScreen(navController, viewModel)
             }
-            composable<Routes.RoomAdd> {
+            dialog<Routes.RoomAdd> {
                 val viewModel: RoomCreateViewModel =
                     viewModel(factory = RoomCreateViewModel.Factory)
                 RoomCreateDialog(navController, viewModel)

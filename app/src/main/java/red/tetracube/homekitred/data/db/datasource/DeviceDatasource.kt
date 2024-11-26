@@ -11,7 +11,7 @@ import red.tetracube.homekitred.data.db.entities.DeviceEntity
 interface DeviceDatasource {
 
     @Query("SELECT * FROM devices WHERE slug = :slug LIMIT 1")
-    fun getDeviceBySlug(slug: String): DeviceEntity?
+    suspend fun getDeviceBySlug(slug: String): DeviceEntity?
 
     @Query("SELECT * FROM devices WHERE hub_slug = :hubSlug")
     fun getDevices(hubSlug: String): Flow<DeviceEntity>

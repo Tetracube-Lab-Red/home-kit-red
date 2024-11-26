@@ -72,10 +72,12 @@ fun IoTHomeScreen(
     val globalMenuItemsBuilder: () -> Unit = {
         menuItems.clear()
         menuItems.addAll(globalMenuItems(navController, toggleBottomSheet))
+        toggleBottomSheet()
     }
     val deviceMenuItemsBuilder: (String) -> Unit = { deviceSlug ->
         menuItems.clear()
-        menuItems.addAll(deviceMenuItems(deviceSlug, toggleBottomSheet))
+        menuItems.addAll(deviceMenuItems(navController, deviceSlug, toggleBottomSheet))
+        toggleBottomSheet()
     }
 
     LaunchedEffect(Unit) {

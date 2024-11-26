@@ -3,6 +3,7 @@ package red.tetracube.homekitred.iot.home.domain.models
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.app.behaviour.routing.Routes
+import red.tetracube.homekitred.app.behaviour.routing.Routes.DeviceRoomJoin
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
 
@@ -20,7 +21,7 @@ sealed class BottomSheetItem(
     data class DeviceMenuItem(
         val menuIcon: Int,
         val menuText: String,
-        val onClick: (String) -> Unit
+        val onClick: () -> Unit
     ) : BottomSheetItem(menuIcon, menuText)
 
 }
@@ -47,12 +48,17 @@ fun globalMenuItems(
         }
     )
 
-fun deviceMenuItems(deviceSlug: String, globalBehavior: () -> Unit): List<DeviceMenuItem> =
+fun deviceMenuItems(
+    navController: NavHostController,
+    deviceSlug: String,
+    globalBehavior: () -> Unit
+): List<DeviceMenuItem> =
     listOf(
         DeviceMenuItem(
             R.drawable.room_preferences_24px,
             "Set device room"
         ) {
             globalBehavior()
+            navController.navigate(DeviceRoomJoin(deviceSlug))
         }
     )
