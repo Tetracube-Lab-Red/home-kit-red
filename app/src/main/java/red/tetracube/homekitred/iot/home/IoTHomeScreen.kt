@@ -26,6 +26,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,7 +41,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.app.models.UIState
 import red.tetracube.homekitred.data.enumerations.DeviceType
-import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
@@ -64,7 +64,6 @@ fun IoTHomeScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )
-
     val toggleBottomSheet = {
         showBottomSheet.value = !showBottomSheet.value
     }
@@ -165,7 +164,11 @@ fun IoTHomeScreenUI(
             if (uiState is UIState.FinishedWithSuccessContent<*>) {
                 val hub = uiState.content as HubWithRooms
                 val pagerState = rememberPagerState(initialPage = 0, pageCount = { hub.rooms.size })
-
+                val selectedRoomSlug = remember {
+                    derivedStateOf {
+                        hub.rooms[pagerState.currentPage].slug
+                    }
+                }
                 ScrollableTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     divider = {
@@ -188,7 +191,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(index, devicesTelemetriesMap, onDeviceMenuRequest)
+                    DevicesGrid(selectedRoomSlug.value, devicesTelemetriesMap, onDeviceMenuRequest)
                 }
             }
         }
@@ -201,26 +204,30 @@ fun IoTHomeScreenUI(
 
 @Composable
 fun DevicesGrid(
-    index: Int,
+    roomSlug: String,
     devicesTelemetriesMap: Map<Device, BasicTelemetry>,
     onDeviceMenuRequest: (String) -> Unit
 ) {
     LazyColumn {
-        devicesTelemetriesMap.map { deviceTelemetryEntry ->
-            item {
-                when (deviceTelemetryEntry.key.type) {
-                    DeviceType.UPS -> UPSCard(
-                        deviceTelemetryEntry.key,
-                        deviceTelemetryEntry.value,
-                        onDeviceMenuRequest
-                    )
+        devicesTelemetriesMap
+            .filter { room ->
+                roomSlug == "all" || room.key.roomSlug == roomSlug
+            }
+            .map { deviceTelemetryEntry ->
+                item {
+                    when (deviceTelemetryEntry.key.type) {
+                        DeviceType.UPS -> UPSCard(
+                            deviceTelemetryEntry.key,
+                            deviceTelemetryEntry.value,
+                            onDeviceMenuRequest
+                        )
 
-                    DeviceType.SWITCH -> TODO()
-                    DeviceType.HUE -> TODO()
-                    else -> {}
+                        DeviceType.SWITCH -> TODO()
+                        DeviceType.HUE -> TODO()
+                        else -> {}
+                    }
                 }
             }
-        }
     }
 }
 
