@@ -53,7 +53,14 @@ class IoTHomeViewModel(
             launch {
                 ioTHomeUseCases.getDevices(null)
                     .collect { d ->
-                        _devicesTelemetriesMap.putIfAbsent(d.slug, d to ioTHomeUseCases.getLatestTelemetry(d.slug))
+                        if (_devicesTelemetriesMap.containsKey(d.slug)) {
+                            _devicesTelemetriesMap.replace(d.slug,  d to ioTHomeUseCases.getLatestTelemetry(d.slug))
+                        } else {
+                            _devicesTelemetriesMap.putIfAbsent(
+                                d.slug,
+                                d to ioTHomeUseCases.getLatestTelemetry(d.slug)
+                            )
+                        }
                     }
             }
 
