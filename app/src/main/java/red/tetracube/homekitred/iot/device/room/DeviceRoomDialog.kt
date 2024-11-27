@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -23,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,30 +37,66 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.app.models.UIState
 
 @Composable
 fun DeviceRoomDialog(
     deviceRoomViewModel: DeviceRoomViewModel,
     navController: NavHostController
 ) {
+    val deviceName = deviceRoomViewModel.deviceName.value
+    val selectedRoom = deviceRoomViewModel.roomSlug
+    val dialogUIState = deviceRoomViewModel.uiState
 
     LaunchedEffect(Unit) {
         deviceRoomViewModel.loadRooms()
     }
 
-    DeviceRoomDialogUI(
-        rooms = deviceRoomViewModel.roomsMap,
-        onDismissRequest = {
+    LaunchedEffect(deviceRoomViewModel.uiState.value) {
+        if (deviceRoomViewModel.uiState.value is UIState.FinishedWithSuccess) {
             navController.popBackStack()
-        },
+        }
+    }
+
+    val supportMessage = remember {
+        derivedStateOf {
+            val uiState = deviceRoomViewModel.uiState.value
+            if (uiState is UIState.FinishedWithError<*>) {
+                if (uiState.error is HomeKitRedError.Unauthorized) {
+                    "No authorized to update the device's room"
+                } else {
+                    "Some problem with device room update"
+                }
+            } else {
+                ""
+            }
+        }
+    }
+
+    DeviceRoomDialogUI(
+        uiState = dialogUIState.value,
+        rooms = deviceRoomViewModel.roomsMap,
+        deviceName = deviceName,
+        roomValue = selectedRoom.value,
+        supportMessage = supportMessage.value,
+        onRoomSelect = deviceRoomViewModel::setRoomSlug,
+        onDismissRequest = navController::popBackStack,
+        onSubmit = deviceRoomViewModel::submitDeviceRoomJoin
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceRoomDialogUI(
+    uiState: UIState,
     rooms: Map<String, String>,
-    onDismissRequest: () -> Unit
+    supportMessage: String,
+    deviceName: String,
+    roomValue: String,
+    onRoomSelect: (String) -> Unit,
+    onDismissRequest: () -> Unit,
+    onSubmit: () -> Unit
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
@@ -79,53 +118,63 @@ fun DeviceRoomDialogUI(
                     Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "Join device in room",
+                        text = "Join $deviceName in room",
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
 
-                var expanded by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                ) {
-                    OutlinedTextField(
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.room_preferences_24px),
-                                contentDescription = null
-                            )
-                        },
-                        modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth(),
-                        value = "",
-                        onValueChange = {},
-                        readOnly = true,
-                        singleLine = true,
-                        label = { Text("Room to join") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                    ) {
-                        rooms.map { option ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        option.value,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                },
-                                onClick = {
-                                    //onDeviceTypeSelect(option)
-                                    expanded = false
-                                },
-                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                            )
+                if (uiState !is UIState.FinishedWithError<*>) {
+                    var expanded by remember { mutableStateOf(false) }
+                    val currentRoomName = remember {
+                        derivedStateOf {
+                            rooms.entries.first { it.key == roomValue }.value
                         }
                     }
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                    ) {
+                        OutlinedTextField(
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.room_preferences_24px),
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .fillMaxWidth(),
+                            value = currentRoomName.value,
+                            supportingText = { Text(supportMessage) },
+                            onValueChange = { },
+                            readOnly = true,
+                            singleLine = true,
+                            label = { Text("Room to join") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            rooms.map { option ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            option.value,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    },
+                                    onClick = {
+                                        onRoomSelect(option.key)
+                                        expanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Text("Device not found")
                 }
 
                 Row(
@@ -134,22 +183,22 @@ fun DeviceRoomDialogUI(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
-                        enabled = true, //uiState is UIState.Neutral || uiState is UIState.FinishedWithError<*>,
+                        enabled = uiState is UIState.Neutral || uiState is UIState.FinishedWithError<*>,
                         onClick = onDismissRequest
                     ) {
                         Text("Cancel")
                     }
 
-                    /*if (uiState is UIState.Loading) {
+                    if (uiState is UIState.Loading) {
                         CircularProgressIndicator(modifier = Modifier.size(ButtonDefaults.IconSize))
-                    } else {*/
-                    TextButton(
-                        enabled = true, //formState.formIsValid,
-                        onClick = { /*onSubmit() */ }
-                    ) {
-                        Text("JOIN")
+                    } else if (uiState !is UIState.FinishedWithError<*> || uiState.error !is HomeKitRedError.NotFound) {
+                        TextButton(
+                            enabled = true,
+                            onClick = onSubmit
+                        ) {
+                            Text("Join")
+                        }
                     }
-                    //}
                 }
             }
         }

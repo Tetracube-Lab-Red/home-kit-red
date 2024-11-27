@@ -1,5 +1,8 @@
 package red.tetracube.homekitred.iot.device.room
 
+import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.data.api.payloads.device.DeviceRoomJoin
+import red.tetracube.homekitred.data.api.repositories.DeviceRoomAPIRepository
 import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
@@ -7,7 +10,8 @@ import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 class DeviceRoomUseCases(
     private val hubDatasource: HubDatasource,
     private val roomDatasource: RoomDatasource,
-    private val deviceDatasource: DeviceDatasource
+    private val deviceDatasource: DeviceDatasource,
+    private val deviceRoomAPIRepository: DeviceRoomAPIRepository
 ) {
 
     suspend fun getRoomsMap(): Map<String, String> {
@@ -17,9 +21,26 @@ class DeviceRoomUseCases(
             .toMap()
     }
 
-    suspend fun getDeviceRoom(deviceSlug: String): String? {
+    suspend fun getDeviceRoom(deviceSlug: String): Pair<String, String?>? {
         return deviceDatasource.getDeviceBySlug(deviceSlug)
-            ?.roomSlug
+            ?.let { it.name to it.roomSlug }
+    }
+
+    suspend fun updateDeviceRoom(deviceSlug: String, roomSlug: String): Result<Unit> {
+        val hub = hubDatasource.getActiveHub()!!
+        try {
+            deviceRoomAPIRepository.deviceRoomJoin(
+                hub.apiURI,
+                hub.token,
+                DeviceRoomJoin(
+                    deviceSlug,
+                    roomSlug
+                )
+            )
+            return Result.success(Unit)
+        } catch (ex: HomeKitRedError) {
+            return Result.failure(ex)
+        }
     }
 
 }
