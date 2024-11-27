@@ -42,9 +42,9 @@ class IoTHomeViewModel(
 
     fun loadHubData() {
         viewModelScope.launch(job) {
+            _uiState.value = UIState.Loading
             launch {
-                _uiState.value = UIState.Loading
-                ioTHomeUseCases.getHubWithRooms()
+                ioTHomeUseCases.loadData()
                     .collect {
                         _uiState.value = UIState.FinishedWithSuccessContent(it)
                     }

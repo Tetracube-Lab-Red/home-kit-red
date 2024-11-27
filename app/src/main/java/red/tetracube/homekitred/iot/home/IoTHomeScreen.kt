@@ -158,9 +158,7 @@ fun IoTHomeScreenUI(
                 .padding(innerPadding)
         ) {
             if (uiState is UIState.Loading) {
-                ElevatedCard {
-                    LinearProgressIndicator()
-                }
+                LinearProgressIndicator()
             }
 
             if (uiState is UIState.FinishedWithSuccessContent<*>) {

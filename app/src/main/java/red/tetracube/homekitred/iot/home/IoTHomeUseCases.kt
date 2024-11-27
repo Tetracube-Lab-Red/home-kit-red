@@ -19,9 +19,12 @@ class IoTHomeUseCases(
     private val database: HomeKitRedDatabase
 ) {
 
-    fun getHubWithRooms(): Flow<HubWithRooms> =
-        hubDatasource.getHubAndRooms()
+    suspend fun loadData(): Flow<HubWithRooms> {
+        val hub = hubDatasource.getActiveHub()!!
+        deviceService.retrieveDevices(hub.slug, hub.apiURI, hub.token)
+        return hubDatasource.getHubAndRooms()
             .map { it.toDomain() }
+    }
 
     suspend fun listenAPITelemetrySteaming() {
         val hub = hubDatasource.getActiveHub()!!
@@ -44,7 +47,6 @@ class IoTHomeUseCases(
 
     suspend fun getDevices(roomSlug: String?): Flow<Device> {
         val hub = hubDatasource.getActiveHub()!!
-        deviceService.retrieveDevices(hub.slug, hub.apiURI, hub.token)
         return database.deviceRepository().getDevices(hub.slug)
             .filter { entity ->
                 if (roomSlug == null) true else entity.roomSlug == roomSlug
