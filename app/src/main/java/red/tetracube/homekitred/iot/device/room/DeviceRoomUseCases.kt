@@ -29,7 +29,7 @@ class DeviceRoomUseCases(
     suspend fun updateDeviceRoom(deviceSlug: String, roomSlug: String): Result<Unit> {
         val hub = hubDatasource.getActiveHub()!!
         try {
-            deviceRoomAPIRepository.deviceRoomJoin(
+            var deviceRoomUpdateResponse = deviceRoomAPIRepository.deviceRoomJoin(
                 hub.apiURI,
                 hub.token,
                 DeviceRoomJoin(
@@ -37,6 +37,11 @@ class DeviceRoomUseCases(
                     roomSlug
                 )
             )
+            deviceDatasource.getDeviceBySlug(deviceRoomUpdateResponse.deviceSlug)
+                ?.apply {
+                    this.roomSlug = deviceRoomUpdateResponse.roomSlug
+                    deviceDatasource.updateDevice(this)
+                }
             return Result.success(Unit)
         } catch (ex: HomeKitRedError) {
             return Result.failure(ex)

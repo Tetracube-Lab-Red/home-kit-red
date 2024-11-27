@@ -46,7 +46,8 @@ class IoTHomeViewModel(
             launch {
                 ioTHomeUseCases.loadData()
                     .collect {
-                        _uiState.value = UIState.FinishedWithSuccessContent(it)
+                        _hub.value = it
+                        _uiState.value = UIState.FinishedWithSuccess
                     }
             }
 

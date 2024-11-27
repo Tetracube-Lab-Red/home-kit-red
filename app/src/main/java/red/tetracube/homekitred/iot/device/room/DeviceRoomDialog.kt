@@ -125,9 +125,9 @@ fun DeviceRoomDialogUI(
 
                 if (uiState !is UIState.FinishedWithError<*>) {
                     var expanded by remember { mutableStateOf(false) }
-                    val currentRoomName = remember {
+                    val currentRoomName = remember(roomValue) {
                         derivedStateOf {
-                            rooms.entries.first { it.key == roomValue }.value
+                            rooms.entries.firstOrNull { it.key == roomValue }?.value ?: ""
                         }
                     }
                     ExposedDropdownMenuBox(

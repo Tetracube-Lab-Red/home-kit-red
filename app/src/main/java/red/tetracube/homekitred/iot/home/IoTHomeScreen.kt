@@ -13,7 +13,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -57,6 +56,7 @@ fun IoTHomeScreen(
     navController: NavHostController,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
+    val hubWithRooms = viewModel.hub
     val uiState = viewModel.uiState
     val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
     val screenScope = rememberCoroutineScope()
@@ -91,6 +91,7 @@ fun IoTHomeScreen(
     }
 
     IoTHomeScreenUI(
+        hub = hubWithRooms.value,
         uiState = uiState.value,
         screenScope = screenScope,
         menuBottomSheet = {
@@ -110,6 +111,7 @@ fun IoTHomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IoTHomeScreenUI(
+    hub: HubWithRooms?,
     uiState: UIState,
     screenScope: CoroutineScope,
     menuBottomSheet: @Composable () -> Unit,
@@ -127,8 +129,7 @@ fun IoTHomeScreenUI(
                     )
                 },
                 actions = {
-                    if (uiState is UIState.FinishedWithSuccessContent<*>) {
-                        val hub = uiState.content as HubWithRooms
+                    if (uiState is UIState.FinishedWithSuccess) {
                         IconButton(
                             onClick = { onHubAvatarClick() }
                         ) {
@@ -140,7 +141,7 @@ fun IoTHomeScreenUI(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = hub.avatarName,
+                                    text = hub?.avatarName ?: "",
                                     color = MaterialTheme.colorScheme.onSecondary
                                 )
                             }
@@ -161,12 +162,11 @@ fun IoTHomeScreenUI(
                 LinearProgressIndicator()
             }
 
-            if (uiState is UIState.FinishedWithSuccessContent<*>) {
-                val hub = uiState.content as HubWithRooms
-                val pagerState = rememberPagerState(initialPage = 0, pageCount = { hub.rooms.size })
-                val selectedRoomSlug = remember {
+            if (uiState is UIState.FinishedWithSuccess) {
+                val pagerState = rememberPagerState(initialPage = 0, pageCount = { hub?.rooms?.size ?: 0 })
+                val selectedRoomSlug = remember(hub?.rooms) {
                     derivedStateOf {
-                        hub.rooms[pagerState.currentPage].slug
+                        hub?.rooms[pagerState.currentPage]?.slug
                     }
                 }
                 ScrollableTabRow(
@@ -176,7 +176,7 @@ fun IoTHomeScreenUI(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    hub.rooms.mapIndexed { idx, room ->
+                    hub?.rooms?.mapIndexed { idx, room ->
                         Tab(
                             selected = pagerState.currentPage == idx,
                             onClick = {
@@ -191,7 +191,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(selectedRoomSlug.value, devicesTelemetriesMap, onDeviceMenuRequest)
+                    DevicesGrid(selectedRoomSlug.value ?: "all", devicesTelemetriesMap, onDeviceMenuRequest)
                 }
             }
         }
