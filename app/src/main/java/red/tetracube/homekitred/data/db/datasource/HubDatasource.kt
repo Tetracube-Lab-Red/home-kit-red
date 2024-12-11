@@ -11,10 +11,6 @@ import red.tetracube.homekitred.data.db.entities.HubWithRoomsEntity
 
 @Dao
 interface HubDatasource {
-
-    @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
-    suspend fun getActiveHub(): HubEntity?
-
     @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
     fun streamActiveHub(): Flow<HubEntity>
 
@@ -24,5 +20,4 @@ interface HubDatasource {
     @Transaction
     @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
     fun getHubAndRooms(): Flow<HubWithRoomsEntity>
-
 }

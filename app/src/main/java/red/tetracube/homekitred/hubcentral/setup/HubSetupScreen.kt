@@ -52,7 +52,7 @@ import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 
 @Composable
 fun HubSetupScreen(

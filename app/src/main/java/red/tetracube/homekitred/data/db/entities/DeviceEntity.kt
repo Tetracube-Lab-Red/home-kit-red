@@ -4,23 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import red.tetracube.homekitred.data.enumerations.DeviceType
+import java.util.UUID
 
 @Entity(tableName = "devices")
 class DeviceEntity(
-    @PrimaryKey
-    @ColumnInfo(name = "slug")
-    var slug: String = "",
-
-    @ColumnInfo(name = "name")
-    var name: String = "",
-
-    @ColumnInfo(name = "type")
-    var type: DeviceType = DeviceType.NONE,
-
-    @ColumnInfo(name = "hub_slug")
-    var hubSlug: String,
-
-    @ColumnInfo(name = "room_slug")
-    var roomSlug: String? = null,
-) {
-}
+    @PrimaryKey var id: UUID,
+    @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "type") var type: DeviceType,
+    @ColumnInfo(name = "hub_id") var hubId: UUID,
+    @ColumnInfo(name = "room_id") var roomId: UUID?,
+)

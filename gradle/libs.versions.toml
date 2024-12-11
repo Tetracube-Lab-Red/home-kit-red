@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.2"
+agp = "8.7.3"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -11,10 +11,10 @@ composeBom = "2024.11.00"
 uiTextGoogleFonts = "1.7.5"
 navigation = "2.8.4"
 pluginKotlinxSerialization = "2.0.21"
-ktor = "3.0.1"
+ktor = "3.0.2"
 ksp = "2.0.21-1.0.25"
 room = "2.6.1"
-jackson-jsr310 = "2.18.1"
+jackson-jsr310 = "2.18.2"
 
 [libraries]
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }

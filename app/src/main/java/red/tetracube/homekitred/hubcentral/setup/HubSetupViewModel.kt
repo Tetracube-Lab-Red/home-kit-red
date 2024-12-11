@@ -12,7 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
 

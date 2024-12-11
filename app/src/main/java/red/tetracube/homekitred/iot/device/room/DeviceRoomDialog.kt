@@ -38,7 +38,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 
 @Composable
 fun DeviceRoomDialog(

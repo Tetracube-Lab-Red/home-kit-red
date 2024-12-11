@@ -7,10 +7,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import red.tetracube.homekitred.app.behaviour.routing.Routes.DeviceProvisioning
-import red.tetracube.homekitred.app.behaviour.routing.Routes.DeviceRoomJoin
-import red.tetracube.homekitred.app.behaviour.routing.Routes.IoT
-import red.tetracube.homekitred.app.behaviour.routing.Routes.IoTHome
+import red.tetracube.homekitred.app.Routes.DeviceProvisioning
+import red.tetracube.homekitred.app.Routes.DeviceRoomJoin
+import red.tetracube.homekitred.app.Routes.IoT
+import red.tetracube.homekitred.app.Routes.IoTHome
 import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningScreen
 import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningViewModel
 import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog

@@ -14,6 +14,9 @@ home and life organization from the convenience of your smartphone.
 - **Real-Time Monitoring**: Get real-time updates and notifications about the status of your devices and services.
 - **User-Friendly Interface**: Enjoy a simple and intuitive interface designed for easy navigation and quick access to features.
 
+## Conventions
+* http urls or address variables names: postfix with `URI` or `_uri` according with the context
+
 ## Getting Started [WIP]
 ### 🛠️ Prerequisites [WIP]
 - Ensure your smart hub is set up and connected to your network.

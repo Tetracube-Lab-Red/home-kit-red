@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.app.behaviour.routing
+package red.tetracube.homekitred.app
 
 import kotlinx.serialization.Serializable
 

@@ -15,7 +15,7 @@ import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.services.HubLocalDataService
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 
 class LoginViewModel(
     private val loginUseCases: LoginUseCases

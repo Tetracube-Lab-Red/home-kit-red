@@ -1,11 +1,11 @@
 package red.tetracube.homekitred.data.db
 
 import android.content.Context
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import red.tetracube.homekitred.data.db.converters.InstantConverter
 import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
@@ -14,7 +14,6 @@ import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
-import red.tetracube.homekitred.data.db.migrations.UnifyDeviceTelemetries
 
 @Database(
     entities = [
@@ -23,13 +22,11 @@ import red.tetracube.homekitred.data.db.migrations.UnifyDeviceTelemetries
         DeviceEntity::class,
         UPSTelemetryEntity::class
     ],
-    version = 4,
+    version = 1,
     autoMigrations = [
-        AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 1, to = 2)
     ]
 )
-@TypeConverters(Converters::class)
+@TypeConverters(InstantConverter::class)
 abstract class HomeKitRedDatabase : RoomDatabase() {
     abstract fun hubRepository(): HubDatasource
     abstract fun roomRepository(): RoomDatasource
@@ -53,7 +50,6 @@ abstract class HomeKitRedDatabase : RoomDatabase() {
                         DATABASE_FILE_NAME
                     )
                         .fallbackToDestructiveMigration()
-                        .addMigrations(UnifyDeviceTelemetries)
                         .build()
 
                     HOME_KIT_RED_DATABASE_INSTANCE = instance

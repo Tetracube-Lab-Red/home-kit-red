@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.data.services.HubLocalDataService
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 
 class SplashViewModel(
     private val splashUseCases: SplashUseCases

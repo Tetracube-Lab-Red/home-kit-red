@@ -15,7 +15,7 @@ import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
 import red.tetracube.homekitred.iot.device.provisioning.models.FieldInputEvent
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
-import red.tetracube.homekitred.app.models.UIState
+import red.tetracube.homekitred.models.ui.UIState
 
 class DeviceProvisioningViewModel(
     private val deviceProvisioningUseCase: DeviceProvisioningUseCase
