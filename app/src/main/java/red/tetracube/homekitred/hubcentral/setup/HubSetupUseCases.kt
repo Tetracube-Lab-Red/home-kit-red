@@ -1,12 +1,12 @@
 package red.tetracube.homekitred.hubcentral.setup
 
 import red.tetracube.homekitred.data.api.models.APIError
-import red.tetracube.homekitred.data.api.repositories.HubAPIRepository
+import red.tetracube.homekitred.data.api.datasource.HubDataSource
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
 import red.tetracube.homekitred.app.exceptions.mappers.toDomainError
 
 class HubSetupUseCases(
-    private val hubAPIRepository: HubAPIRepository
+    private val hubAPIRepository: HubDataSource
 ) {
 
     suspend fun create(hubAddress: String, hubName: String, hubPassword: String): Result<String> {

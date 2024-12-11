@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.data.api.payloads.room
+package red.tetracube.homekitred.data.api.entities.room
 
 import com.fasterxml.jackson.annotation.JsonCreator
 

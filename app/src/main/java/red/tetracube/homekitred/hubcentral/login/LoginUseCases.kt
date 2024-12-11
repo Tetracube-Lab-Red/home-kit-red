@@ -1,14 +1,14 @@
 package red.tetracube.homekitred.hubcentral.login
 
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.data.api.repositories.HubAPIRepository
+import red.tetracube.homekitred.data.api.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.services.HubLocalDataService
 import kotlin.String
 
 class LoginUseCases(
-    private val hubAPIRepository: HubAPIRepository,
+    private val hubAPIRepository: HubDataSource,
     private val hubDataSource: HubDatasource,
     private val hubLocalDataService: HubLocalDataService
 ) {

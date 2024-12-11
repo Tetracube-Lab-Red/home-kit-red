@@ -198,7 +198,7 @@ class DeviceProvisioningViewModel(
                 DeviceProvisioningViewModel(
                     deviceProvisioningUseCase = DeviceProvisioningUseCase(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                        deviceAPIRepository = homeKitRedContainer.deviceAPIRepository
+                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource
                     )
                 )
             }

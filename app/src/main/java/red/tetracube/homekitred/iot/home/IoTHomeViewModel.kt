@@ -98,7 +98,7 @@ class IoTHomeViewModel(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
                         database = homeKitRedContainer.homeKitRedDatabase,
                         deviceService = DeviceService(
-                            deviceAPIRepository = homeKitRedContainer.deviceAPIRepository,
+                            ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
                             database = homeKitRedContainer.homeKitRedDatabase
                         )
                     )

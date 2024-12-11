@@ -1,13 +1,13 @@
 package red.tetracube.homekitred.data.services
 
-import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse.UPSTelemetryData
-import red.tetracube.homekitred.data.api.repositories.DeviceAPIRepository
+import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
+import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.data.mappers.asEntity
 
 class DeviceService(
-    private val deviceAPIRepository: DeviceAPIRepository,
+    private val ioTAPIDataSource: IoTAPIDataSource,
     private val database: HomeKitRedDatabase
 ) {
 
@@ -16,7 +16,7 @@ class DeviceService(
         apiURI: String,
         token: String
     ) {
-        deviceAPIRepository.getDevices(apiURI, token)
+        ioTAPIDataSource.getDevices(apiURI, token)
             .devices
             .map { deviceData ->
                 DeviceEntity(
@@ -32,7 +32,7 @@ class DeviceService(
         database.deviceRepository().getDevicesStaticList(hubSlug)
             .forEach { deviceEntity ->
                 var deviceTelemetry =
-                    deviceAPIRepository.getDeviceTelemetry(apiURI, token, deviceEntity.slug)
+                    ioTAPIDataSource.getDeviceTelemetry(apiURI, token, deviceEntity.slug)
 
                 if (deviceTelemetry is UPSTelemetryData) {
                     var telemetryEntity = deviceTelemetry.asEntity()
@@ -45,7 +45,7 @@ class DeviceService(
         streamingHubAddress: String,
         token: String
     ) {
-        deviceAPIRepository.getTelemetryStreaming(streamingHubAddress)
+        ioTAPIDataSource.getTelemetryStreaming(streamingHubAddress)
             .collect {
                 if (it is UPSTelemetryData) {
                     var telemetryEntity = it.asEntity()

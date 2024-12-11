@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.data.mappers
 
-import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse.UPSTelemetryData
+import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 import red.tetracube.homekitred.data.enumerations.UPSStatus
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry

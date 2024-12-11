@@ -1,14 +1,13 @@
-package red.tetracube.homekitred.data.api.repositories
+package red.tetracube.homekitred.data.api.datasource
 
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
 import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
-import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
-import red.tetracube.homekitred.data.api.payloads.device.DeviceRoomJoin
+import red.tetracube.homekitred.data.api.entities.device.DeviceRoomJoin
 
 class DeviceRoomAPIRepository(
-    private val tetraCubeAPIClient: TetraCubeAPIClient
+    private val baseAPIDataSource: BaseAPIDataSource
 ) {
 
     companion object {
@@ -20,7 +19,7 @@ class DeviceRoomAPIRepository(
         token: String,
         request: DeviceRoomJoin
     ): DeviceRoomJoin {
-        return tetraCubeAPIClient.client.patch("$hubAddress$DEVICE_ROOM_RESOURCES")
+        return baseAPIDataSource.client.patch("$hubAddress$DEVICE_ROOM_RESOURCES")
         {
             headers {
                 append("Authorization", "Bearer $token")

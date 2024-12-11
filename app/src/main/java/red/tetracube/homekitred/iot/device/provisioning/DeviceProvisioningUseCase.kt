@@ -1,9 +1,9 @@
 package red.tetracube.homekitred.iot.device.provisioning
 
 import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.data.api.payloads.device.DeviceProvisioningRequest
-import red.tetracube.homekitred.data.api.payloads.device.UPSProvisioningFields
-import red.tetracube.homekitred.data.api.repositories.DeviceAPIRepository
+import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
+import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
+import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
@@ -11,7 +11,7 @@ import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFo
 
 class DeviceProvisioningUseCase(
     private val hubDatasource: HubDatasource,
-    private val deviceAPIRepository: DeviceAPIRepository
+    private val ioTAPIDataSource: IoTAPIDataSource
 ) {
 
     suspend fun sendDeviceProvisioningRequest(
@@ -35,7 +35,7 @@ class DeviceProvisioningUseCase(
         )
 
         try {
-            deviceAPIRepository.deviceProvisioning(
+            ioTAPIDataSource.deviceProvisioning(
                 hub.apiURI,
                 hub.token,
                 request

@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.data.api.payloads.device
+package red.tetracube.homekitred.data.api.entities.device
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type

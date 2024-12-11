@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.data.api.repositories
+package red.tetracube.homekitred.data.api.datasource
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.receiveDeserialized
@@ -8,53 +8,48 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import kotlinx.coroutines.flow.flow
-import red.tetracube.homekitred.data.api.clients.TetraCubeAPIClient
-import red.tetracube.homekitred.data.api.payloads.device.DeviceProvisioningRequest
-import red.tetracube.homekitred.data.api.payloads.device.DeviceTelemetryResponse
-import red.tetracube.homekitred.data.api.payloads.device.GetDevicesResponse
+import red.tetracube.homekitred.data.api.entities.device.DeviceData
+import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
+import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse
+import red.tetracube.homekitred.data.api.entities.device.GetDevicesResponse
 
-class DeviceAPIRepository(
-    private val tetraCubeAPIClient: TetraCubeAPIClient
-) {
+class IoTAPIDataSource : BaseAPIDataSource() {
 
     companion object {
-        const val DEVICE_RESOURCES = "/iot/devices"
-        const val TELEMETRY_RESOURCES = "/telemetry"
+        const val BASE_PATH = "/iot"
+        const val DEVICES = "/devices"
+        const val PROVISIONING = "/telemetry"
     }
 
     suspend fun deviceProvisioning(
-        hubAddress: String,
+        hubURI: String,
         token: String,
         request: DeviceProvisioningRequest
-    ) {
-        tetraCubeAPIClient.client.post("$hubAddress$DEVICE_RESOURCES")
+    ): DeviceData =
+        client.post("$hubURI$BASE_PATH$DEVICES$PROVISIONING")
         {
             headers {
                 append("Authorization", "Bearer $token")
             }
             setBody(request)
         }
-    }
+            .body()
 
-    suspend fun getDevices(
-        hubAddress: String,
-        token: String
-    ): GetDevicesResponse {
-        return tetraCubeAPIClient.client.get("$hubAddress$DEVICE_RESOURCES")
+    suspend fun getDevices(hubURI: String, token: String): GetDevicesResponse =
+        client.get("$hubURI$BASE_PATH$DEVICES")
         {
             headers {
                 append("Authorization", "Bearer $token")
             }
         }
             .body<GetDevicesResponse>()
-    }
 
     suspend fun getDeviceTelemetry(
         hubAddress: String,
         token: String,
         deviceSlug: String
     ): DeviceTelemetryResponse {
-        return tetraCubeAPIClient.client.get("$hubAddress$DEVICE_RESOURCES/$deviceSlug$TELEMETRY_RESOURCES")
+        return client.get("$hubAddress$DEVICE_RESOURCES/$deviceSlug$TELEMETRY_RESOURCES")
         {
             headers {
                 append("Authorization", "Bearer $token")
@@ -64,10 +59,10 @@ class DeviceAPIRepository(
     }
 
     fun getTelemetryStreaming(streamingHubAddress: String) = flow {
-        tetraCubeAPIClient.client.webSocket(
+        client.webSocket(
             urlString = "$streamingHubAddress$DEVICE_RESOURCES$TELEMETRY_RESOURCES"
         ) {
-            while(true) {
+            while (true) {
                 val telemetry = receiveDeserialized<DeviceTelemetryResponse>()
                 emit(telemetry)
             }
