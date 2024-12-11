@@ -1,6 +1,5 @@
 package red.tetracube.homekitred.data.services
 
-import red.tetracube.homekitred.data.api.datasource.RoomAPIRepository
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 

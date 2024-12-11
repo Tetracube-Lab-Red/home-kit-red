@@ -1,7 +1,7 @@
-package red.tetracube.homekitred.data.api.entities.room
+package red.tetracube.homekitred.data.api.entities.hub
 
 import com.fasterxml.jackson.annotation.JsonCreator
 
 data class GetRoomsResponse @JsonCreator constructor(
-    val rooms: List<RoomResponse>
+    val rooms: List<RoomData>
 )

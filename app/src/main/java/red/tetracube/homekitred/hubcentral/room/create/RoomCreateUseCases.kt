@@ -1,7 +1,6 @@
 package red.tetracube.homekitred.hubcentral.room.create
 
 import red.tetracube.homekitred.data.api.models.APIError
-import red.tetracube.homekitred.data.api.datasource.RoomAPIRepository
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.entities.RoomEntity
