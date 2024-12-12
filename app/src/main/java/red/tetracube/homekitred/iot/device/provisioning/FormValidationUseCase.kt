@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.iot.device.provisioning
 
-import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.business.enumerations.DeviceType
 
 class FormValidationUseCase {
 

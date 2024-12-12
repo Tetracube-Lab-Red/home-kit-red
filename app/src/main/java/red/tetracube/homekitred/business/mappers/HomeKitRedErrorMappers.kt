@@ -1,7 +1,7 @@
-package red.tetracube.homekitred.app.exceptions.mappers
+package red.tetracube.homekitred.business.mappers
 
 import red.tetracube.homekitred.data.api.models.APIError
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 
 fun APIError.toDomainError(): HomeKitRedError {
     return when(this) {

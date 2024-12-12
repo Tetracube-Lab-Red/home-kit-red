@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.app
+package red.tetracube.homekitred.navigation
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.shell
+package red.tetracube.homekitred.ui.shell
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import red.tetracube.homekitred.app.Routes
+import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.iot.addIoTNavigation
 import red.tetracube.homekitred.hubcentral.login.LoginScreen
 import red.tetracube.homekitred.hubcentral.setup.HubSetupScreen
@@ -16,8 +16,8 @@ import red.tetracube.homekitred.hubcentral.setup.HubSetupViewModel
 import red.tetracube.homekitred.hubcentral.login.LoginViewModel
 import red.tetracube.homekitred.hubcentral.room.create.RoomCreateDialog
 import red.tetracube.homekitred.hubcentral.room.create.RoomCreateViewModel
-import red.tetracube.homekitred.splash.SplashScreen
-import red.tetracube.homekitred.splash.SplashViewModel
+import red.tetracube.homekitred.ui.splash.SplashScreen
+import red.tetracube.homekitred.ui.splash.SplashViewModel
 import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
 
 @Composable

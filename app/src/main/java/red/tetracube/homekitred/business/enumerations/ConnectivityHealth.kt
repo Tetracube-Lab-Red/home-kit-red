@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.data.enumerations
+package red.tetracube.homekitred.business.enumerations
 
 enum class ConnectivityHealth {
     UNKNOWN,

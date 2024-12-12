@@ -1,11 +1,11 @@
 package red.tetracube.homekitred.iot.device.provisioning
 
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
 import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
 

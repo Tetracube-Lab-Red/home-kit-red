@@ -8,28 +8,6 @@ class HubLocalDataService(
     private val roomDatasource: RoomDatasource
 ) {
 
-    suspend fun updateLocalHubData(
-        hubSlug: String,
-        apiURI: String,
-        token: String
-    ) {
-        roomAPIRepository.getRooms(
-            apiURI,
-            token
-        )
-            .rooms
-            .map { room ->
-                RoomEntity(
-                    slug = room.slug,
-                    name = room.name,
-                    hubSlug = hubSlug
-                )
-            }
-            .forEach { roomEntity ->
-                roomDatasource.insert(roomEntity)
-            }
-        // 2 get notifications
-        // 3 get devices
-    }
+
 
 }

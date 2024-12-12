@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.hubcentral.login
 
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity

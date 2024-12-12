@@ -3,7 +3,7 @@ package red.tetracube.homekitred.data.db.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.business.enumerations.DeviceType
 import java.util.UUID
 
 @Entity(tableName = "devices")

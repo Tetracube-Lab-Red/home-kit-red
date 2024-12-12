@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import red.tetracube.homekitred.data.enumerations.ConnectivityHealth
-import red.tetracube.homekitred.data.enumerations.TelemetryHealth
-import red.tetracube.homekitred.data.enumerations.UPSStatus
+import red.tetracube.homekitred.business.enumerations.ConnectivityHealth
+import red.tetracube.homekitred.business.enumerations.TelemetryHealth
+import red.tetracube.homekitred.business.enumerations.UPSStatus
 import java.time.Instant
 import java.util.UUID
 

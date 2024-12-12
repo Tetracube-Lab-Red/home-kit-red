@@ -2,8 +2,8 @@ package red.tetracube.homekitred.iot.home.domain.models
 
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.app.Routes
-import red.tetracube.homekitred.app.Routes.DeviceRoomJoin
+import red.tetracube.homekitred.navigation.Routes
+import red.tetracube.homekitred.navigation.Routes.DeviceRoomJoin
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
 

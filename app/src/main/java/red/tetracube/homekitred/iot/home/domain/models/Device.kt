@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.iot.home.domain.models
 
-import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.business.enumerations.DeviceType
 
 data class Device (
     val slug: String,

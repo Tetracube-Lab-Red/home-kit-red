@@ -2,8 +2,8 @@ package red.tetracube.homekitred.data.api.entities.device
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import red.tetracube.homekitred.data.enumerations.DeviceType
-import red.tetracube.homekitred.data.enumerations.ProvisioningStatus
+import red.tetracube.homekitred.business.enumerations.DeviceType
+import red.tetracube.homekitred.business.enumerations.ProvisioningStatus
 import java.util.UUID
 
 data class DeviceData @JsonCreator constructor(

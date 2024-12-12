@@ -44,11 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.app.Routes
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.navigation.Routes
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
-import red.tetracube.homekitred.models.ui.UIState
+import red.tetracube.homekitred.business.models.ui.UIState
 
 @Composable
 fun LoginScreen(

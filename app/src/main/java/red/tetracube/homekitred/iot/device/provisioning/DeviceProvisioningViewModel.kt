@@ -10,12 +10,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.data.enumerations.DeviceType
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
 import red.tetracube.homekitred.iot.device.provisioning.models.FieldInputEvent
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
-import red.tetracube.homekitred.models.ui.UIState
+import red.tetracube.homekitred.business.models.ui.UIState
 
 class DeviceProvisioningViewModel(
     private val deviceProvisioningUseCase: DeviceProvisioningUseCase

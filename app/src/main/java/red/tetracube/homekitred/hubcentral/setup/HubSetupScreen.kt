@@ -50,9 +50,9 @@ import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
 import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent.FieldName
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
-import red.tetracube.homekitred.models.ui.UIState
+import red.tetracube.homekitred.business.models.ui.UIState
 
 @Composable
 fun HubSetupScreen(

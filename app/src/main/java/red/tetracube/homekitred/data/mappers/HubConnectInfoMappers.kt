@@ -1,11 +1,11 @@
-package red.tetracube.homekitred.splash.domain.mappers
+package red.tetracube.homekitred.data.mappers
 
 import red.tetracube.homekitred.data.db.entities.HubEntity
-import red.tetracube.homekitred.splash.domain.models.HubConnectionInfo
+import red.tetracube.homekitred.ui.shell.models.HubConnectionInfo
 
 fun HubEntity.toConnectInfo() =
     HubConnectionInfo(
-        slug = this.slug,
+        id = this.id,
         active = this.active,
         token = this.token,
         apiURI = this.apiURI

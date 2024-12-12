@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.splash
+package red.tetracube.homekitred.ui.splash
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.app.Routes
-import red.tetracube.homekitred.models.ui.UIState
+import red.tetracube.homekitred.navigation.Routes
+import red.tetracube.homekitred.business.models.ui.UIState
 
 @Composable
 fun SplashScreen(
@@ -38,9 +38,11 @@ fun SplashScreen(
 ) {
     val uiState = viewModel.uiState.value
     val hubExists = viewModel.hubActiveExists.value
+
     LaunchedEffect(Unit) {
         viewModel.loadDefaultHub()
     }
+
     LaunchedEffect(uiState, hubExists) {
         if (uiState is UIState.FinishedWithSuccess) {
             if (hubExists != null) {
@@ -56,6 +58,7 @@ fun SplashScreen(
             }
         }
     }
+
     SplashScreenUI()
 
     if (uiState is UIState.FinishedWithError<*>) {

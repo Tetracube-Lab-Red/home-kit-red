@@ -4,8 +4,8 @@ import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.datasource.RoomDatasource
 import red.tetracube.homekitred.data.db.entities.RoomEntity
-import red.tetracube.homekitred.app.exceptions.HomeKitRedError
-import red.tetracube.homekitred.app.exceptions.mappers.toDomainError
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.business.mappers.toDomainError
 
 class RoomCreateUseCases(
     private val hubDatasource: HubDatasource,

@@ -3,10 +3,11 @@ package red.tetracube.homekitred.data.api.entities.device
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import red.tetracube.homekitred.data.enumerations.ConnectivityHealth
-import red.tetracube.homekitred.data.enumerations.TelemetryHealth
-import red.tetracube.homekitred.data.enumerations.UPSStatus
+import red.tetracube.homekitred.business.enumerations.ConnectivityHealth
+import red.tetracube.homekitred.business.enumerations.TelemetryHealth
+import red.tetracube.homekitred.business.enumerations.UPSStatus
 import java.time.Instant
+import java.util.UUID
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -23,7 +24,8 @@ import java.time.Instant
 sealed class DeviceTelemetryResponse {
 
     data class UPSTelemetryData(
-        val deviceSlug: String,
+        val id: UUID,
+        val deviceId: UUID,
         val telemetryTS: Instant,
         val connectivityHealth: ConnectivityHealth,
         val telemetryHealth: TelemetryHealth,
