@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.data.services.HubLocalDataService
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.models.ui.UIState
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.mappers.toConnectInfo
@@ -21,17 +21,9 @@ class SplashViewModel(
     private val globalDataUseCases: GlobalDataUseCases
 ) : ViewModel() {
 
-    /* private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
-     val uiState: State<UIState>
-         get() = _uiState*/
-
     val uiState: MutableStateFlow<UIState> = MutableStateFlow<UIState>(
         UIState.Neutral
     )
-    /*
-        private val _hubActiveExists = mutableStateOf<Boolean?>(null)
-        val hubActiveExists: State<Boolean?>
-            get() = _hubActiveExists*/
 
     fun loadDefaultHub() {
         viewModelScope.launch {
@@ -40,15 +32,15 @@ class SplashViewModel(
                 .map { nullableHub -> nullableHub?.toConnectInfo() }
                 .map { nullableConnectInfo ->
                     if (nullableConnectInfo != null) {
-                         val result = globalDataUseCases.updateLocalData(defaultHubConnectInfo)
-                        //     if (result.isSuccess) {
-                        UIState.FinishedWithSuccessContent(true)
-                        /* } else {
-                             result.exceptionOrNull()
-                                 ?.let { it as HomeKitRedError }
-                                 ?.let { UIState.FinishedWithError(it) }
-                                 ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
-                         }*/
+                        val result = globalDataUseCases.updateLocalData(nullableConnectInfo)
+                        if (result.isSuccess) {
+                            UIState.FinishedWithSuccessContent(true)
+                        } else {
+                            result.exceptionOrNull()
+                                ?.let { it as HomeKitRedError }
+                                ?.let { UIState.FinishedWithError(it) }
+                                ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
+                        }
                     } else {
                         UIState.FinishedWithSuccessContent(false)
                     }
@@ -67,9 +59,8 @@ class SplashViewModel(
                 SplashViewModel(
                     hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
                     globalDataUseCases = GlobalDataUseCases(
-                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                        roomAPIRepository = homeKitRedContainer.roomAPIRepository,
                         roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                        hubAPIDataSource = homeKitRedContainer.hubAPIDataSource
                     )
                 )
             }

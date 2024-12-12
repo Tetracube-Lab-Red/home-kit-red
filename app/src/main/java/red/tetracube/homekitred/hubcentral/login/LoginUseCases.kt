@@ -4,7 +4,6 @@ import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDatasource
 import red.tetracube.homekitred.data.db.entities.HubEntity
-import red.tetracube.homekitred.data.services.HubLocalDataService
 import kotlin.String
 
 class LoginUseCases(

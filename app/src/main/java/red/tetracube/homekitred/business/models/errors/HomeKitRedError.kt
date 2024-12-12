@@ -1,23 +1,39 @@
 package red.tetracube.homekitred.business.models.errors
 
-sealed class HomeKitRedError {
+sealed class HomeKitRedError : Exception() {
 
-    data object UnreachableService : HomeKitRedError()
+    object UnreachableService : HomeKitRedError() {
+        private fun readResolve(): Any = UnreachableService
+    }
 
-    data object ModuleNotAvailable : HomeKitRedError()
+    object ModuleNotAvailable : HomeKitRedError() {
+        private fun readResolve(): Any = ModuleNotAvailable
+    }
 
-    data object ServiceError : HomeKitRedError()
+    object ServiceError : HomeKitRedError() {
+        private fun readResolve(): Any = ServiceError
+    }
 
-    data object Unauthorized : HomeKitRedError()
+    object Unauthorized : HomeKitRedError() {
+        private fun readResolve(): Any = Unauthorized
+    }
 
-    data object NotFound : HomeKitRedError()
+    object NotFound : HomeKitRedError() {
+        private fun readResolve(): Any = NotFound
+    }
 
-    data object ClientError : HomeKitRedError()
+    object ClientError : HomeKitRedError()
 
-    data object Conflict : HomeKitRedError()
+    object Conflict : HomeKitRedError() {
+        private fun readResolve(): Any = Conflict
+    }
 
-    data object UnprocessableResult : HomeKitRedError()
+    object UnprocessableResult : HomeKitRedError() {
+        private fun readResolve(): Any = UnprocessableResult
+    }
 
-    data object GenericError : HomeKitRedError()
+    object GenericError : HomeKitRedError() {
+        private fun readResolve(): Any = GenericError
+    }
 
 }
