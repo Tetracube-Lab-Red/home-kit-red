@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.data.mappers
+package red.tetracube.homekitred.business.mappers
 
 import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity

@@ -13,7 +13,7 @@ import red.tetracube.homekitred.data.api.entities.hub.GetRoomsResponse
 import red.tetracube.homekitred.data.api.entities.hub.RoomCreateRequest
 import red.tetracube.homekitred.data.api.entities.hub.RoomData
 
-class HubDataSource : BaseAPIDataSource() {
+class HubAPIDataSource : BaseAPIDataSource() {
 
     companion object {
         const val BASE_PATH = "/hub"

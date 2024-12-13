@@ -4,13 +4,13 @@ import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
 import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
 import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
 
 class DeviceProvisioningUseCase(
-    private val hubDatasource: HubDatasource,
+    private val hubDatasource: HubDataSource,
     private val ioTAPIDataSource: IoTAPIDataSource
 ) {
 

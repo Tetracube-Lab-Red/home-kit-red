@@ -8,7 +8,7 @@ import red.tetracube.homekitred.data.db.entities.RoomEntity
 import java.util.UUID
 
 @Dao
-interface RoomDatasource {
+interface RoomDataSource {
     @Query("SELECT * FROM rooms WHERE hub_id = :hubId order by name")
     suspend fun getHubRooms(hubId: UUID): List<RoomEntity>
 

@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.hubcentral.login
+package red.tetracube.homekitred.ui.hub.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,19 +44,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
-import red.tetracube.homekitred.hubcentral.login.models.LoginUIModel
 import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.navigation.Routes
+import red.tetracube.homekitred.ui.form.rememberFormState
+import red.tetracube.homekitred.ui.form.rememberPasswordField
+import red.tetracube.homekitred.ui.form.rememberTextField
+import red.tetracube.homekitred.ui.form.validateHostAddress
+import red.tetracube.homekitred.ui.form.validateHubName
+import red.tetracube.homekitred.ui.form.validatePassword
 
 @Composable
 fun LoginScreen(
     navHostController: NavHostController,
     loginViewModel: LoginViewModel
 ) {
-    val formStatus = loginViewModel.loginUIModel.value
-
     val uiState = loginViewModel.uiState.value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,7 +76,7 @@ fun LoginScreen(
                     duration = SnackbarDuration.Long
                 )
             }
-        } else if (uiState is UIState.FinishedWithSuccess) {
+        } else if (uiState is UIState.FinishedWithSuccessContent<*>) {
             navHostController.navigate(Routes.IoT) {
                 popUpTo<Routes.Login>() { inclusive = true }
             }
@@ -82,38 +84,31 @@ fun LoginScreen(
     }
 
     LoginScreenUI(
-        formStatus = formStatus,
         snackbarHostState = snackbarHostState,
         uiState = uiState,
-        onTextInput = { fieldName: FieldInputEvent.FieldName, value: String ->
-            loginViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
-        },
-        onFieldTrailingIconClick = {
-            loginViewModel.onInputEvent(FieldInputEvent.FieldTrailingButtonClick(FieldInputEvent.FieldName.PASSWORD))
-        },
         onSetupHuButtonClick = {
             navHostController.navigate(Routes.HubSetup) {
                 launchSingleTop = true
             }
         },
-        onDialogConfirm = {
-            loginViewModel.onLoginButtonClick()
-        }
+        onFormConfirm = loginViewModel::onLoginButtonClick
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreenUI(
-    formStatus: LoginUIModel,
-    onTextInput: (FieldInputEvent.FieldName, String) -> Unit,
-    onFieldTrailingIconClick: () -> Unit,
     onSetupHuButtonClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
-    onDialogConfirm: () -> Unit,
+    onFormConfirm: (String, String, String) -> Unit,
     uiState: UIState
 ) {
     val focusRequester = LocalFocusManager.current
+    val hubAddressField = rememberTextField { validateHostAddress(it) }
+    val hubNameField = rememberTextField { validateHubName(it) }
+    val hubPasswordField = rememberPasswordField { validatePassword(it) }
+    val formState = rememberFormState(listOf(hubAddressField, hubNameField, hubPasswordField))
+
     Scaffold(
         modifier = Modifier
             .clickable(
@@ -176,19 +171,18 @@ fun LoginScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub host address") },
-                        value = formStatus.hubAddressField.value,
+                        value = hubAddressField.value,
                         onValueChange = { value: String ->
-                            onTextInput(
-                                FieldInputEvent.FieldName.HUB_ADDRESS,
-                                value
-                            )
+                            hubAddressField.setValue(value)
                         },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubAddressField.validationMessage)
+                            hubAddressField.getSupportingMessage()?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubAddressField.isDirty && !formStatus.hubAddressField.isValid,
+                        isError = hubAddressField.hasError(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Uri
@@ -207,19 +201,18 @@ fun LoginScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub name") },
-                        value = formStatus.hubNameField.value,
+                        value = hubNameField.value,
                         onValueChange = { value: String ->
-                            onTextInput(
-                                FieldInputEvent.FieldName.HUB_NAME,
-                                value
-                            )
+                            hubNameField.setValue(value)
                         },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubNameField.validationMessage)
+                            hubNameField.getSupportingMessage()?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubNameField.isDirty && !formStatus.hubNameField.isValid,
+                        isError = hubNameField.hasError(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text
@@ -238,21 +231,20 @@ fun LoginScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Password") },
-                        value = formStatus.hubPasswordField.value,
+                        value = hubPasswordField.value,
                         onValueChange = { value: String ->
-                            onTextInput(
-                                FieldInputEvent.FieldName.PASSWORD,
-                                value
-                            )
+                            hubPasswordField.setValue(value)
                         },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubPasswordField.validationMessage)
+                            hubPasswordField.getSupportingMessage()?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubPasswordField.isDirty && !formStatus.hubPasswordField.isValid,
+                        isError = hubPasswordField.hasError(),
                         visualTransformation =
-                        if (formStatus.hubPasswordField.clearPassword) {
+                        if (hubPasswordField.showPassword) {
                             VisualTransformation.None
                         } else {
                             PasswordVisualTransformation()
@@ -264,10 +256,10 @@ fun LoginScreenUI(
                         trailingIcon = {
                             IconButton(
                                 onClick = {
-                                    onFieldTrailingIconClick()
+                                    hubPasswordField.togglePasswordVisibility()
                                 }
                             ) {
-                                val icon = if (formStatus.hubPasswordField.clearPassword) {
+                                val icon = if (hubPasswordField.showPassword) {
                                     R.drawable.visibility_off_24px
                                 } else {
                                     R.drawable.visibility_24px
@@ -287,10 +279,10 @@ fun LoginScreenUI(
                 FilledTonalButton(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = formStatus.formIsValid && uiState !is UIState.Loading,
+                    enabled = formState.isValid && uiState !is UIState.Loading,
                     onClick = {
                         focusRequester.clearFocus()
-                        onDialogConfirm()
+                        onFormConfirm(hubAddressField.value, hubNameField.value, hubPasswordField.value)
                     }
                 ) {
                     Text("Sign in")

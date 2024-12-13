@@ -1,15 +1,16 @@
-package red.tetracube.homekitred.hubcentral.login
+package red.tetracube.homekitred.business.usecases
 
+import red.tetracube.homekitred.business.mappers.toConnectInfo
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.data.api.datasource.HubDataSource
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
+import red.tetracube.homekitred.data.api.datasource.HubAPIDataSource
+import red.tetracube.homekitred.data.api.entities.hub.HubLoginRequest
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.entities.HubEntity
-import kotlin.String
 
-class LoginUseCases(
-    private val hubAPIRepository: HubDataSource,
-    private val hubDataSource: HubDatasource,
-    private val hubLocalDataService: HubLocalDataService
+class HubUseCases(
+    private val hubAPIDataSource: HubAPIDataSource,
+    private val hubDataSource: HubDataSource,
+    private val globalDataUseCases: GlobalDataUseCases
 ) {
 
     suspend fun login(
@@ -18,10 +19,12 @@ class LoginUseCases(
         hubPassword: String
     ): Result<Unit> {
         val hubDataAPI = try {
-            hubAPIRepository.hubLogin(
+            hubAPIDataSource.login(
                 hubAddress,
-                hubName,
-                hubPassword
+                hubLoginRequest = HubLoginRequest(
+                    hubName,
+                    hubPassword
+                )
             )
         } catch (ex: HomeKitRedError) {
             return Result.failure(ex)
@@ -34,7 +37,7 @@ class LoginUseCases(
             hubAddress
         }
         val hubData = HubEntity(
-            slug = hubDataAPI.slug,
+            id = hubDataAPI.id,
             name = hubDataAPI.name,
             token = hubDataAPI.token,
             apiURI = hubAddress,
@@ -42,10 +45,8 @@ class LoginUseCases(
             active = true
         )
         hubDataSource.insert(hubData)
-        hubLocalDataService.updateLocalHubData(
-            hubData.slug,
-            hubData.apiURI,
-            hubData.token
+        globalDataUseCases.updateLocalData(
+            hubData.toConnectInfo()
         )
         return Result.success(Unit)
     }

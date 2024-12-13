@@ -2,13 +2,13 @@ package red.tetracube.homekitred.business.usecases
 
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.models.ui.state.HubConnectionInfo
-import red.tetracube.homekitred.data.api.datasource.HubDataSource
-import red.tetracube.homekitred.data.db.datasource.RoomDatasource
+import red.tetracube.homekitred.data.api.datasource.HubAPIDataSource
+import red.tetracube.homekitred.data.db.datasource.RoomDataSource
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 
 class GlobalDataUseCases(
-    private val roomDatasource: RoomDatasource,
-    private val hubAPIDataSource: HubDataSource,
+    private val roomDatasource: RoomDataSource,
+    private val hubAPIDataSource: HubAPIDataSource,
 ) {
 
     suspend fun updateLocalData(hubConnectionInfo: HubConnectionInfo): Result<Unit> {

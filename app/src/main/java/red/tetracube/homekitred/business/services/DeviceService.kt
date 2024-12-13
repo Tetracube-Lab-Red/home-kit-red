@@ -1,10 +1,10 @@
-package red.tetracube.homekitred.data.services
+package red.tetracube.homekitred.business.services
 
 import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
-import red.tetracube.homekitred.data.mappers.asEntity
+import red.tetracube.homekitred.business.mappers.asEntity
 
 class DeviceService(
     private val ioTAPIDataSource: IoTAPIDataSource,

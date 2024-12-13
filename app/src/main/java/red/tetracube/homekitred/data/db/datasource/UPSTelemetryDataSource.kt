@@ -9,7 +9,7 @@ import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 import java.util.UUID
 
 @Dao
-interface UPSTelemetryDatasource {
+interface UPSTelemetryDataSource {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(telemetry: UPSTelemetryEntity): Long
 

@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.models.ui.UIState
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.mappers.toConnectInfo
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.business.mappers.toConnectInfo
 import red.tetracube.homekitred.business.usecases.GlobalDataUseCases
 
 class SplashViewModel(
-    private val hubDatasource: HubDatasource,
+    private val hubDatasource: HubDataSource,
     private val globalDataUseCases: GlobalDataUseCases
 ) : ViewModel() {
 

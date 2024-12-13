@@ -1,16 +1,16 @@
 package red.tetracube.homekitred.hubcentral.room.create
 
 import red.tetracube.homekitred.data.api.models.APIError
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.db.datasource.RoomDatasource
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.data.db.datasource.RoomDataSource
 import red.tetracube.homekitred.data.db.entities.RoomEntity
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.mappers.toDomainError
 
 class RoomCreateUseCases(
-    private val hubDatasource: HubDatasource,
+    private val hubDatasource: HubDataSource,
     private val roomAPIRepository: RoomAPIRepository,
-    private val roomDatasource: RoomDatasource
+    private val roomDatasource: RoomDataSource
 ) {
 
     suspend fun createRoom(name: String): Result<Unit> {

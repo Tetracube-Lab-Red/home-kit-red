@@ -2,14 +2,14 @@ package red.tetracube.homekitred.iot.device.room
 
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.entities.device.DeviceRoomJoin
-import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.db.datasource.RoomDatasource
+import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.data.db.datasource.RoomDataSource
 
 class DeviceRoomUseCases(
-    private val hubDatasource: HubDatasource,
-    private val roomDatasource: RoomDatasource,
-    private val deviceDatasource: DeviceDatasource,
+    private val hubDatasource: HubDataSource,
+    private val roomDatasource: RoomDataSource,
+    private val deviceDatasource: DeviceDataSource,
     private val deviceRoomAPIRepository: DeviceRoomAPIRepository
 ) {
 

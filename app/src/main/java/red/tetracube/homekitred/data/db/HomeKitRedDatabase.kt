@@ -6,10 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import red.tetracube.homekitred.data.db.converters.InstantConverter
-import red.tetracube.homekitred.data.db.datasource.DeviceDatasource
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.db.datasource.RoomDatasource
-import red.tetracube.homekitred.data.db.datasource.UPSTelemetryDatasource
+import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.data.db.datasource.RoomDataSource
+import red.tetracube.homekitred.data.db.datasource.UPSTelemetryDataSource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import red.tetracube.homekitred.data.db.entities.RoomEntity
@@ -28,10 +28,10 @@ import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 )
 @TypeConverters(InstantConverter::class)
 abstract class HomeKitRedDatabase : RoomDatabase() {
-    abstract fun hubRepository(): HubDatasource
-    abstract fun roomRepository(): RoomDatasource
-    abstract fun deviceRepository(): DeviceDatasource
-    abstract fun upsTelemetryDatasource(): UPSTelemetryDatasource
+    abstract fun hubDataSource(): HubDataSource
+    abstract fun roomDataSource(): RoomDataSource
+    abstract fun deviceDataSource(): DeviceDataSource
+    abstract fun upsTelemetryDataSource(): UPSTelemetryDataSource
 
     companion object {
         private const val DATABASE_FILE_NAME = "home_kit_red.db"

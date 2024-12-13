@@ -10,7 +10,7 @@ import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import java.util.UUID
 
 @Dao
-interface DeviceDatasource {
+interface DeviceDataSource {
     @Query("SELECT * FROM devices WHERE id = :id LIMIT 1")
     suspend fun getDeviceById(id: UUID): DeviceEntity?
 

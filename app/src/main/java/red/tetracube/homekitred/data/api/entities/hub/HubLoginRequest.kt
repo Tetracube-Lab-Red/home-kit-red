@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class HubLoginRequest @JsonCreator constructor(
-    @JsonProperty("name") val slug: String,
+    @JsonProperty("name") val name: String,
     @JsonProperty("accessCode") val accessCode: String
 )

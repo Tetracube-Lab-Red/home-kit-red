@@ -5,16 +5,16 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
-import red.tetracube.homekitred.data.db.datasource.HubDatasource
-import red.tetracube.homekitred.data.mappers.asBasicTelemetry
-import red.tetracube.homekitred.data.services.DeviceService
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.business.mappers.asBasicTelemetry
+import red.tetracube.homekitred.business.services.DeviceService
 import red.tetracube.homekitred.iot.home.domain.mappers.toDomain
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 class IoTHomeUseCases(
-    private val hubDatasource: HubDatasource,
+    private val hubDatasource: HubDataSource,
     private val deviceService: DeviceService,
     private val database: HomeKitRedDatabase
 ) {
