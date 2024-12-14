@@ -20,3 +20,12 @@ fun rememberPasswordField(
         PasswordField(validationFn)
     }
 }
+
+@Composable
+fun rememberSelectField(
+    validationFn: ((String) -> Pair<Boolean, String>)?
+): SelectField {
+    return remember {
+        SelectField(validationFn)
+    }
+}

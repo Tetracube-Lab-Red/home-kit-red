@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot.device.provisioning.models
+package red.tetracube.homekitred.ui.iot.device.provisioning.models
 
 import red.tetracube.homekitred.business.enumerations.DeviceType
 

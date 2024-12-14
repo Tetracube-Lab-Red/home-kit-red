@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot.device.provisioning
+package red.tetracube.homekitred.ui.iot.device.provisioning
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -35,9 +35,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -50,22 +50,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.enumerations.DeviceType
-import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
-import red.tetracube.homekitred.iot.device.provisioning.models.DeviceTypeOptionModel
-import red.tetracube.homekitred.iot.device.provisioning.models.FieldInputEvent
-import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
+import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.ui.iot.device.provisioning.models.DeviceTypeOptionModel
+import red.tetracube.homekitred.ui.form.rememberFormState
+import red.tetracube.homekitred.ui.form.rememberSelectField
+import red.tetracube.homekitred.ui.form.rememberTextField
 
 @Composable
 fun DeviceProvisioningScreen(
     viewModel: DeviceProvisioningViewModel,
     navHostController: NavHostController
 ) {
-    val formStatus = viewModel.deviceProvisioningFormSate.value
-    val upsProvisioningFormModel = viewModel.upsProvisioningFormState.value
-    val uiState = viewModel.uiState.value
+    val uiState = viewModel.uiState.collectAsState().value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -83,7 +81,7 @@ fun DeviceProvisioningScreen(
                     duration = SnackbarDuration.Long
                 )
             }
-        } else if (uiState is UIState.FinishedWithSuccess) {
+        } else if (uiState is UIState.FinishedWithSuccessContent<*>) {
             navHostController.popBackStack()
         }
     }
@@ -102,18 +100,6 @@ fun DeviceProvisioningScreen(
                     "UPS",
                     R.drawable.battery_charging_full_24px
                 )
-
-                DeviceType.SWITCH -> DeviceTypeOptionModel(
-                    DeviceType.SWITCH,
-                    "Switch",
-                    R.drawable.switch_24px
-                )
-
-                DeviceType.HUE -> DeviceTypeOptionModel(
-                    DeviceType.HUE,
-                    "Hue Lights",
-                    R.drawable.emoji_objects_24px
-                )
             }
         }
             .filter { it.deviceType != DeviceType.NONE }
@@ -127,20 +113,8 @@ fun DeviceProvisioningScreen(
             navHostController.popBackStack()
         },
         snackbarHostState = snackbarHostState,
-        formStatus = formStatus,
-        onTextInput = { fieldName, value ->
-            viewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
-        },
-        onDeviceTypeSelect = {
-            viewModel.onInputEvent(FieldInputEvent.DeviceTypeSelect(it))
-        },
         upsProvisioningForm = {
-            UPSForm(
-                upsProvisioningFormModel = upsProvisioningFormModel,
-                onTextInput = { fieldName, value ->
-                    viewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
-                }
-            )
+            UPSForm()
         }
     )
 }
@@ -151,13 +125,14 @@ fun DeviceProvisioningScreenUI(
     uiState: UIState,
     deviceTypes: List<DeviceTypeOptionModel>,
     onBackIconClick: () -> Unit,
-    formStatus: DeviceProvisioningFormModel,
-    onTextInput: (FieldInputEvent.FieldName, String) -> Unit,
-    onDeviceTypeSelect: (DeviceTypeOptionModel) -> Unit,
     upsProvisioningForm: @Composable () -> Unit,
     onSaveClick: () -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
+    val deviceName = rememberTextField { validateDeviceName(it) }
+    val deviceType = rememberSelectField { validateDeviceType(DeviceType.valueOf(it)) }
+    val formState = rememberFormState(listOf(deviceName, deviceType))
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -183,7 +158,7 @@ fun DeviceProvisioningScreenUI(
                         )
                     } else {
                         TextButton(
-                            enabled = formStatus.formIsValid,
+                            enabled = formState.isValid,
                             onClick = onSaveClick
                         ) {
                             Text("Save")
@@ -212,29 +187,25 @@ fun DeviceProvisioningScreenUI(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Device name") },
-                value = formStatus.deviceName.value,
-                onValueChange = { value: String ->
-                    onTextInput(
-                        FieldInputEvent.FieldName.DEVICE_NAME,
-                        value
-                    )
-                },
+                value = deviceName.value,
+                onValueChange = { value: String -> deviceName.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    Text(formStatus.deviceName.validationMessage)
+                    deviceName.message?.let {
+                        Text(it)
+                    }
                 },
-                isError = formStatus.deviceName.isDirty && !formStatus.deviceName.isValid
+                isError = deviceName.hasError()
             )
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            var expanded by remember { mutableStateOf(false) }
             var icon by remember { mutableIntStateOf(R.drawable.home_iot_device_24px) }
 
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
+                expanded = deviceType.expanded,
+                onExpandedChange = { deviceType.toggleSelect() },
             ) {
                 OutlinedTextField(
                     leadingIcon = {
@@ -246,19 +217,23 @@ fun DeviceProvisioningScreenUI(
                     modifier = Modifier
                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth(),
-                    value = formStatus.deviceType.value,
+                    value = deviceType.value,
                     onValueChange = {},
                     readOnly = true,
                     singleLine = true,
                     supportingText = {
-                        Text(formStatus.deviceType.validationMessage)
+                        deviceType.message?.let {
+                            Text(it)
+                        }
                     },
                     label = { Text("Device Type") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = deviceType.expanded)
+                    },
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    expanded = deviceType.expanded,
+                    onDismissRequest = { deviceType.toggleSelect() },
                 ) {
                     deviceTypes.forEach { option ->
                         DropdownMenuItem(
@@ -276,8 +251,8 @@ fun DeviceProvisioningScreenUI(
                             },
                             onClick = {
                                 icon = option.fieldIcon
-                                onDeviceTypeSelect(option)
-                                expanded = false
+                                deviceType.setOptionValue(option.deviceType.name)
+                                deviceType.toggleSelect()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
@@ -293,7 +268,7 @@ fun DeviceProvisioningScreenUI(
 
             val density = LocalDensity.current
             AnimatedVisibility(
-                visible = formStatus.deviceType.internalType == DeviceType.UPS,
+                visible = deviceType.option == DeviceType.UPS.name,
                 enter = slideInVertically {
                     with(density) { 10.dp.roundToPx() }
                 } + expandVertically(
@@ -310,10 +285,7 @@ fun DeviceProvisioningScreenUI(
 }
 
 @Composable
-fun UPSForm(
-    upsProvisioningFormModel: UPSProvisioningFormModel,
-    onTextInput: (FieldInputEvent.FieldName, String) -> Unit
-) {
+fun UPSForm() {
     Column {
         Text(
             "NUT server details",

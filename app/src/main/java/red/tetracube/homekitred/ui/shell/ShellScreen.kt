@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import red.tetracube.homekitred.navigation.Routes
-import red.tetracube.homekitred.iot.addIoTNavigation
+import red.tetracube.homekitred.ui.iot.addIoTNavigation
 import red.tetracube.homekitred.ui.hub.login.LoginScreen
 import red.tetracube.homekitred.ui.hub.setup.HubSetupScreen
 import red.tetracube.homekitred.ui.hub.setup.HubSetupViewModel

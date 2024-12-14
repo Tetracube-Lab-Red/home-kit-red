@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot
+package red.tetracube.homekitred.ui.iot
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
@@ -11,8 +11,8 @@ import red.tetracube.homekitred.navigation.Routes.DeviceProvisioning
 import red.tetracube.homekitred.navigation.Routes.DeviceRoomJoin
 import red.tetracube.homekitred.navigation.Routes.IoT
 import red.tetracube.homekitred.navigation.Routes.IoTHome
-import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningScreen
-import red.tetracube.homekitred.iot.device.provisioning.DeviceProvisioningViewModel
+import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningScreen
+import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningViewModel
 import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog
 import red.tetracube.homekitred.iot.device.room.DeviceRoomViewModel
 import red.tetracube.homekitred.iot.home.IoTHomeScreen
