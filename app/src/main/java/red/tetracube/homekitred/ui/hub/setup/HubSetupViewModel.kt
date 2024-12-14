@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.ui.hub.login
+package red.tetracube.homekitred.ui.hub.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +15,7 @@ import red.tetracube.homekitred.business.models.ui.UIState
 import red.tetracube.homekitred.business.usecases.GlobalDataUseCases
 import red.tetracube.homekitred.business.usecases.HubUseCases
 
-class LoginViewModel(
+class HubSetupViewModel(
     private val hubUseCases: HubUseCases
 ) : ViewModel() {
 
@@ -23,12 +23,16 @@ class LoginViewModel(
     val uiState: StateFlow<UIState>
         get() = _uiState
 
-    fun onLoginButtonClick(hubAddress: String, hubName: String, hubPassword: String) {
+    fun onSetupButtonClick(hubAddress: String, hubName: String, hubPassword: String) {
         _uiState.value = UIState.Loading
         viewModelScope.launch {
-            val loginResult = hubUseCases.login(hubAddress, hubName, hubPassword)
-            if (loginResult.isFailure) {
-                _uiState.value = loginResult.exceptionOrNull()
+            val createHubResult = hubUseCases.create(
+                hubAddress,
+                hubName,
+                hubPassword
+            )
+            if (createHubResult.isFailure) {
+                _uiState.value = createHubResult.exceptionOrNull()
                     ?.let { it as HomeKitRedError }
                     ?.let { UIState.FinishedWithError(it) }
                     ?: UIState.FinishedWithError(HomeKitRedError.GenericError)
@@ -43,17 +47,17 @@ class LoginViewModel(
             initializer {
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
-                val loginUseCases = HubUseCases(
-                    homeKitRedContainer.hubAPIDataSource,
-                    homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
-                    globalDataUseCases = GlobalDataUseCases(
-                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomDataSource(),
-                        homeKitRedContainer.hubAPIDataSource,
+                HubSetupViewModel(
+                    hubUseCases = HubUseCases(
+                        hubAPIDataSource = homeKitRedContainer.hubAPIDataSource,
+                        hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
+                        globalDataUseCases = GlobalDataUseCases(
+                            roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomDataSource(),
+                            hubAPIDataSource = homeKitRedContainer.hubAPIDataSource
+                        )
                     )
                 )
-                LoginViewModel(loginUseCases)
             }
         }
     }
-
 }

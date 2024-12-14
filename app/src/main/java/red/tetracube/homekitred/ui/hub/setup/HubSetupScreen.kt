@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.hubcentral.setup
+package red.tetracube.homekitred.ui.hub.setup
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,6 +33,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,19 +49,21 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent
-import red.tetracube.homekitred.hubcentral.login.models.FieldInputEvent.FieldName
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.hubcentral.setup.models.HubSetupUIModel
 import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.ui.form.rememberFormState
+import red.tetracube.homekitred.ui.form.rememberPasswordField
+import red.tetracube.homekitred.ui.form.rememberTextField
+import red.tetracube.homekitred.ui.hub.login.validateHostAddress
+import red.tetracube.homekitred.ui.hub.login.validateHubName
+import red.tetracube.homekitred.ui.hub.login.validatePassword
 
 @Composable
 fun HubSetupScreen(
     navHostController: NavHostController,
     hubSetupViewModel: HubSetupViewModel
 ) {
-    val formStatus = hubSetupViewModel.hubSetupModel.value
-    val uiState = hubSetupViewModel.uiState.value
+    val uiState = hubSetupViewModel.uiState.collectAsState().value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val shouldShowDialog = remember { mutableStateOf(false) }
@@ -78,25 +81,18 @@ fun HubSetupScreen(
                     duration = SnackbarDuration.Long
                 )
             }
-        } else if (uiState is UIState.FinishedWithSuccess) {
+        } else if (uiState is UIState.FinishedWithSuccessContent<*>) {
             shouldShowDialog.value = true
         }
     }
 
     HubSetupScreenUI(
         uiState = uiState,
-        formStatus = formStatus,
-        onTextInput = { fieldName: FieldName, value: String ->
-            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
-        },
-        onFieldTrailingIconClick = {
-            hubSetupViewModel.onInputEvent(FieldInputEvent.FieldTrailingButtonClick(FieldName.PASSWORD))
-        },
         onBackButtonClick = {
             navHostController.popBackStack()
         },
-        onSetupButtonClick = {
-            hubSetupViewModel.onSetupButtonClick()
+        onSetupButtonClick = { hubAddress, hubName, hubPassword ->
+            hubSetupViewModel.onSetupButtonClick(hubAddress, hubName, hubPassword)
         },
         snackbarHostState = snackbarHostState,
         shouldShowDialog = shouldShowDialog.value,
@@ -110,16 +106,17 @@ fun HubSetupScreen(
 @Composable
 fun HubSetupScreenUI(
     uiState: UIState,
-    formStatus: HubSetupUIModel,
-    onTextInput: (FieldName, String) -> Unit,
-    onFieldTrailingIconClick: () -> Unit,
     onBackButtonClick: () -> Unit,
-    onSetupButtonClick: () -> Unit,
+    onSetupButtonClick: (String, String, String) -> Unit,
     snackbarHostState: SnackbarHostState,
     shouldShowDialog: Boolean,
     onDialogConfirm: () -> Unit
 ) {
     val focusRequester = LocalFocusManager.current
+    val hubAddressField = rememberTextField { validateHostAddress(it) }
+    val hubNameField = rememberTextField { validateHubName(it) }
+    val hubPasswordField = rememberPasswordField { validatePassword(it) }
+    val formState = rememberFormState(listOf(hubAddressField, hubNameField, hubPasswordField))
     Scaffold(
         modifier = Modifier
             .clickable(
@@ -175,19 +172,16 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub host address") },
-                        value = formStatus.hubAddressField.value,
-                        onValueChange = { value: String ->
-                            onTextInput(
-                                FieldName.HUB_ADDRESS,
-                                value
-                            )
-                        },
+                        value = hubAddressField.value,
+                        onValueChange = { value: String -> hubAddressField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubAddressField.validationMessage)
+                            hubAddressField.message?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubAddressField.isDirty && !formStatus.hubAddressField.isValid,
+                        isError = hubAddressField.hasError(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Uri
@@ -206,14 +200,16 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub name") },
-                        value = formStatus.hubNameField.value,
-                        onValueChange = { value: String -> onTextInput(FieldName.HUB_NAME, value) },
+                        value = hubNameField.value,
+                        onValueChange = { value: String -> hubNameField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubNameField.validationMessage)
+                            hubAddressField.message?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubNameField.isDirty && !formStatus.hubNameField.isValid,
+                        isError = hubAddressField.hasError(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text
@@ -232,16 +228,18 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Password") },
-                        value = formStatus.hubPasswordField.value,
-                        onValueChange = { value: String -> onTextInput(FieldName.PASSWORD, value) },
+                        value = hubPasswordField.value,
+                        onValueChange = { value: String -> hubPasswordField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            Text(formStatus.hubPasswordField.validationMessage)
+                            hubPasswordField.message?.let {
+                                Text(it)
+                            }
                         },
-                        isError = formStatus.hubPasswordField.isDirty && !formStatus.hubPasswordField.isValid,
+                        isError = hubPasswordField.hasError(),
                         visualTransformation =
-                        if (formStatus.hubPasswordField.clearPassword) {
+                        if (!hubPasswordField.showPassword) {
                             VisualTransformation.None
                         } else {
                             PasswordVisualTransformation()
@@ -252,11 +250,9 @@ fun HubSetupScreenUI(
                         ),
                         trailingIcon = {
                             IconButton(
-                                onClick = {
-                                    onFieldTrailingIconClick()
-                                }
+                                onClick = { hubPasswordField.togglePasswordVisibility() }
                             ) {
-                                val icon = if (formStatus.hubPasswordField.clearPassword) {
+                                val icon = if (hubPasswordField.showPassword) {
                                     R.drawable.visibility_off_24px
                                 } else {
                                     R.drawable.visibility_24px
@@ -277,10 +273,14 @@ fun HubSetupScreenUI(
                 FilledTonalButton(
                     colors = ButtonDefaults.filledTonalButtonColors(),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = formStatus.formIsValid && uiState !is UIState.Loading,
+                    enabled = formState.isValid && uiState !is UIState.Loading,
                     onClick = {
                         focusRequester.clearFocus()
-                        onSetupButtonClick()
+                        onSetupButtonClick(
+                            hubAddressField.value,
+                            hubNameField.value,
+                            hubPasswordField.value
+                        )
                     }
                 ) {
                     Text("Setup")
@@ -291,13 +291,15 @@ fun HubSetupScreenUI(
         if (shouldShowDialog) {
             BasicAlertDialog(
                 onDismissRequest = { },
-                properties = DialogProperties (
+                properties = DialogProperties(
                     dismissOnClickOutside = false,
                     dismissOnBackPress = false
                 )
             ) {
                 Surface(
-                    modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight(),
                     shape = MaterialTheme.shapes.large,
                     tonalElevation = AlertDialogDefaults.TonalElevation
                 ) {

@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -50,16 +51,13 @@ import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.ui.form.rememberFormState
 import red.tetracube.homekitred.ui.form.rememberPasswordField
 import red.tetracube.homekitred.ui.form.rememberTextField
-import red.tetracube.homekitred.ui.form.validateHostAddress
-import red.tetracube.homekitred.ui.form.validateHubName
-import red.tetracube.homekitred.ui.form.validatePassword
 
 @Composable
 fun LoginScreen(
     navHostController: NavHostController,
     loginViewModel: LoginViewModel
 ) {
-    val uiState = loginViewModel.uiState.value
+    val uiState = loginViewModel.uiState.collectAsState().value
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -282,7 +280,11 @@ fun LoginScreenUI(
                     enabled = formState.isValid && uiState !is UIState.Loading,
                     onClick = {
                         focusRequester.clearFocus()
-                        onFormConfirm(hubAddressField.value, hubNameField.value, hubPasswordField.value)
+                        onFormConfirm(
+                            hubAddressField.value,
+                            hubNameField.value,
+                            hubPasswordField.value
+                        )
                     }
                 ) {
                     Text("Sign in")

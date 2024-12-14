@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,23 +29,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.navigation.Routes
 
 @Composable
 fun SplashScreen(
     navHostController: NavHostController,
     viewModel: SplashViewModel
 ) {
-    val uiState = viewModel.uiState.value
-    val hubExists = viewModel.hubActiveExists.value
+    val uiState = viewModel.uiState.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.loadDefaultHub()
     }
 
-    LaunchedEffect(uiState, hubExists) {
-        if (uiState is UIState.FinishedWithSuccess) {
+    LaunchedEffect(uiState) {
+        if (uiState is UIState.FinishedWithSuccessContent<*>) {
+            val hubExists = uiState.content as? Boolean?
             if (hubExists != null) {
                 if (!hubExists) {
                     navHostController.navigate(Routes.Login) {

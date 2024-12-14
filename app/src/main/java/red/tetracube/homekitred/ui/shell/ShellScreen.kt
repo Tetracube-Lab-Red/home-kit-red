@@ -11,8 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.iot.addIoTNavigation
 import red.tetracube.homekitred.ui.hub.login.LoginScreen
-import red.tetracube.homekitred.hubcentral.setup.HubSetupScreen
-import red.tetracube.homekitred.hubcentral.setup.HubSetupViewModel
+import red.tetracube.homekitred.ui.hub.setup.HubSetupScreen
+import red.tetracube.homekitred.ui.hub.setup.HubSetupViewModel
 import red.tetracube.homekitred.ui.hub.login.LoginViewModel
 import red.tetracube.homekitred.hubcentral.room.create.RoomCreateDialog
 import red.tetracube.homekitred.hubcentral.room.create.RoomCreateViewModel

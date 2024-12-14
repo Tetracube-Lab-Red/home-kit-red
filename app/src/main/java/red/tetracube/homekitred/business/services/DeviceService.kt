@@ -5,6 +5,7 @@ import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.business.mappers.asEntity
+import java.util.UUID
 
 class DeviceService(
     private val ioTAPIDataSource: IoTAPIDataSource,
@@ -12,7 +13,7 @@ class DeviceService(
 ) {
 
     suspend fun retrieveDevices(
-        hubSlug: String,
+        hubId: UUID,
         apiURI: String,
         token: String
     ) {
@@ -20,16 +21,16 @@ class DeviceService(
             .devices
             .map { deviceData ->
                 DeviceEntity(
-                    slug = deviceData.slug,
+                    id = deviceData.id,
                     name = deviceData.name,
-                    type = deviceData.type,
-                    hubSlug = hubSlug,
-                    roomSlug = deviceData.roomSlug
+                    type = deviceData.deviceType,
+                    hubId = hubId,
+                    roomId = deviceData.roomId
                 )
             }
-            .forEach { database.deviceRepository().insert(it) }
+            .forEach { database.deviceDataSource().insert(it) }
 
-        database.deviceRepository().getDevicesStaticList(hubSlug)
+        database.deviceDataSource().getDevicesStaticList(hubSlug)
             .forEach { deviceEntity ->
                 var deviceTelemetry =
                     ioTAPIDataSource.getDeviceTelemetry(apiURI, token, deviceEntity.slug)

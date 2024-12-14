@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
@@ -21,13 +22,15 @@ class SplashViewModel(
     private val globalDataUseCases: GlobalDataUseCases
 ) : ViewModel() {
 
-    val uiState: MutableStateFlow<UIState> = MutableStateFlow<UIState>(
+    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow<UIState>(
         UIState.Neutral
     )
+    val uiState: StateFlow<UIState>
+        get(): StateFlow<UIState> = _uiState
 
     fun loadDefaultHub() {
         viewModelScope.launch {
-            uiState.value = UIState.Loading
+            _uiState.value = UIState.Loading
             hubDatasource.streamActiveHub()
                 .map { nullableHub -> nullableHub?.toConnectInfo() }
                 .map { nullableConnectInfo ->
@@ -46,7 +49,7 @@ class SplashViewModel(
                     }
                 }
                 .collect { liveUIState ->
-                    uiState.value = liveUIState
+                    _uiState.value = liveUIState
                 }
         }
     }
@@ -57,9 +60,9 @@ class SplashViewModel(
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 SplashViewModel(
-                    hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
+                    hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                     globalDataUseCases = GlobalDataUseCases(
-                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomRepository(),
+                        roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomDataSource(),
                         hubAPIDataSource = homeKitRedContainer.hubAPIDataSource
                     )
                 )

@@ -3,9 +3,13 @@ package red.tetracube.homekitred.business.usecases
 import red.tetracube.homekitred.business.mappers.toConnectInfo
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.HubAPIDataSource
+import red.tetracube.homekitred.data.api.entities.hub.HubCreateRequest
+import red.tetracube.homekitred.data.api.entities.hub.HubCreateResponse
 import red.tetracube.homekitred.data.api.entities.hub.HubLoginRequest
+import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.entities.HubEntity
+import kotlin.Result
 
 class HubUseCases(
     private val hubAPIDataSource: HubAPIDataSource,
@@ -45,10 +49,28 @@ class HubUseCases(
             active = true
         )
         hubDataSource.insert(hubData)
-        globalDataUseCases.updateLocalData(
+        return globalDataUseCases.updateLocalData(
             hubData.toConnectInfo()
         )
-        return Result.success(Unit)
+    }
+
+    suspend fun create(
+        hubAddress: String,
+        hubName: String,
+        hubPassword: String
+    ): Result<HubCreateResponse> {
+        return try {
+            val createHubResult = hubAPIDataSource.createHub(
+                hubAddress,
+                HubCreateRequest(
+                    hubName,
+                    hubPassword
+                )
+            )
+            return Result.success(createHubResult)
+        } catch (exception: HomeKitRedError) {
+            Result.failure(exception)
+        }
     }
 
 }
