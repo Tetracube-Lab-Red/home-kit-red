@@ -6,7 +6,6 @@ import red.tetracube.homekitred.data.api.datasource.HubAPIDataSource
 import red.tetracube.homekitred.data.api.entities.hub.HubCreateRequest
 import red.tetracube.homekitred.data.api.entities.hub.HubCreateResponse
 import red.tetracube.homekitred.data.api.entities.hub.HubLoginRequest
-import red.tetracube.homekitred.data.api.models.APIError
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.entities.HubEntity
 import kotlin.Result

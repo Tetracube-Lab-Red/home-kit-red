@@ -12,6 +12,9 @@ import red.tetracube.homekitred.data.db.entities.HubWithRoomsEntity
 @Dao
 interface HubDataSource {
     @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
+    fun getActiveHub(): HubEntity?
+
+    @Query("SELECT * FROM hubs WHERE active = true LIMIT 1")
     fun streamActiveHub(): Flow<HubEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

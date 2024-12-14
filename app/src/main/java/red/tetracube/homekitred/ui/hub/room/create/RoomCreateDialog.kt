@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.hubcentral.room.create
+package red.tetracube.homekitred.ui.hub.room.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,18 +22,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent
-import red.tetracube.homekitred.hubcentral.room.create.models.FieldInputEvent.FieldName
-import red.tetracube.homekitred.hubcentral.room.create.models.RoomCreateUIModel
 import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.ui.form.rememberFormState
+import red.tetracube.homekitred.ui.form.rememberTextField
 
 
 @Composable
@@ -41,29 +40,20 @@ fun RoomCreateDialog(
     navController: NavHostController,
     viewModel: RoomCreateViewModel
 ) {
-    val formState = viewModel.roomCreateState
-    val uiState = viewModel.uiState
-
-    LaunchedEffect(uiState.value) {
-        if (uiState.value is UIState.FinishedWithSuccess) {
+    val uiState = viewModel.uiState.collectAsState().value
+    LaunchedEffect(uiState) {
+        if (uiState is UIState.FinishedWithSuccessContent<*>) {
             navController.popBackStack()
         }
     }
 
     RoomCreateDialogUI(
-        formState = formState.value,
-        uiState = uiState.value,
-        onInputFocus = { fieldName: FieldName ->
-            viewModel.onInputEvent(FieldInputEvent.FieldFocusAcquire(fieldName))
-        },
-        onTextInput = { fieldName: FieldName, value: String ->
-            viewModel.onInputEvent(FieldInputEvent.FieldValueInput(fieldName, value))
-        },
+        uiState = uiState,
         onDismissRequest = {
             navController.popBackStack()
         },
-        onSubmit = {
-            viewModel.onRoomSubmit()
+        onSubmit = { roomName ->
+            viewModel.onRoomSubmit(roomName)
         },
     )
 }
@@ -71,13 +61,13 @@ fun RoomCreateDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomCreateDialogUI(
-    formState: RoomCreateUIModel,
     uiState: UIState,
-    onInputFocus: (FieldName) -> Unit,
-    onTextInput: (FieldName, String) -> Unit,
     onDismissRequest: () -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: (String) -> Unit
 ) {
+    val roomNameField = rememberTextField { validateRoomName(it) }
+    val formState = rememberFormState(listOf(roomNameField))
+
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
         modifier = Modifier,
@@ -104,20 +94,18 @@ fun RoomCreateDialogUI(
                 }
 
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged {
-                            if (it.isFocused) onInputFocus(FieldName.ROOM_NAME)
-                        },
+                    modifier = Modifier.fillMaxWidth(),
                     label = { Text("Room name") },
-                    value = formState.roomNameField.value,
-                    onValueChange = { value: String -> onTextInput(FieldName.ROOM_NAME, value) },
+                    value = roomNameField.value,
+                    onValueChange = { value: String -> roomNameField.setValue(value) },
                     singleLine = true,
                     maxLines = 1,
                     supportingText = {
-                        Text(formState.roomNameField.supportingText)
+                        roomNameField.message?.let {
+                            Text(it)
+                        }
                     },
-                    isError = formState.roomNameField.isDirty && !formState.roomNameField.isValid,
+                    isError = roomNameField.hasError(),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         autoCorrectEnabled = true,
                         keyboardType = KeyboardType.Text
@@ -155,8 +143,8 @@ fun RoomCreateDialogUI(
                         CircularProgressIndicator(modifier = Modifier.size(ButtonDefaults.IconSize))
                     } else {
                         TextButton(
-                            enabled = formState.formIsValid,
-                            onClick = { onSubmit() }
+                            enabled = formState.isValid,
+                            onClick = { onSubmit(roomNameField.value) }
                         ) {
                             Text("OK")
                         }

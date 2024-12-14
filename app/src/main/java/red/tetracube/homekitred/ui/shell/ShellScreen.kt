@@ -14,11 +14,11 @@ import red.tetracube.homekitred.ui.hub.login.LoginScreen
 import red.tetracube.homekitred.ui.hub.setup.HubSetupScreen
 import red.tetracube.homekitred.ui.hub.setup.HubSetupViewModel
 import red.tetracube.homekitred.ui.hub.login.LoginViewModel
-import red.tetracube.homekitred.hubcentral.room.create.RoomCreateDialog
-import red.tetracube.homekitred.hubcentral.room.create.RoomCreateViewModel
+import red.tetracube.homekitred.ui.hub.room.create.RoomCreateViewModel
 import red.tetracube.homekitred.ui.splash.SplashScreen
 import red.tetracube.homekitred.ui.splash.SplashViewModel
 import red.tetracube.homekitred.ui.theme.HomeKitRedTheme
+import red.tetracube.homekitred.ui.hub.room.create.RoomCreateDialog
 
 @Composable
 fun ShellScreen() {
