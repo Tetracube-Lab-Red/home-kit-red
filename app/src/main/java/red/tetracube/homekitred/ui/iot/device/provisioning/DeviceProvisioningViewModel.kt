@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.business.usecases.DeviceUseCase
+import red.tetracube.homekitred.models.DeviceProvisioning
+import red.tetracube.homekitred.models.UPSProvisioning
 
 class DeviceProvisioningViewModel(
     private val deviceUseCase: DeviceUseCase
@@ -22,12 +24,12 @@ class DeviceProvisioningViewModel(
     val uiState: StateFlow<UIState>
         get() = _uiState
 
-    fun onSaveClick() {
+    fun onSaveClick(deviceProvisioning: DeviceProvisioning, upsProvisioning: UPSProvisioning) {
         viewModelScope.launch {
             _uiState.value = UIState.Loading
             val deviceProvisioningResult = deviceUseCase.sendDeviceProvisioningRequest(
-                _deviceProvisioningFormState.value,
-                _upsProvisioningFormState.value
+                deviceProvisioning,
+                upsProvisioning
             )
             if (deviceProvisioningResult.isSuccess) {
                 _uiState.value = UIState.FinishedWithSuccessContent(Unit)

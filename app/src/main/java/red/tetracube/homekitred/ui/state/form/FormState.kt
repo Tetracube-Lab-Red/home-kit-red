@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.ui.form
+package red.tetracube.homekitred.ui.state.form
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

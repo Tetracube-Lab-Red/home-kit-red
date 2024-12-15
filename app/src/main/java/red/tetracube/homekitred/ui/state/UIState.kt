@@ -1,6 +1,6 @@
-package red.tetracube.homekitred.business.models.ui
+package red.tetracube.homekitred.ui.state
 
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 
 sealed class UIState {
     

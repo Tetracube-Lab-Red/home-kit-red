@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.business.usecases.RoomUseCases
 
 class RoomCreateViewModel(

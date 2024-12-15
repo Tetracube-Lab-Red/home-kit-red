@@ -1,10 +1,12 @@
-package red.tetracube.homekitred.ui.form
+package red.tetracube.homekitred.ui.state.form
 
 import androidx.compose.runtime.Stable
 
+
 @Stable
-class SelectField internal constructor(private val validationFn: ((String) -> Pair<Boolean, String>)?) :
-    FormField {
+class PasswordField internal constructor(
+    private val validationFn: ((String) -> Pair<Boolean, String>)?
+) : FormField {
 
     override var isValid = false
         private set
@@ -14,25 +16,21 @@ class SelectField internal constructor(private val validationFn: ((String) -> Pa
         private set
     override var message = null as String?
         private set
-    var expanded = false
-        private set
-    var option: String? = null
+    var showPassword = false
         private set
 
     override fun getSupportingMessage(): String? = message
 
     override fun hasError() = isDirty && !isValid
 
-    fun toggleSelect() = !expanded
-
-    fun setOptionValue(value: String) {
-        option = value
-    }
-
     override fun setValue(value: String) {
         this.value = value
         this.isDirty = true
         validateInput()
+    }
+
+    fun togglePasswordVisibility() {
+        showPassword = !showPassword
     }
 
     private fun validateInput() {

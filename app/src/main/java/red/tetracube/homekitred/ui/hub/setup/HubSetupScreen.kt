@@ -49,11 +49,11 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
-import red.tetracube.homekitred.ui.form.rememberFormState
-import red.tetracube.homekitred.ui.form.rememberPasswordField
-import red.tetracube.homekitred.ui.form.rememberTextField
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
+import red.tetracube.homekitred.ui.state.form.rememberFormState
+import red.tetracube.homekitred.ui.state.form.rememberPasswordField
+import red.tetracube.homekitred.ui.state.form.rememberTextField
 import red.tetracube.homekitred.ui.hub.login.validateHostAddress
 import red.tetracube.homekitred.ui.hub.login.validateHubName
 import red.tetracube.homekitred.ui.hub.login.validatePassword

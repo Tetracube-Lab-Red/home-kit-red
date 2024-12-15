@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.business.usecases
 
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.HubAPIDataSource
 import red.tetracube.homekitred.data.api.entities.hub.RoomCreateRequest
 import red.tetracube.homekitred.data.api.entities.hub.RoomData

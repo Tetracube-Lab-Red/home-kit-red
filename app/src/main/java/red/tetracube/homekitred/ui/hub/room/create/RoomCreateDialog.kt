@@ -29,10 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
-import red.tetracube.homekitred.ui.form.rememberFormState
-import red.tetracube.homekitred.ui.form.rememberTextField
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
+import red.tetracube.homekitred.ui.state.form.rememberFormState
+import red.tetracube.homekitred.ui.state.form.rememberTextField
 
 
 @Composable

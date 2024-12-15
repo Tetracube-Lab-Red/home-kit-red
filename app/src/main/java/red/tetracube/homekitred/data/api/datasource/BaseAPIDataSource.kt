@@ -22,7 +22,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.*
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 
 sealed class BaseAPIDataSource {
 

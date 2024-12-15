@@ -51,12 +51,17 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.business.enumerations.DeviceType
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
+import red.tetracube.homekitred.ui.state.form.SelectField
+import red.tetracube.homekitred.ui.state.form.TextField
 import red.tetracube.homekitred.ui.iot.device.provisioning.models.DeviceTypeOptionModel
-import red.tetracube.homekitred.ui.form.rememberFormState
-import red.tetracube.homekitred.ui.form.rememberSelectField
-import red.tetracube.homekitred.ui.form.rememberTextField
+import red.tetracube.homekitred.ui.state.form.rememberFormState
+import red.tetracube.homekitred.ui.state.form.rememberSelectField
+import red.tetracube.homekitred.ui.state.form.rememberTextField
+import red.tetracube.homekitred.models.DeviceProvisioning
+import red.tetracube.homekitred.models.UPSProvisioning
+import kotlin.String
 
 @Composable
 fun DeviceProvisioningScreen(
@@ -105,16 +110,33 @@ fun DeviceProvisioningScreen(
             .filter { it.deviceType != DeviceType.NONE }
     }
 
+    val deviceName = rememberTextField { validateDeviceName(it) }
+    val deviceType = rememberSelectField<DeviceType> { validateDeviceType(it) }
+    val nutServerURI = rememberTextField { validateNutHost(it) }
+    val nutServerPort = rememberTextField { validateNutPort(it) }
+    val upsInternalName = rememberTextField { validateNutUPSAlias(it) }
+
     DeviceProvisioningScreenUI(
         uiState = uiState,
         deviceTypes = options,
-        onSaveClick = viewModel::onSaveClick,
+        deviceName,
+        deviceType,
+        onSaveClick = {
+            viewModel.onSaveClick(
+                DeviceProvisioning(deviceName.value, DeviceType.valueOf(deviceType.value)),
+                UPSProvisioning(
+                    nutServerURI.value,
+                    nutServerPort.value.toInt(),
+                    upsInternalName.value
+                )
+            )
+        },
         onBackIconClick = {
             navHostController.popBackStack()
         },
         snackbarHostState = snackbarHostState,
         upsProvisioningForm = {
-            UPSForm()
+            UPSForm(nutServerURI, nutServerPort, upsInternalName)
         }
     )
 }
@@ -124,13 +146,13 @@ fun DeviceProvisioningScreen(
 fun DeviceProvisioningScreenUI(
     uiState: UIState,
     deviceTypes: List<DeviceTypeOptionModel>,
+    deviceName: TextField,
+    deviceType: SelectField<DeviceType>,
     onBackIconClick: () -> Unit,
     upsProvisioningForm: @Composable () -> Unit,
     onSaveClick: () -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    val deviceName = rememberTextField { validateDeviceName(it) }
-    val deviceType = rememberSelectField { validateDeviceType(DeviceType.valueOf(it)) }
     val formState = rememberFormState(listOf(deviceName, deviceType))
 
     Scaffold(
@@ -251,7 +273,7 @@ fun DeviceProvisioningScreenUI(
                             },
                             onClick = {
                                 icon = option.fieldIcon
-                                deviceType.setOptionValue(option.deviceType.name)
+                                deviceType.setOptionValue(option.deviceType)
                                 deviceType.toggleSelect()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -268,7 +290,7 @@ fun DeviceProvisioningScreenUI(
 
             val density = LocalDensity.current
             AnimatedVisibility(
-                visible = deviceType.option == DeviceType.UPS.name,
+                visible = deviceType.option == DeviceType.UPS,
                 enter = slideInVertically {
                     with(density) { 10.dp.roundToPx() }
                 } + expandVertically(
@@ -285,7 +307,11 @@ fun DeviceProvisioningScreenUI(
 }
 
 @Composable
-fun UPSForm() {
+fun UPSForm(
+    nutServerURI: TextField,
+    nutServerPort: TextField,
+    upsInternalName: TextField
+) {
     Column {
         Text(
             "NUT server details",
@@ -297,32 +323,32 @@ fun UPSForm() {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.65f),
                 label = { Text("Host") },
-                value = upsProvisioningFormModel.nutServerHost.value,
-                onValueChange = { value: String ->
-                    onTextInput(FieldInputEvent.FieldName.NUT_HOST, value)
-                },
+                value = nutServerURI.value,
+                onValueChange = { value: String -> nutServerURI.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    Text(upsProvisioningFormModel.nutServerHost.validationMessage)
+                    nutServerURI.message?.let {
+                        Text(it)
+                    }
                 },
-                isError = upsProvisioningFormModel.nutServerHost.isDirty && !upsProvisioningFormModel.nutServerHost.isValid
+                isError = nutServerURI.hasError()
             )
 
             Spacer(modifier = Modifier.size(16.dp))
 
             OutlinedTextField(
                 label = { Text("Port") },
-                value = upsProvisioningFormModel.nutServerPort.value,
-                onValueChange = { value: String ->
-                    onTextInput(FieldInputEvent.FieldName.NUT_PORT, value)
-                },
+                value = nutServerPort.value,
+                onValueChange = { value: String -> nutServerPort.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    Text(upsProvisioningFormModel.nutServerPort.validationMessage)
+                    nutServerPort.message?.let {
+                        Text(it)
+                    }
                 },
-                isError = upsProvisioningFormModel.nutServerPort.isDirty && !upsProvisioningFormModel.nutServerPort.isValid,
+                isError = nutServerPort.hasError(),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Number
@@ -333,16 +359,16 @@ fun UPSForm() {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Alias") },
-            value = upsProvisioningFormModel.nutUPSAlias.value,
-            onValueChange = { value: String ->
-                onTextInput(FieldInputEvent.FieldName.NUT_UPS_ALIAS, value)
-            },
+            value = upsInternalName.value,
+            onValueChange = { value: String -> upsInternalName.setValue(value) },
             singleLine = true,
             maxLines = 1,
             supportingText = {
-                Text(upsProvisioningFormModel.nutUPSAlias.validationMessage)
+                upsInternalName.message?.let {
+                    Text(it)
+                }
             },
-            isError = upsProvisioningFormModel.nutUPSAlias.isDirty && !upsProvisioningFormModel.nutUPSAlias.isValid
+            isError = upsInternalName.hasError()
         )
     }
 }

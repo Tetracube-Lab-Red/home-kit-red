@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.business.models.errors
+package red.tetracube.homekitred.models.errors
 
 sealed class HomeKitRedError : Exception() {
 

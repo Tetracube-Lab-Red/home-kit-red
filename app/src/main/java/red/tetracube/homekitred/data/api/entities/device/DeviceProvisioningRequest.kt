@@ -9,7 +9,7 @@ data class DeviceProvisioningRequest @JsonCreator constructor(
     @JsonProperty val deviceType: DeviceType,
     @JsonProperty val deviceName: String,
     @JsonProperty val roomId: UUID?,
-    @JsonProperty val upsProvisioning: UPSProvisioningFields?
+    @JsonProperty val upsProvisioning: UPSProvisioningFields? = null
 )
 
 data class UPSProvisioningFields @JsonCreator constructor(

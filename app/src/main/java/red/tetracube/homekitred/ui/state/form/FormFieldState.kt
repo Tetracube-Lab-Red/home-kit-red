@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.ui.form
+package red.tetracube.homekitred.ui.state.form
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -7,9 +7,10 @@ import androidx.compose.runtime.remember
 fun rememberTextField(
     validationFn: ((String) -> Pair<Boolean, String>)?
 ): TextField {
-    return remember {
+    val textField = remember {
         TextField(validationFn)
     }
+    return textField
 }
 
 @Composable
@@ -22,9 +23,9 @@ fun rememberPasswordField(
 }
 
 @Composable
-fun rememberSelectField(
-    validationFn: ((String) -> Pair<Boolean, String>)?
-): SelectField {
+fun <T> rememberSelectField(
+    validationFn: ((T) -> Pair<Boolean, String>)?
+): SelectField<T> {
     return remember {
         SelectField(validationFn)
     }

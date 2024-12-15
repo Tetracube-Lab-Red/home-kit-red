@@ -1,6 +1,6 @@
 package red.tetracube.homekitred.iot.device.room
 
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.entities.device.DeviceRoomJoin
 import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDataSource

@@ -38,7 +38,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard

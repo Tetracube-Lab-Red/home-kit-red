@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.business.models.ui.state
+package red.tetracube.homekitred.models
 
 import java.util.UUID
 

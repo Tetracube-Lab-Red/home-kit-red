@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
-import red.tetracube.homekitred.business.models.ui.UIState
+import red.tetracube.homekitred.models.errors.HomeKitRedError
+import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.business.mappers.toConnectInfo
 import red.tetracube.homekitred.business.usecases.GlobalDataUseCases

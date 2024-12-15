@@ -1,7 +1,7 @@
 package red.tetracube.homekitred.business.usecases
 
 import red.tetracube.homekitred.business.enumerations.DeviceType
-import red.tetracube.homekitred.business.models.errors.HomeKitRedError
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.api.entities.device.DeviceData
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
@@ -9,8 +9,8 @@ import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
 import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
-import red.tetracube.homekitred.iot.device.provisioning.models.DeviceProvisioningFormModel
-import red.tetracube.homekitred.iot.device.provisioning.models.UPSProvisioningFormModel
+import red.tetracube.homekitred.models.DeviceProvisioning
+import red.tetracube.homekitred.models.UPSProvisioning
 
 class DeviceUseCase(
     private val hubDatasource: HubDataSource,
@@ -19,23 +19,21 @@ class DeviceUseCase(
 ) {
 
     suspend fun sendDeviceProvisioningRequest(
-        deviceProvisioningFormModel: DeviceProvisioningFormModel,
-        upsProvisioningViewModel: UPSProvisioningFormModel
+        deviceProvisioningModel: DeviceProvisioning,
+        upsProvisioningModel: UPSProvisioning
     ): Result<Unit> {
         val hub = hubDatasource.getActiveHub()!!
         val request = DeviceProvisioningRequest(
-            deviceProvisioningFormModel.deviceType.internalType,
-            deviceProvisioningFormModel.deviceName.value,
+            deviceProvisioningModel.deviceType,
+            deviceProvisioningModel.name,
             roomId = null,
-            upsProvisioning = if (deviceProvisioningFormModel.deviceType.internalType == DeviceType.UPS) {
+            upsProvisioning = if (deviceProvisioningModel.deviceType == DeviceType.UPS)
                 UPSProvisioningFields(
-                    deviceAddress = upsProvisioningViewModel.nutServerHost.value,
-                    devicePort = upsProvisioningViewModel.nutServerPort.value.toInt(),
-                    internalName = upsProvisioningViewModel.nutUPSAlias.value
+                    deviceAddress = upsProvisioningModel.nutServerURI,
+                    devicePort = upsProvisioningModel.nutServerPort,
+                    internalName = upsProvisioningModel.upsInternalName
                 )
-            } else {
-                null
-            }
+            else null
         )
 
         val apiProvisioningResponse = try {
