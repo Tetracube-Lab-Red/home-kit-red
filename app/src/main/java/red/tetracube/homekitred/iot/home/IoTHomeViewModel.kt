@@ -12,14 +12,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
+import red.tetracube.homekitred.business.usecases.DeviceUseCases
 import red.tetracube.homekitred.ui.state.UIState
-import red.tetracube.homekitred.business.services.DeviceService
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 class IoTHomeViewModel(
-    private val ioTHomeUseCases: IoTHomeUseCases
+    private val deviceUseCases: DeviceUseCases
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<UIState>(UIState.Neutral)
@@ -44,15 +44,15 @@ class IoTHomeViewModel(
         viewModelScope.launch(job) {
             _uiState.value = UIState.Loading
             launch {
-                ioTHomeUseCases.loadData()
-                    .collect {
-                        _hub.value = it
-                        _uiState.value = UIState.FinishedWithSuccess
-                    }
+                /*   ioTHomeUseCases.loadData()
+                       .collect {
+                           _hub.value = it
+                           _uiState.value = UIState.FinishedWithSuccess
+                       }*/
             }
 
             launch {
-                ioTHomeUseCases.getDevices(null)
+                /*ioTHomeUseCases.getDevices(null)
                     .collect { d ->
                         if (_devicesTelemetriesMap.containsKey(d.slug)) {
                             _devicesTelemetriesMap.replace(d.slug,  d to ioTHomeUseCases.getLatestTelemetry(d.slug))
@@ -62,24 +62,24 @@ class IoTHomeViewModel(
                                 d to ioTHomeUseCases.getLatestTelemetry(d.slug)
                             )
                         }
-                    }
+                    }*/
             }
 
             launch {
-                ioTHomeUseCases.listenDatabaseTelemetryStreaming()
-                    .collect { telemetries ->
-                        telemetries.forEach { telemetry ->
-                            _devicesTelemetriesMap[telemetry.slug]
-                                ?.first
-                                ?.also { device ->
-                                    _devicesTelemetriesMap[telemetry.slug] = device to telemetry
-                                }
-                        }
-                    }
+                /*   ioTHomeUseCases.listenDatabaseTelemetryStreaming()
+                       .collect { telemetries ->
+                           telemetries.forEach { telemetry ->
+                               _devicesTelemetriesMap[telemetry.slug]
+                                   ?.first
+                                   ?.also { device ->
+                                       _devicesTelemetriesMap[telemetry.slug] = device to telemetry
+                                   }
+                           }
+                       }*/
             }
 
             launch {
-                ioTHomeUseCases.listenAPITelemetrySteaming()
+                //  ioTHomeUseCases.listenAPITelemetrySteaming()
             }
         }
     }
@@ -94,13 +94,19 @@ class IoTHomeViewModel(
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 IoTHomeViewModel(
-                    ioTHomeUseCases = IoTHomeUseCases(
-                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                        database = homeKitRedContainer.homeKitRedDatabase,
-                        deviceService = DeviceService(
-                            ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
-                            database = homeKitRedContainer.homeKitRedDatabase
-                        )
+                    /* ioTHomeUseCases = IoTHomeUseCases(
+                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
+                         database = homeKitRedContainer.homeKitRedDatabase,
+                         deviceService = DeviceService(
+                             ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
+                             database = homeKitRedContainer.homeKitRedDatabase
+                         )
+                     )*/
+
+                    deviceUseCases = DeviceUseCases(
+                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
+                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
+                        deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
                     )
                 )
             }

@@ -48,6 +48,7 @@ import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 import red.tetracube.homekitred.iot.home.domain.models.deviceMenuItems
 import red.tetracube.homekitred.iot.home.domain.models.globalMenuItems
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,9 +75,9 @@ fun IoTHomeScreen(
         menuItems.addAll(globalMenuItems(navController, toggleBottomSheet))
         toggleBottomSheet()
     }
-    val deviceMenuItemsBuilder: (String) -> Unit = { deviceSlug ->
+    val deviceMenuItemsBuilder: (UUID) -> Unit = { deviceId ->
         menuItems.clear()
-        menuItems.addAll(deviceMenuItems(navController, deviceSlug, toggleBottomSheet))
+        menuItems.addAll(deviceMenuItems(navController, deviceId, toggleBottomSheet))
         toggleBottomSheet()
     }
 
@@ -118,7 +119,7 @@ fun IoTHomeScreenUI(
     showBottomSheet: Boolean,
     onHubAvatarClick: () -> Unit,
     devicesTelemetriesMap: Map<Device, BasicTelemetry>,
-    onDeviceMenuRequest: (String) -> Unit
+    onDeviceMenuRequest: (UUID) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -129,7 +130,7 @@ fun IoTHomeScreenUI(
                     )
                 },
                 actions = {
-                    if (uiState is UIState.FinishedWithSuccess) {
+                    if (uiState is UIState.FinishedWithSuccessContent<*>) {
                         IconButton(
                             onClick = { onHubAvatarClick() }
                         ) {
@@ -162,11 +163,11 @@ fun IoTHomeScreenUI(
                 LinearProgressIndicator()
             }
 
-            if (uiState is UIState.FinishedWithSuccess) {
+            if (uiState is UIState.FinishedWithSuccessContent<*>) {
                 val pagerState = rememberPagerState(initialPage = 0, pageCount = { hub?.rooms?.size ?: 0 })
                 val selectedRoomSlug = remember(hub?.rooms) {
                     derivedStateOf {
-                        hub?.rooms[pagerState.currentPage]?.slug
+                        hub?.rooms[pagerState.currentPage]?.id
                     }
                 }
                 ScrollableTabRow(
@@ -191,7 +192,7 @@ fun IoTHomeScreenUI(
                     }
                 }
                 HorizontalPager(state = pagerState) { index ->
-                    DevicesGrid(selectedRoomSlug.value ?: "all", devicesTelemetriesMap, onDeviceMenuRequest)
+                    DevicesGrid(selectedRoomSlug.value, devicesTelemetriesMap, onDeviceMenuRequest)
                 }
             }
         }
@@ -204,14 +205,14 @@ fun IoTHomeScreenUI(
 
 @Composable
 fun DevicesGrid(
-    roomSlug: String,
+    roomId: UUID?,
     devicesTelemetriesMap: Map<Device, BasicTelemetry>,
-    onDeviceMenuRequest: (String) -> Unit
+    onDeviceMenuRequest: (UUID) -> Unit
 ) {
     LazyColumn {
         devicesTelemetriesMap
             .filter { room ->
-                roomSlug == "all" || room.key.roomSlug == roomSlug
+                roomId == null || room.key.id == roomId
             }
             .map { deviceTelemetryEntry ->
                 item {
@@ -221,9 +222,6 @@ fun DevicesGrid(
                             deviceTelemetryEntry.value,
                             onDeviceMenuRequest
                         )
-
-                        DeviceType.SWITCH -> TODO()
-                        DeviceType.HUE -> TODO()
                         else -> {}
                     }
                 }

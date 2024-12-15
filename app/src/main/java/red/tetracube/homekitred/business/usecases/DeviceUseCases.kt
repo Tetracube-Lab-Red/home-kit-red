@@ -1,9 +1,11 @@
 package red.tetracube.homekitred.business.usecases
 
 import red.tetracube.homekitred.business.enumerations.DeviceType
+import red.tetracube.homekitred.business.mappers.asEntity
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.api.entities.device.DeviceData
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
+import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
 import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
@@ -11,6 +13,7 @@ import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
 import red.tetracube.homekitred.models.errors.HomeKitRedError
+import java.util.UUID
 
 class DeviceUseCases(
     private val hubDatasource: HubDataSource,
@@ -62,6 +65,44 @@ class DeviceUseCases(
         )
 
         return Result.success(Unit)
+    }
+
+    suspend fun retrieveDevices(
+        hubId: UUID,
+        apiURI: String,
+        token: String
+    ) {
+        ioTAPIDataSource.getDevices(apiURI, token)
+            .devices
+            .map { deviceData ->
+                DeviceEntity(
+                    id = deviceData.id,
+                    name = deviceData.name,
+                    type = deviceData.deviceType,
+                    hubId = hubId,
+                    roomId = deviceData.roomId
+                )
+            }
+            .forEach { deviceDataSource.insert(it) }
+
+        deviceDataSource.getDevices(hubId)
+            .collect { deviceEntity ->
+                var deviceTelemetry =
+                    ioTAPIDataSource.getDeviceTelemetry(apiURI, token, deviceEntity.id)
+            }
+    }
+
+    suspend fun listenDeviceTelemetryStreams(
+        streamingHubAddress: String,
+        token: String
+    ) {
+        ioTAPIDataSource.getTelemetryStreaming(streamingHubAddress)
+            .collect {
+                if (it is UPSTelemetryData) {
+                    var telemetryEntity = it.asEntity()
+                 //   upsTelemetryDatasource.insert(telemetryEntity)
+                }
+            }
     }
 
 }

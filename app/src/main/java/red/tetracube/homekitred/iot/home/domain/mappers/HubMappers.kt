@@ -3,10 +3,11 @@ package red.tetracube.homekitred.iot.home.domain.mappers
 import red.tetracube.homekitred.data.db.entities.HubWithRoomsEntity
 import red.tetracube.homekitred.iot.home.domain.models.Room
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
+import java.util.UUID
 
 fun HubWithRoomsEntity.toDomain() =
     HubWithRooms(
-        slug = this.hub.slug,
+        id = this.hub.id,
         avatarName = if (this.hub.name.contains(" ")) {
             this.hub.name.split(" ")
                 .map { it.first() }
@@ -17,12 +18,12 @@ fun HubWithRoomsEntity.toDomain() =
         name = this.hub.name,
         rooms = listOf<Room>(
             Room(
-                slug = "all",
+                id = UUID.randomUUID(),
                 name = "House"
             )
         ) + this.rooms.map {
             Room(
-                slug = it.slug,
+                id = it.id,
                 name = it.name
             )
         }

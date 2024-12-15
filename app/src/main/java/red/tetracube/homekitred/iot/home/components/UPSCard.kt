@@ -25,16 +25,17 @@ import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry.UPSBasicTe
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Composable
 fun UPSCard(
     device: Device,
     basicTelemetry: BasicTelemetry,
-    onDeviceMenuRequest: (String) -> Unit
+    onDeviceMenuRequest: (UUID) -> Unit
 ) {
     DeviceCard(
         onDeviceLongClick = {
-            onDeviceMenuRequest(device.slug)
+            onDeviceMenuRequest(device.id)
         }
     ) {
         Column(

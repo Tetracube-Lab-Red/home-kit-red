@@ -6,6 +6,7 @@ import red.tetracube.homekitred.navigation.Routes
 import red.tetracube.homekitred.navigation.Routes.DeviceRoomJoin
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
+import java.util.UUID
 
 sealed class BottomSheetItem(
     val icon: Int,
@@ -50,7 +51,7 @@ fun globalMenuItems(
 
 fun deviceMenuItems(
     navController: NavHostController,
-    deviceSlug: String,
+    deviceId: UUID,
     globalBehavior: () -> Unit
 ): List<DeviceMenuItem> =
     listOf(
@@ -59,6 +60,6 @@ fun deviceMenuItems(
             "Set device room"
         ) {
             globalBehavior()
-            navController.navigate(DeviceRoomJoin(deviceSlug))
+            navController.navigate(DeviceRoomJoin(deviceId.toString()))
         }
     )

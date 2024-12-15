@@ -1,6 +1,8 @@
 package red.tetracube.homekitred.iot.home.domain.models
 
+import java.util.UUID
+
 data class Room(
-    val slug: String,
+    val id: UUID,
     val name: String
 )
