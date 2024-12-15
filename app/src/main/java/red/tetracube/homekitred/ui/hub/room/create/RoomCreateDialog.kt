@@ -96,12 +96,12 @@ fun RoomCreateDialogUI(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Room name") },
-                    value = roomNameField.value,
+                    value = roomNameField.value.value,
                     onValueChange = { value: String -> roomNameField.setValue(value) },
                     singleLine = true,
                     maxLines = 1,
                     supportingText = {
-                        roomNameField.message?.let {
+                        roomNameField.message.value?.let {
                             Text(it)
                         }
                     },
@@ -144,7 +144,7 @@ fun RoomCreateDialogUI(
                     } else {
                         TextButton(
                             enabled = formState.isValid,
-                            onClick = { onSubmit(roomNameField.value) }
+                            onClick = { onSubmit(roomNameField.value.value) }
                         ) {
                             Text("OK")
                         }

@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 class Form internal constructor(private val fields: List<FormField>) {
 
     val isValid: Boolean
-        get() = fields.all { it.isValid }
+        get() = fields.all { it.isValid.value }
 
 }
 

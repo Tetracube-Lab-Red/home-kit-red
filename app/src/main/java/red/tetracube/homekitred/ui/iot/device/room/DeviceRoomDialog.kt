@@ -121,7 +121,7 @@ fun DeviceRoomDialogUI(
 
                 if (uiState !is UIState.FinishedWithError<*>) {
                     ExposedDropdownMenuBox(
-                        expanded = roomSelectField.expanded,
+                        expanded = roomSelectField.expanded.value,
                         onExpandedChange = { roomSelectField.toggleSelect() },
                     ) {
                         OutlinedTextField(
@@ -134,16 +134,16 @@ fun DeviceRoomDialogUI(
                             modifier = Modifier
                                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                                 .fillMaxWidth(),
-                            value = roomSelectField.value,
+                            value = roomSelectField.value.value,
                             supportingText = { Text(supportMessage) },
                             onValueChange = { },
                             readOnly = true,
                             singleLine = true,
                             label = { Text("Room to join") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roomSelectField.expanded) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roomSelectField.expanded.value) },
                         )
                         ExposedDropdownMenu(
-                            expanded = roomSelectField.expanded,
+                            expanded = roomSelectField.expanded.value,
                             onDismissRequest = { roomSelectField.toggleSelect() },
                         ) {
                             rooms.map { option ->
@@ -186,7 +186,7 @@ fun DeviceRoomDialogUI(
                         TextButton(
                             enabled = true,
                             onClick = {
-                                roomSelectField.option?.roomId?.apply {
+                                roomSelectField.option.value?.roomId?.apply {
                                     onSubmit(this)
                                 }
                             }

@@ -172,12 +172,12 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub host address") },
-                        value = hubAddressField.value,
+                        value = hubAddressField.value.value,
                         onValueChange = { value: String -> hubAddressField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            hubAddressField.message?.let {
+                            hubAddressField.message.value?.let {
                                 Text(it)
                             }
                         },
@@ -200,12 +200,12 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Hub name") },
-                        value = hubNameField.value,
+                        value = hubNameField.value.value,
                         onValueChange = { value: String -> hubNameField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            hubAddressField.message?.let {
+                            hubAddressField.message.value?.let {
                                 Text(it)
                             }
                         },
@@ -228,18 +228,18 @@ fun HubSetupScreenUI(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Password") },
-                        value = hubPasswordField.value,
+                        value = hubPasswordField.value.value,
                         onValueChange = { value: String -> hubPasswordField.setValue(value) },
                         singleLine = true,
                         maxLines = 1,
                         supportingText = {
-                            hubPasswordField.message?.let {
+                            hubPasswordField.message.value?.let {
                                 Text(it)
                             }
                         },
                         isError = hubPasswordField.hasError(),
                         visualTransformation =
-                        if (!hubPasswordField.showPassword) {
+                        if (!hubPasswordField.showPassword.value) {
                             VisualTransformation.None
                         } else {
                             PasswordVisualTransformation()
@@ -252,7 +252,7 @@ fun HubSetupScreenUI(
                             IconButton(
                                 onClick = { hubPasswordField.togglePasswordVisibility() }
                             ) {
-                                val icon = if (hubPasswordField.showPassword) {
+                                val icon = if (hubPasswordField.showPassword.value) {
                                     R.drawable.visibility_off_24px
                                 } else {
                                     R.drawable.visibility_24px
@@ -277,9 +277,9 @@ fun HubSetupScreenUI(
                     onClick = {
                         focusRequester.clearFocus()
                         onSetupButtonClick(
-                            hubAddressField.value,
-                            hubNameField.value,
-                            hubPasswordField.value
+                            hubAddressField.value.value,
+                            hubNameField.value.value,
+                            hubPasswordField.value.value
                         )
                     }
                 ) {

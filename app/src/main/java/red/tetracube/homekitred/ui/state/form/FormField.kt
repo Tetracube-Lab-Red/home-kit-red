@@ -1,13 +1,13 @@
 package red.tetracube.homekitred.ui.state.form
 
+import androidx.compose.runtime.State
+
 interface FormField {
 
-    val isValid: Boolean
-    val value: String
-    val isDirty: Boolean
-    val message: String?
-
-    fun getSupportingMessage(): String?
+    val isValid: State<Boolean>
+    val value: State<String>
+    val isDirty: State<Boolean>
+    val message: State<String?>
 
     fun hasError(): Boolean
 

@@ -123,11 +123,11 @@ fun DeviceProvisioningScreen(
         deviceType,
         onSaveClick = {
             viewModel.onSaveClick(
-                DeviceProvisioning(deviceName.value, DeviceType.valueOf(deviceType.value)),
+                DeviceProvisioning(deviceName.value.value, DeviceType.valueOf(deviceType.value.value)),
                 UPSProvisioning(
-                    nutServerURI.value,
-                    nutServerPort.value.toInt(),
-                    upsInternalName.value
+                    nutServerURI.value.value,
+                    nutServerPort.value.value.toInt(),
+                    upsInternalName.value.value
                 )
             )
         },
@@ -209,12 +209,12 @@ fun DeviceProvisioningScreenUI(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Device name") },
-                value = deviceName.value,
+                value = deviceName.value.value,
                 onValueChange = { value: String -> deviceName.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    deviceName.message?.let {
+                    deviceName.message.value?.let {
                         Text(it)
                     }
                 },
@@ -226,7 +226,7 @@ fun DeviceProvisioningScreenUI(
             var icon by remember { mutableIntStateOf(R.drawable.home_iot_device_24px) }
 
             ExposedDropdownMenuBox(
-                expanded = deviceType.expanded,
+                expanded = deviceType.expanded.value,
                 onExpandedChange = { deviceType.toggleSelect() },
             ) {
                 OutlinedTextField(
@@ -239,22 +239,22 @@ fun DeviceProvisioningScreenUI(
                     modifier = Modifier
                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth(),
-                    value = deviceType.value,
+                    value = deviceType.value.value,
                     onValueChange = {},
                     readOnly = true,
                     singleLine = true,
                     supportingText = {
-                        deviceType.message?.let {
+                        deviceType.message.value?.let {
                             Text(it)
                         }
                     },
                     label = { Text("Device Type") },
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = deviceType.expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = deviceType.expanded.value)
                     },
                 )
                 ExposedDropdownMenu(
-                    expanded = deviceType.expanded,
+                    expanded = deviceType.expanded.value,
                     onDismissRequest = { deviceType.toggleSelect() },
                 ) {
                     deviceTypes.forEach { option ->
@@ -290,7 +290,7 @@ fun DeviceProvisioningScreenUI(
 
             val density = LocalDensity.current
             AnimatedVisibility(
-                visible = deviceType.option == DeviceType.UPS,
+                visible = deviceType.option.value == DeviceType.UPS,
                 enter = slideInVertically {
                     with(density) { 10.dp.roundToPx() }
                 } + expandVertically(
@@ -323,12 +323,12 @@ fun UPSForm(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.65f),
                 label = { Text("Host") },
-                value = nutServerURI.value,
+                value = nutServerURI.value.value,
                 onValueChange = { value: String -> nutServerURI.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    nutServerURI.message?.let {
+                    nutServerURI.message.value?.let {
                         Text(it)
                     }
                 },
@@ -339,12 +339,12 @@ fun UPSForm(
 
             OutlinedTextField(
                 label = { Text("Port") },
-                value = nutServerPort.value,
+                value = nutServerPort.value.value,
                 onValueChange = { value: String -> nutServerPort.setValue(value) },
                 singleLine = true,
                 maxLines = 1,
                 supportingText = {
-                    nutServerPort.message?.let {
+                    nutServerPort.message.value?.let {
                         Text(it)
                     }
                 },
@@ -359,12 +359,12 @@ fun UPSForm(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Alias") },
-            value = upsInternalName.value,
+            value = upsInternalName.value.value,
             onValueChange = { value: String -> upsInternalName.setValue(value) },
             singleLine = true,
             maxLines = 1,
             supportingText = {
-                upsInternalName.message?.let {
+                upsInternalName.message.value?.let {
                     Text(it)
                 }
             },
