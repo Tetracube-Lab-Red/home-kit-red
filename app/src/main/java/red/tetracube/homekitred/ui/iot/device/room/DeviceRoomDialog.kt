@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot.device.room
+package red.tetracube.homekitred.ui.iot.device.room
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,11 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -37,50 +34,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
+import red.tetracube.homekitred.models.RoomSelectItem
 import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.ui.state.UIState
+import red.tetracube.homekitred.ui.state.form.rememberSelectField
+import java.util.UUID
 
 @Composable
 fun DeviceRoomDialog(
     deviceRoomViewModel: DeviceRoomViewModel,
     navController: NavHostController
 ) {
-    val deviceName = deviceRoomViewModel.deviceName.value
-    val selectedRoom = deviceRoomViewModel.roomSlug
-    val dialogUIState = deviceRoomViewModel.uiState
+    val deviceName = deviceRoomViewModel.loadDevice().collectAsState("").value
+    val dialogUIState = deviceRoomViewModel.uiState.collectAsState().value
+    val rooms = deviceRoomViewModel.loadRooms().collectAsState(emptyList()).value
 
-    LaunchedEffect(Unit) {
-        deviceRoomViewModel.loadRooms()
-    }
-
-    LaunchedEffect(deviceRoomViewModel.uiState.value) {
-        if (deviceRoomViewModel.uiState.value is UIState.FinishedWithSuccess) {
+    LaunchedEffect(dialogUIState) {
+        if (deviceRoomViewModel.uiState.value is UIState.FinishedWithSuccessContent<*>) {
             navController.popBackStack()
         }
     }
 
-    val supportMessage = remember {
-        derivedStateOf {
-            val uiState = deviceRoomViewModel.uiState.value
-            if (uiState is UIState.FinishedWithError<*>) {
-                if (uiState.error is HomeKitRedError.Unauthorized) {
-                    "No authorized to update the device's room"
-                } else {
-                    "Some problem with device room update"
-                }
+    val supportMessage = remember(dialogUIState) {
+        if (dialogUIState is UIState.FinishedWithError<*>) {
+            if (dialogUIState.error is HomeKitRedError.Unauthorized) {
+                "No authorized to update the device's room"
             } else {
-                ""
+                "Some problem with device room update"
             }
+        } else {
+            ""
         }
     }
 
     DeviceRoomDialogUI(
-        uiState = dialogUIState.value,
-        rooms = deviceRoomViewModel.roomsMap,
+        uiState = dialogUIState,
+        rooms = rooms,
         deviceName = deviceName,
-        roomValue = selectedRoom.value,
-        supportMessage = supportMessage.value,
-        onRoomSelect = deviceRoomViewModel::setRoomSlug,
+        supportMessage = supportMessage,
         onDismissRequest = navController::popBackStack,
         onSubmit = deviceRoomViewModel::submitDeviceRoomJoin
     )
@@ -90,14 +81,19 @@ fun DeviceRoomDialog(
 @Composable
 fun DeviceRoomDialogUI(
     uiState: UIState,
-    rooms: Map<String, String>,
+    rooms: List<RoomSelectItem>,
     supportMessage: String,
     deviceName: String,
-    roomValue: String,
-    onRoomSelect: (String) -> Unit,
     onDismissRequest: () -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: (UUID) -> Unit
 ) {
+    val roomSelectField = rememberSelectField<RoomSelectItem>(null)
+    rooms.firstOrNull { r -> r.selected }
+        ?.apply {
+            roomSelectField.setValue(this.roomName)
+            roomSelectField.setOptionValue(this)
+        }
+
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
         modifier = Modifier,
@@ -124,15 +120,9 @@ fun DeviceRoomDialogUI(
                 }
 
                 if (uiState !is UIState.FinishedWithError<*>) {
-                    var expanded by remember { mutableStateOf(false) }
-                    val currentRoomName = remember(roomValue) {
-                        derivedStateOf {
-                            rooms.entries.firstOrNull { it.key == roomValue }?.value ?: ""
-                        }
-                    }
                     ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
+                        expanded = roomSelectField.expanded,
+                        onExpandedChange = { roomSelectField.toggleSelect() },
                     ) {
                         OutlinedTextField(
                             leadingIcon = {
@@ -144,29 +134,30 @@ fun DeviceRoomDialogUI(
                             modifier = Modifier
                                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                                 .fillMaxWidth(),
-                            value = currentRoomName.value,
+                            value = roomSelectField.value,
                             supportingText = { Text(supportMessage) },
                             onValueChange = { },
                             readOnly = true,
                             singleLine = true,
                             label = { Text("Room to join") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roomSelectField.expanded) },
                         )
                         ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
+                            expanded = roomSelectField.expanded,
+                            onDismissRequest = { roomSelectField.toggleSelect() },
                         ) {
                             rooms.map { option ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            option.value,
+                                            option.roomName,
                                             style = MaterialTheme.typography.bodyLarge
                                         )
                                     },
                                     onClick = {
-                                        onRoomSelect(option.key)
-                                        expanded = false
+                                        roomSelectField.setValue(option.roomName)
+                                        roomSelectField.setOptionValue(option)
+                                        roomSelectField.toggleSelect()
                                     },
                                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                                 )
@@ -194,7 +185,11 @@ fun DeviceRoomDialogUI(
                     } else if (uiState !is UIState.FinishedWithError<*> || uiState.error !is HomeKitRedError.NotFound) {
                         TextButton(
                             enabled = true,
-                            onClick = onSubmit
+                            onClick = {
+                                roomSelectField.option?.roomId?.apply {
+                                    onSubmit(this)
+                                }
+                            }
                         ) {
                             Text("Join")
                         }

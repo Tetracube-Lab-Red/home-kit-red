@@ -13,10 +13,11 @@ import red.tetracube.homekitred.navigation.Routes.IoT
 import red.tetracube.homekitred.navigation.Routes.IoTHome
 import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningScreen
 import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningViewModel
-import red.tetracube.homekitred.iot.device.room.DeviceRoomDialog
-import red.tetracube.homekitred.iot.device.room.DeviceRoomViewModel
+import red.tetracube.homekitred.ui.iot.device.room.DeviceRoomDialog
+import red.tetracube.homekitred.ui.iot.device.room.DeviceRoomViewModel
 import red.tetracube.homekitred.iot.home.IoTHomeScreen
 import red.tetracube.homekitred.iot.home.IoTHomeViewModel
+import java.util.UUID
 
 fun NavGraphBuilder.addIoTNavigation(
     navController: NavHostController
@@ -41,8 +42,12 @@ fun NavGraphBuilder.addIoTNavigation(
             )
         }
         dialog<DeviceRoomJoin> { backStackEntry ->
-            val deviceSlug: DeviceRoomJoin = backStackEntry.toRoute()
-            val viewModel: DeviceRoomViewModel = viewModel(factory = DeviceRoomViewModel.Factory(deviceSlug.deviceSlug))
+            val deviceId: DeviceRoomJoin = backStackEntry.toRoute()
+            val viewModel: DeviceRoomViewModel = viewModel(
+                factory = DeviceRoomViewModel.Factory(
+                    UUID.fromString(deviceId.deviceId)
+                )
+            )
             DeviceRoomDialog(viewModel, navController)
         }
     }

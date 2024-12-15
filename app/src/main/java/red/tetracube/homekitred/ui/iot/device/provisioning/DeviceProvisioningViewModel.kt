@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.ui.state.UIState
-import red.tetracube.homekitred.business.usecases.DeviceUseCase
+import red.tetracube.homekitred.business.usecases.DeviceUseCases
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
 
 class DeviceProvisioningViewModel(
-    private val deviceUseCase: DeviceUseCase
+    private val deviceUseCases: DeviceUseCases
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Neutral)
@@ -27,7 +27,7 @@ class DeviceProvisioningViewModel(
     fun onSaveClick(deviceProvisioning: DeviceProvisioning, upsProvisioning: UPSProvisioning) {
         viewModelScope.launch {
             _uiState.value = UIState.Loading
-            val deviceProvisioningResult = deviceUseCase.sendDeviceProvisioningRequest(
+            val deviceProvisioningResult = deviceUseCases.sendDeviceProvisioningRequest(
                 deviceProvisioning,
                 upsProvisioning
             )
@@ -48,7 +48,7 @@ class DeviceProvisioningViewModel(
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 DeviceProvisioningViewModel(
-                    deviceUseCase = DeviceUseCase(
+                    deviceUseCases = DeviceUseCases(
                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                         ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
                         deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()

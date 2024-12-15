@@ -1,7 +1,6 @@
 package red.tetracube.homekitred.business.usecases
 
 import red.tetracube.homekitred.business.enumerations.DeviceType
-import red.tetracube.homekitred.models.errors.HomeKitRedError
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
 import red.tetracube.homekitred.data.api.entities.device.DeviceData
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
@@ -11,8 +10,9 @@ import red.tetracube.homekitred.data.db.datasource.HubDataSource
 import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
+import red.tetracube.homekitred.models.errors.HomeKitRedError
 
-class DeviceUseCase(
+class DeviceUseCases(
     private val hubDatasource: HubDataSource,
     private val ioTAPIDataSource: IoTAPIDataSource,
     private val deviceDataSource: DeviceDataSource
