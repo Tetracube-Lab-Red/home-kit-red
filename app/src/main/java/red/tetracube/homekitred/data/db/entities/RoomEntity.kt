@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 import java.util.UUID
 
 @Entity(tableName = "rooms")
-data class RoomEntity(
+class RoomEntity(
     @PrimaryKey var id: UUID,
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "hub_id") var hubId: UUID,
+    @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "hub_id") var hubId: UUID
 )

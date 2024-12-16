@@ -54,6 +54,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.business.enumerations.DeviceType
+import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
@@ -109,7 +110,15 @@ fun IoTHomeScreen(
     IotHomeScreenUINew(
         iotData = iotDataFlow,
         onHubAvatarClick = globalMenuItemsBuilder,
-        screenScope = screenScope
+        screenScope = screenScope,
+        showBottomSheet = showBottomSheet.value,
+        menuBottomSheet = {
+            MenuBottomSheet(
+                sheetState = sheetState,
+                onModalDismissRequest = toggleBottomSheet,
+                menuItems = menuItems
+            )
+        }
     )
 }
 
@@ -119,6 +128,8 @@ fun IotHomeScreenUINew(
     screenScope: CoroutineScope,
     iotData: UIState,
     onHubAvatarClick: () -> Unit,
+    menuBottomSheet: @Composable () -> Unit,
+    showBottomSheet: Boolean,
 ) {
     Scaffold(
         topBar = {
@@ -167,6 +178,10 @@ fun IotHomeScreenUINew(
             )
         }
 
+        if (showBottomSheet) {
+            menuBottomSheet()
+        }
+
     }
 }
 
@@ -187,12 +202,9 @@ fun DashboardPane(
         initialPage = 0,
         pageCount = { ioTDashboardModel.rooms.size }
     )
-
-    /*val selectedRoomSlug = remember(ioTDashboardModel.rooms) {
-        derivedStateOf {
-            hub?.rooms[pagerState.currentPage]?.id
-        }
-    }*/
+    val selectedRoom = remember(ioTDashboardModel.rooms) {
+        ioTDashboardModel.rooms[pagerState.currentPage].id
+    }
     Column(modifier = Modifier.padding(padding)) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -214,28 +226,28 @@ fun DashboardPane(
                 )
             }
         }
-        ListDetailPaneScaffold(
-            directive = navigator.scaffoldDirective,
-            value = navigator.scaffoldValue,
-            listPane = {
-                AnimatedPane {
-                    MyList(
-                        onItemClick = { item ->
-                            // Navigate to the detail pane with the passed item
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
-                        },
-                    )
-                }
-            },
-            detailPane = {
-                AnimatedPane {
-                    // Show the detail pane content if selected item is available
-                    navigator.currentDestination?.content?.let {
-                        MyDetails(it)
+        HorizontalPager(state = pagerState) { index ->
+            ListDetailPaneScaffold(
+                directive = navigator.scaffoldDirective,
+                value = navigator.scaffoldValue,
+                listPane = {
+                    AnimatedPane {
+                        MyList(
+                            onItemClick = { item ->
+                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                            },
+                        )
+                    }
+                },
+                detailPane = {
+                    AnimatedPane {
+                        navigator.currentDestination?.content?.let {
+                            MyDetails(it)
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
