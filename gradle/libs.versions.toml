@@ -17,6 +17,9 @@ room = "2.6.1"
 jackson-jsr310 = "2.18.2"
 
 [libraries]
+androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
+androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-jackson", version.ref = "ktor"}
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }

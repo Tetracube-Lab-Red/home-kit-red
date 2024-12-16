@@ -1,17 +1,8 @@
 package red.tetracube.homekitred.iot.home
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
-import red.tetracube.homekitred.business.mappers.asBasicTelemetry
 import red.tetracube.homekitred.business.usecases.DeviceUseCases
-import red.tetracube.homekitred.iot.home.domain.mappers.toDomain
-import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
-import red.tetracube.homekitred.iot.home.domain.models.Device
-import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 class IoTHomeUseCases(
     private val hubDatasource: HubDataSource,

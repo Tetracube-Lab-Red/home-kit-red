@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot.home
+package red.tetracube.homekitred.ui.iot.home
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
@@ -10,15 +10,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.business.usecases.DeviceUseCases
+import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.ui.iot.home.mappers.toUIModel
 import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 
 class IoTHomeViewModel(
+    private val hubDataSource: HubDataSource,
     private val deviceUseCases: DeviceUseCases
 ) : ViewModel() {
 
@@ -39,6 +43,11 @@ class IoTHomeViewModel(
             if (field.isCancelled) field = Job()
             return field
         }
+
+    fun iotData() =
+        hubDataSource.getHubAndRooms()
+            .map { it.toUIModel() }
+            .map { UIState.FinishedWithSuccessContent(it) }
 
     fun loadHubData() {
         viewModelScope.launch(job) {
@@ -102,9 +111,9 @@ class IoTHomeViewModel(
                              database = homeKitRedContainer.homeKitRedDatabase
                          )
                      )*/
-
+                    hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                     deviceUseCases = DeviceUseCases(
-                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
+                        hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                         ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
                         deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
                     )

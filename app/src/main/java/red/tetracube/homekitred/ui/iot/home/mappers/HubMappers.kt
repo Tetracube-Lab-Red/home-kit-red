@@ -1,13 +1,12 @@
-package red.tetracube.homekitred.iot.home.domain.mappers
+package red.tetracube.homekitred.ui.iot.home.mappers
 
 import red.tetracube.homekitred.data.db.entities.HubWithRoomsEntity
-import red.tetracube.homekitred.iot.home.domain.models.Room
-import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
-import java.util.UUID
+import red.tetracube.homekitred.ui.iot.home.models.IoTDashboardModel
+import red.tetracube.homekitred.ui.iot.home.models.Room
 
-fun HubWithRoomsEntity.toDomain() =
-    HubWithRooms(
-        id = this.hub.id,
+fun HubWithRoomsEntity.toUIModel() =
+    IoTDashboardModel(
+        hubId = this.hub.id,
         avatarName = if (this.hub.name.contains(" ")) {
             this.hub.name.split(" ")
                 .map { it.first() }
@@ -15,10 +14,10 @@ fun HubWithRoomsEntity.toDomain() =
         } else {
             this.hub.name.take(2)
         },
-        name = this.hub.name,
+        hubName = this.hub.name,
         rooms = listOf<Room>(
             Room(
-                id = UUID.randomUUID(),
+                id = null,
                 name = "House"
             )
         ) + this.rooms.map {

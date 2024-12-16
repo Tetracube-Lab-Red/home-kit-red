@@ -16,7 +16,7 @@ import red.tetracube.homekitred.models.errors.HomeKitRedError
 import java.util.UUID
 
 class DeviceUseCases(
-    private val hubDatasource: HubDataSource,
+    private val hubDataSource: HubDataSource,
     private val ioTAPIDataSource: IoTAPIDataSource,
     private val deviceDataSource: DeviceDataSource
 ) {
@@ -25,7 +25,7 @@ class DeviceUseCases(
         deviceProvisioningModel: DeviceProvisioning,
         upsProvisioningModel: UPSProvisioning
     ): Result<Unit> {
-        val hub = hubDatasource.getActiveHub()!!
+        val hub = hubDataSource.getActiveHub()!!
         val request = DeviceProvisioningRequest(
             deviceProvisioningModel.deviceType,
             deviceProvisioningModel.name,

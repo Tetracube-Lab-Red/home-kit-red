@@ -15,8 +15,8 @@ import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningScr
 import red.tetracube.homekitred.ui.iot.device.provisioning.DeviceProvisioningViewModel
 import red.tetracube.homekitred.ui.iot.device.room.DeviceRoomDialog
 import red.tetracube.homekitred.ui.iot.device.room.DeviceRoomViewModel
-import red.tetracube.homekitred.iot.home.IoTHomeScreen
-import red.tetracube.homekitred.iot.home.IoTHomeViewModel
+import red.tetracube.homekitred.ui.iot.home.IoTHomeScreen
+import red.tetracube.homekitred.ui.iot.home.IoTHomeViewModel
 import java.util.UUID
 
 fun NavGraphBuilder.addIoTNavigation(

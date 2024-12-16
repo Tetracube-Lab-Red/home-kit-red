@@ -49,7 +49,7 @@ class DeviceProvisioningViewModel(
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 DeviceProvisioningViewModel(
                     deviceUseCases = DeviceUseCases(
-                        hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
+                        hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                         ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
                         deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
                     )
