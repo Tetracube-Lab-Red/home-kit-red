@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry.UPSBasicTelemetry
-import red.tetracube.homekitred.iot.home.domain.models.Device
+import red.tetracube.homekitred.ui.iot.home.models.Device
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID

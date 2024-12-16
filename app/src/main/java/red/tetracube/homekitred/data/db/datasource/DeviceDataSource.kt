@@ -15,7 +15,7 @@ interface DeviceDataSource {
     suspend fun getDeviceById(id: UUID): DeviceEntity?
 
     @Query("SELECT * FROM devices WHERE hub_id = :hubId")
-    fun getDevices(hubId: UUID): Flow<DeviceEntity>
+    fun getDevices(hubId: UUID): Flow<List<DeviceEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(device: DeviceEntity): Long

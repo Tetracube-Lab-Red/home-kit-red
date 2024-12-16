@@ -25,5 +25,6 @@ fun HubWithRoomsEntity.toUIModel() =
                 id = it.id,
                 name = it.name
             )
-        }
+        },
+        list = listOf("hello")
     )

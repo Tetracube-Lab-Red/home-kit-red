@@ -13,7 +13,6 @@ import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
 import red.tetracube.homekitred.models.errors.HomeKitRedError
-import java.util.UUID
 
 class DeviceUseCases(
     private val hubDataSource: HubDataSource,
@@ -67,30 +66,7 @@ class DeviceUseCases(
         return Result.success(Unit)
     }
 
-    suspend fun retrieveDevices(
-        hubId: UUID,
-        apiURI: String,
-        token: String
-    ) {
-        ioTAPIDataSource.getDevices(apiURI, token)
-            .devices
-            .map { deviceData ->
-                DeviceEntity(
-                    id = deviceData.id,
-                    name = deviceData.name,
-                    type = deviceData.deviceType,
-                    hubId = hubId,
-                    roomId = deviceData.roomId
-                )
-            }
-            .forEach { deviceDataSource.insert(it) }
 
-        deviceDataSource.getDevices(hubId)
-            .collect { deviceEntity ->
-                var deviceTelemetry =
-                    ioTAPIDataSource.getDeviceTelemetry(apiURI, token, deviceEntity.id)
-            }
-    }
 
     suspend fun listenDeviceTelemetryStreams(
         streamingHubAddress: String,

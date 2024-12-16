@@ -9,17 +9,21 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.business.usecases.DeviceUseCases
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
-import red.tetracube.homekitred.ui.iot.home.mappers.toUIModel
-import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
-import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
+import red.tetracube.homekitred.ui.iot.home.mappers.toUIModel
+import red.tetracube.homekitred.ui.iot.home.models.Device
+import red.tetracube.homekitred.ui.state.UIState
 
 class IoTHomeViewModel(
     private val hubDataSource: HubDataSource,
@@ -44,21 +48,46 @@ class IoTHomeViewModel(
             return field
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun iotData() =
         hubDataSource.getHubAndRooms()
             .map { it.toUIModel() }
+            .flatMapMerge { iotData ->
+                flow {
+                    emit(listOf("1", "2", "3", "4", "5", "6"))
+                    delay(2000)
+                    emit(listOf("7", "8", "9", "10", "11", "12"))
+                }
+                    .map { device ->
+                        iotData.copy(
+                            list = iotData.list + device
+                        )
+                    }
+            }
             .map { UIState.FinishedWithSuccessContent(it) }
+
+   /* suspend fun getDevices(roomSlug: String?): Flow<Device> {
+        val hub = hubDatasource.getActiveHub()!!
+        return database.deviceRepository().getDevices(hub.slug)
+            .filter { entity ->
+                if (roomSlug == null) true else entity.roomSlug == roomSlug
+            }
+            .map { entity ->
+                Device(
+                    name = entity.name,
+                    slug = entity.slug,
+                    roomName = entity.roomSlug?.let {
+                        database.roomRepository().getBySlug(it).name
+                    },
+                    roomSlug = entity.roomSlug,
+                    notifications = 0,
+                    type = entity.type
+                )
+            }
+    }*/
 
     fun loadHubData() {
         viewModelScope.launch(job) {
-            _uiState.value = UIState.Loading
-            launch {
-                /*   ioTHomeUseCases.loadData()
-                       .collect {
-                           _hub.value = it
-                           _uiState.value = UIState.FinishedWithSuccess
-                       }*/
-            }
 
             launch {
                 /*ioTHomeUseCases.getDevices(null)

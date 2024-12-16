@@ -63,7 +63,9 @@ class SplashViewModel(
                     hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                     globalDataUseCases = GlobalDataUseCases(
                         roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomDataSource(),
-                        hubAPIDataSource = homeKitRedContainer.hubAPIDataSource
+                        hubAPIDataSource = homeKitRedContainer.hubAPIDataSource,
+                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
+                        deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
                     )
                 )
             }

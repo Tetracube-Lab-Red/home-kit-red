@@ -48,7 +48,9 @@ class LoginViewModel(
                     homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
                     globalDataUseCases = GlobalDataUseCases(
                         roomDatasource = homeKitRedContainer.homeKitRedDatabase.roomDataSource(),
-                        homeKitRedContainer.hubAPIDataSource,
+                        hubAPIDataSource = homeKitRedContainer.hubAPIDataSource,
+                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
+                        deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
                     )
                 )
                 LoginViewModel(loginUseCases)

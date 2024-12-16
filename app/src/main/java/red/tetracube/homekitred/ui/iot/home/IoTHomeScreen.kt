@@ -36,7 +36,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,21 +48,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import red.tetracube.homekitred.ui.state.UIState
 import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
 import red.tetracube.homekitred.iot.home.components.UPSCard
 import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
 import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
-import red.tetracube.homekitred.iot.home.domain.models.Device
 import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
 import red.tetracube.homekitred.iot.home.domain.models.deviceMenuItems
 import red.tetracube.homekitred.iot.home.domain.models.globalMenuItems
+import red.tetracube.homekitred.ui.iot.home.models.Device
 import red.tetracube.homekitred.ui.iot.home.models.IoTDashboardModel
 import red.tetracube.homekitred.ui.iot.home.models.MyItem
+import red.tetracube.homekitred.ui.state.UIState
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +73,7 @@ fun IoTHomeScreen(
     navController: NavHostController,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
-    val iotDataFlow = viewModel.iotData().collectAsState(UIState.Loading).value
+    val iotDataFlow = remember { viewModel.iotData() }.collectAsStateWithLifecycle(UIState.Loading)
     val uiState = viewModel.uiState.value
     val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
     val screenScope = rememberCoroutineScope()
@@ -108,7 +108,7 @@ fun IoTHomeScreen(
     }
 
     IotHomeScreenUINew(
-        iotData = iotDataFlow,
+        iotData = iotDataFlow.value,
         onHubAvatarClick = globalMenuItemsBuilder,
         screenScope = screenScope,
         showBottomSheet = showBottomSheet.value,
@@ -233,6 +233,7 @@ fun DashboardPane(
                 listPane = {
                     AnimatedPane {
                         MyList(
+                            devices = ioTDashboardModel.list,
                             onItemClick = { item ->
                                 navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
                             },
@@ -253,11 +254,12 @@ fun DashboardPane(
 
 @Composable
 fun MyList(
+    devices: List<String>,
     onItemClick: (MyItem) -> Unit,
 ) {
     Card {
         LazyColumn {
-            shortStrings.forEachIndexed { id, string ->
+            devices.forEachIndexed { id, string ->
                 item {
                     ListItem(
                         modifier = Modifier
