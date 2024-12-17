@@ -8,23 +8,21 @@ import red.tetracube.homekitred.data.api.entities.device.DeviceData
 import red.tetracube.homekitred.data.api.entities.device.DeviceProvisioningRequest
 import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
-import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
-import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.data.db.HomeKitRedDatabase
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
 import red.tetracube.homekitred.models.errors.HomeKitRedError
 
 class DeviceUseCases(
-    private val hubDataSource: HubDataSource,
+    private val localDataSource: HomeKitRedDatabase,
     private val ioTAPIDataSource: IoTAPIDataSource,
-    private val deviceDataSource: DeviceDataSource
 ) {
 
     suspend fun sendDeviceProvisioningRequest(
         deviceProvisioningModel: DeviceProvisioning,
         upsProvisioningModel: UPSProvisioning
     ): Result<Unit> {
-        val hub = hubDataSource.getActiveHub()!!
+        val hub = localDataSource.hubDataSource().getActiveHub()!!
         val request = DeviceProvisioningRequest(
             deviceProvisioningModel.deviceType,
             deviceProvisioningModel.name,
@@ -53,7 +51,7 @@ class DeviceUseCases(
         }
 
         val apiDeviceData = apiProvisioningResponse as DeviceData
-        deviceDataSource.insert(
+        localDataSource.deviceDataSource().insert(
             apiDeviceData.asEntity(hub.id)
         )
 
@@ -61,16 +59,16 @@ class DeviceUseCases(
     }
 
     suspend fun listenDevicesStreams() {
-        val hub = hubDataSource.getActiveHub()!!
+        val hub = localDataSource.hubDataSource().getActiveHub()!!
         ioTAPIDataSource.getDevicesStreaming(hub.websocketURI)
             .map { it.asEntity(hub.id) }
             .collect { deviceEntity ->
-                deviceDataSource.insert(deviceEntity)
+                localDataSource.deviceDataSource().insert(deviceEntity)
             }
     }
 
     suspend fun listenDeviceTelemetryStreams() {
-        val hub = hubDataSource.getActiveHub()!!
+        val hub = localDataSource.hubDataSource().getActiveHub()!!
         ioTAPIDataSource.getTelemetryStreaming(hub.websocketURI)
             .collect {
                 if (it is UPSTelemetryData) {

@@ -23,7 +23,7 @@ data class Room(
 )
 
 @Parcelize
-data class Device (
+data class Device(
     val id: UUID,
     val name: String,
     val roomName: String?,
@@ -34,26 +34,23 @@ data class Device (
 ) : Parcelable
 
 @Parcelize
-sealed class BasicTelemetry(
-    val id: UUID,
-    val connection: ConnectivityHealth,
-    val telemetry: TelemetryHealth,
-    val timestamp: Instant
-) : Parcelable {
+sealed class BasicTelemetry : Parcelable {
+
+    abstract val id: UUID
+    abstract val deviceId: UUID
+    abstract val connectivityHealth: ConnectivityHealth
+    abstract val telemetryHealth: TelemetryHealth
+    abstract val telemetryTS: Instant
 
     @Parcelize
     data class UPSBasicTelemetry(
-        val deviceId: UUID,
+        override val id: UUID,
+        override val deviceId: UUID,
         val primaryStatus: UPSStatus,
         val secondaryStatus: UPSStatus?,
-        val connectivityHealth: ConnectivityHealth,
-        val telemetryHealth: TelemetryHealth,
-        val telemetryTS: Instant
-    ) : BasicTelemetry(
-        deviceId,
-        connectivityHealth,
-        telemetryHealth,
-        telemetryTS
-    )
+        override val connectivityHealth: ConnectivityHealth,
+        override val telemetryHealth: TelemetryHealth,
+        override val telemetryTS: Instant
+    ) : BasicTelemetry()
 
 }

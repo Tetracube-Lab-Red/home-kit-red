@@ -12,17 +12,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.business.usecases.DeviceUseCases
-import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
-import red.tetracube.homekitred.data.db.datasource.HubDataSource
+import red.tetracube.homekitred.data.db.HomeKitRedDatabase
+import red.tetracube.homekitred.ui.iot.home.mappers.asBasicTelemetry
 import red.tetracube.homekitred.ui.iot.home.mappers.toUIModel
+import red.tetracube.homekitred.ui.iot.home.models.BasicTelemetry
 import red.tetracube.homekitred.ui.state.UIState
 
 class IoTHomeViewModel(
-    private val hubDataSource: HubDataSource,
-    private val deviceDataSource: DeviceDataSource,
+    private val localDataSource: HomeKitRedDatabase,
     private val deviceUseCases: DeviceUseCases
 ) : ViewModel() {
 
@@ -38,16 +39,23 @@ class IoTHomeViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun iotData() =
-        hubDataSource.getHubAndRooms()
+        localDataSource.hubDataSource().getHubAndRooms()
             .map { it.toUIModel() }
             .flatMapMerge { iotData ->
-                deviceDataSource.getDevices(iotData.hubId)
-                    .map { devices ->
+                localDataSource.deviceDataSource().getDevices(iotData.hubId)
+                    .zip(
+                        localDataSource.upsTelemetryDataSource().telemetriesLiveData()
+                            .map { telemetries ->
+                                telemetries.map { telemetry -> telemetry.asBasicTelemetry() as BasicTelemetry}
+                            }
+                    ) { devices, telemetries ->
                         devices.map { device ->
                             val roomName = device.roomId?.let { roomId ->
                                 iotData.rooms.firstOrNull { room -> room.id == roomId }
                             }?.name
-                            device.toUIModel(roomName)
+                            val telemetry =
+                                telemetries.firstOrNull { telemetry -> telemetry.deviceId == device.id }
+                            device.toUIModel(roomName, telemetry)
                         }
                     }
                     .map { devices ->
@@ -58,33 +66,13 @@ class IoTHomeViewModel(
             }
             .map { UIState.FinishedWithSuccessContent(it) }
 
-    /* suspend fun getDevices(roomSlug: String?): Flow<Device> {
-         val hub = hubDatasource.getActiveHub()!!
-         return database.deviceRepository().getDevices(hub.slug)
-             .filter { entity ->
-                 if (roomSlug == null) true else entity.roomSlug == roomSlug
-             }
-             .map { entity ->
-                 Device(
-                     name = entity.name,
-                     slug = entity.slug,
-                     roomName = entity.roomSlug?.let {
-                         database.roomRepository().getBySlug(it).name
-                     },
-                     roomSlug = entity.roomSlug,
-                     notifications = 0,
-                     type = entity.type
-                 )
-             }
-     }*/
-
     fun loadHubData() {
         viewModelScope.launch(job) {
             launch {
                 deviceUseCases.listenDevicesStreams()
             }
             launch {
-               deviceUseCases.listenDeviceTelemetryStreams()
+                deviceUseCases.listenDeviceTelemetryStreams()
             }
         }
     }
@@ -99,20 +87,10 @@ class IoTHomeViewModel(
                 val homeKitRedContainer =
                     (this[APPLICATION_KEY] as HomeKitRedApp).homeKitRedContainer
                 IoTHomeViewModel(
-                    /* ioTHomeUseCases = IoTHomeUseCases(
-                         hubDatasource = homeKitRedContainer.homeKitRedDatabase.hubRepository(),
-                         database = homeKitRedContainer.homeKitRedDatabase,
-                         deviceService = DeviceService(
-                             ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
-                             database = homeKitRedContainer.homeKitRedDatabase
-                         )
-                     )*/
-                    hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
-                    deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource(),
+                    localDataSource = homeKitRedContainer.homeKitRedDatabase,
                     deviceUseCases = DeviceUseCases(
-                        hubDataSource = homeKitRedContainer.homeKitRedDatabase.hubDataSource(),
-                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource,
-                        deviceDataSource = homeKitRedContainer.homeKitRedDatabase.deviceDataSource()
+                        localDataSource = homeKitRedContainer.homeKitRedDatabase,
+                        ioTAPIDataSource = homeKitRedContainer.ioTAPIDataSource
                     )
                 )
             }
