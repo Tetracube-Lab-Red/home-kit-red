@@ -1,7 +1,6 @@
-package red.tetracube.homekitred.iot.home.components
+package red.tetracube.homekitred.ui.iot.home.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,17 +10,14 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeviceCard(
-    onDeviceLongClick: () -> Unit,
+    onDeviceClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val haptics = LocalHapticFeedback.current
     OutlinedCard(
         modifier = Modifier
             .padding(8.dp)
@@ -30,11 +26,7 @@ fun DeviceCard(
             .combinedClickable(
                 enabled = true,
                 onClick = {
-
-                },
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onDeviceLongClick()
+                    onDeviceClick()
                 }
             )
     ) {

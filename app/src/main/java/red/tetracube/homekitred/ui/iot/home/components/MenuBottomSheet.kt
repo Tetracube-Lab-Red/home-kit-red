@@ -1,4 +1,4 @@
-package red.tetracube.homekitred.iot.home.components
+package red.tetracube.homekitred.ui.iot.home.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,9 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
+import red.tetracube.homekitred.ui.iot.home.models.BottomSheetItem
+import red.tetracube.homekitred.ui.iot.home.models.BottomSheetItem.DeviceMenuItem
+import red.tetracube.homekitred.ui.iot.home.models.BottomSheetItem.GlobalMenuItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

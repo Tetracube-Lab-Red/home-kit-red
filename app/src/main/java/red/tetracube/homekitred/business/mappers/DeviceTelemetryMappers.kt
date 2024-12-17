@@ -3,7 +3,7 @@ package red.tetracube.homekitred.business.mappers
 import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse.UPSTelemetryData
 import red.tetracube.homekitred.data.db.entities.UPSTelemetryEntity
 import red.tetracube.homekitred.business.enumerations.UPSStatus
-import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
+import red.tetracube.homekitred.ui.iot.home.models.BasicTelemetry
 
 fun UPSTelemetryData.asEntity(): UPSTelemetryEntity =
     UPSTelemetryEntity(

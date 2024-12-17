@@ -1,12 +1,8 @@
-package red.tetracube.homekitred.iot.home.domain.models
+package red.tetracube.homekitred.ui.iot.home.models
 
 import androidx.navigation.NavHostController
 import red.tetracube.homekitred.R
 import red.tetracube.homekitred.navigation.Routes
-import red.tetracube.homekitred.navigation.Routes.DeviceRoomJoin
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.DeviceMenuItem
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem.GlobalMenuItem
-import java.util.UUID
 
 sealed class BottomSheetItem(
     val icon: Int,
@@ -30,9 +26,9 @@ sealed class BottomSheetItem(
 fun globalMenuItems(
     navController: NavHostController,
     globalBehavior: () -> Unit
-): List<GlobalMenuItem> =
+): List<BottomSheetItem.GlobalMenuItem> =
     listOf(
-        GlobalMenuItem(
+        BottomSheetItem.GlobalMenuItem(
             R.drawable.room_preferences_24px,
             "New room"
         ) {
@@ -40,26 +36,11 @@ fun globalMenuItems(
             navController.navigate(Routes.RoomAdd)
         },
 
-        GlobalMenuItem(
+        BottomSheetItem.GlobalMenuItem(
             R.drawable.home_iot_device_24px,
             "Add device"
         ) {
             globalBehavior()
             navController.navigate(Routes.DeviceProvisioning)
-        }
-    )
-
-fun deviceMenuItems(
-    navController: NavHostController,
-    deviceId: UUID,
-    globalBehavior: () -> Unit
-): List<DeviceMenuItem> =
-    listOf(
-        DeviceMenuItem(
-            R.drawable.room_preferences_24px,
-            "Set device room"
-        ) {
-            globalBehavior()
-            navController.navigate(DeviceRoomJoin(deviceId.toString()))
         }
     )

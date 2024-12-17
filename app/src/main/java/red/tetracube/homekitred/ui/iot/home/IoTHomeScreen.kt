@@ -2,7 +2,6 @@ package red.tetracube.homekitred.ui.iot.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +20,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -36,14 +34,12 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleOwner
@@ -53,16 +49,11 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.business.enumerations.DeviceType
-import red.tetracube.homekitred.iot.home.components.MenuBottomSheet
-import red.tetracube.homekitred.iot.home.components.UPSCard
-import red.tetracube.homekitred.iot.home.domain.models.BasicTelemetry
-import red.tetracube.homekitred.iot.home.domain.models.BottomSheetItem
-import red.tetracube.homekitred.iot.home.domain.models.HubWithRooms
-import red.tetracube.homekitred.iot.home.domain.models.deviceMenuItems
-import red.tetracube.homekitred.iot.home.domain.models.globalMenuItems
+import red.tetracube.homekitred.ui.iot.home.components.MenuBottomSheet
+import red.tetracube.homekitred.ui.iot.home.components.UPSCard
 import red.tetracube.homekitred.ui.iot.home.models.Device
 import red.tetracube.homekitred.ui.iot.home.models.IoTDashboardModel
-import red.tetracube.homekitred.ui.iot.home.models.MyItem
+import red.tetracube.homekitred.ui.iot.home.models.globalMenuItems
 import red.tetracube.homekitred.ui.state.UIState
 import java.util.UUID
 
@@ -74,28 +65,21 @@ fun IoTHomeScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val iotDataFlow = remember { viewModel.iotData() }.collectAsStateWithLifecycle(UIState.Loading)
-    val uiState = viewModel.uiState.value
-    val devicesTelemetriesMap = viewModel.devicesTelemetriesMap
     val screenScope = rememberCoroutineScope()
-    var showBottomSheet = remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false,
-    )
-    val toggleBottomSheet = {
-        showBottomSheet.value = !showBottomSheet.value
-    }
 
-    val menuItems = remember { mutableListOf<BottomSheetItem>() }
-    val globalMenuItemsBuilder: () -> Unit = {
-        menuItems.clear()
-        menuItems.addAll(globalMenuItems(navController, toggleBottomSheet))
-        toggleBottomSheet()
+    var showBottomSheet = remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val toggleBottomSheet: () -> Unit = {
+        if (sheetState.isVisible) {
+            screenScope.launch { sheetState.hide() }
+        } else {
+            screenScope.launch { sheetState.show() }
+        }.invokeOnCompletion {
+            if (sheetState.isVisible) showBottomSheet.value = true
+            if (!sheetState.isVisible) showBottomSheet.value = false
+        }
     }
-    val deviceMenuItemsBuilder: (UUID) -> Unit = { deviceId ->
-        menuItems.clear()
-        menuItems.addAll(deviceMenuItems(navController, deviceId, toggleBottomSheet))
-        toggleBottomSheet()
-    }
+    val menuItems = remember { globalMenuItems(navController, toggleBottomSheet) }
 
     LaunchedEffect(Unit) {
         viewModel.loadHubData()
@@ -109,13 +93,18 @@ fun IoTHomeScreen(
 
     IotHomeScreenUINew(
         iotData = iotDataFlow.value,
-        onHubAvatarClick = globalMenuItemsBuilder,
+        onHubAvatarClick = toggleBottomSheet,
         screenScope = screenScope,
         showBottomSheet = showBottomSheet.value,
         menuBottomSheet = {
             MenuBottomSheet(
                 sheetState = sheetState,
-                onModalDismissRequest = toggleBottomSheet,
+                onModalDismissRequest = {
+                    screenScope.launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            if (!sheetState.isVisible) showBottomSheet.value = false
+                        }
+                },
                 menuItems = menuItems
             )
         }
@@ -192,7 +181,7 @@ fun DashboardPane(
     screenScope: CoroutineScope,
     ioTDashboardModel: IoTDashboardModel
 ) {
-    val navigator = rememberListDetailPaneScaffoldNavigator<MyItem>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<Device>()
 
     BackHandler(navigator.canNavigateBack()) {
         navigator.navigateBack()
@@ -232,10 +221,11 @@ fun DashboardPane(
                 value = navigator.scaffoldValue,
                 listPane = {
                     AnimatedPane {
-                        MyList(
-                            devices = ioTDashboardModel.list,
-                            onItemClick = { item ->
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, item)
+                        DevicesList(
+                            devices = ioTDashboardModel.devices,
+                            roomId = selectedRoom,
+                            onDeviceClick = { device ->
+                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, device)
                             },
                         )
                     }
@@ -253,35 +243,36 @@ fun DashboardPane(
 }
 
 @Composable
-fun MyList(
-    devices: List<String>,
-    onItemClick: (MyItem) -> Unit,
+fun DevicesList(
+    devices: List<Device>,
+    roomId: UUID?,
+    onDeviceClick: (Device) -> Unit,
 ) {
     Card {
         LazyColumn {
-            devices.forEachIndexed { id, string ->
-                item {
-                    ListItem(
-                        modifier = Modifier
-                            .background(Color.Magenta)
-                            .clickable {
-                                onItemClick(MyItem(id))
-                            },
-                        headlineContent = {
-                            Text(
-                                text = string,
-                            )
-                        },
-                    )
+            devices
+                .filter { room -> roomId == null || room.id == roomId }
+                .forEachIndexed { id, device ->
+                    item {
+                        when (device.type) {
+                            DeviceType.UPS -> UPSCard(
+                                device,
+                                device.telemetry
+                            ) {
+                                onDeviceClick(device)
+                            }
+
+                            else -> {}
+                        }
+                    }
                 }
-            }
         }
     }
 }
 
 @Composable
-fun MyDetails(item: MyItem) {
-    val text = shortStrings[item.id]
+fun MyDetails(device: Device) {
+    val text = device.name
     Card {
         Column(
             Modifier
@@ -289,7 +280,7 @@ fun MyDetails(item: MyItem) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Details page for $text",
+                text = "Details page device $text",
                 fontSize = 24.sp,
             )
             Spacer(Modifier.size(16.dp))
@@ -299,107 +290,3 @@ fun MyDetails(item: MyItem) {
         }
     }
 }
-
-val shortStrings = listOf(
-    "Cupcake",
-    "Donut",
-    "Eclair",
-    "Froyo",
-    "Gingerbread",
-    "Honeycomb",
-    "Ice cream sandwich",
-    "Jelly bean",
-    "Kitkat",
-    "Lollipop",
-    "Marshmallow",
-    "Nougat",
-    "Oreo",
-    "Pie",
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun IoTHomeScreenUI(
-    hub: HubWithRooms?,
-    screenScope: CoroutineScope,
-    menuBottomSheet: @Composable () -> Unit,
-    showBottomSheet: Boolean,
-    devicesTelemetriesMap: Map<Device, BasicTelemetry>,
-    onDeviceMenuRequest: (UUID) -> Unit
-) {
-    Scaffold(
-
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-
-
-            val pagerState =
-                rememberPagerState(initialPage = 0, pageCount = { hub?.rooms?.size ?: 0 })
-            val selectedRoomSlug = remember(hub?.rooms) {
-                derivedStateOf {
-                    hub?.rooms[pagerState.currentPage]?.id
-                }
-            }
-            ScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                divider = {
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                hub?.rooms?.mapIndexed { idx, room ->
-                    Tab(
-                        selected = pagerState.currentPage == idx,
-                        onClick = {
-                            screenScope.launch {
-                                pagerState.animateScrollToPage(idx)
-                            }
-                        },
-                        text = {
-                            Text(text = room.name)
-                        }
-                    )
-                }
-            }
-            HorizontalPager(state = pagerState) { index ->
-                DevicesGrid(selectedRoomSlug.value, devicesTelemetriesMap, onDeviceMenuRequest)
-            }
-        }
-
-        if (showBottomSheet) {
-            menuBottomSheet()
-        }
-    }
-}
-
-@Composable
-fun DevicesGrid(
-    roomId: UUID?,
-    devicesTelemetriesMap: Map<Device, BasicTelemetry>,
-    onDeviceMenuRequest: (UUID) -> Unit
-) {
-    LazyColumn {
-        devicesTelemetriesMap
-            .filter { room ->
-                roomId == null || room.key.id == roomId
-            }
-            .map { deviceTelemetryEntry ->
-                item {
-                    when (deviceTelemetryEntry.key.type) {
-                        DeviceType.UPS -> UPSCard(
-                            deviceTelemetryEntry.key,
-                            deviceTelemetryEntry.value,
-                            onDeviceMenuRequest
-                        )
-
-                        else -> {}
-                    }
-                }
-            }
-    }
-}
-

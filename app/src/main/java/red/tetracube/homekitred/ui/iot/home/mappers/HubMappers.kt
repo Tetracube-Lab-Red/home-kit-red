@@ -26,5 +26,5 @@ fun HubWithRoomsEntity.toUIModel() =
                 name = it.name
             )
         },
-        list = listOf("hello")
+        devices = emptyList()
     )

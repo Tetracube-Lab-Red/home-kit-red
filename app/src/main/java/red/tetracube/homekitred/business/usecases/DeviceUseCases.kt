@@ -1,5 +1,6 @@
 package red.tetracube.homekitred.business.usecases
 
+import kotlinx.coroutines.flow.map
 import red.tetracube.homekitred.business.enumerations.DeviceType
 import red.tetracube.homekitred.business.mappers.asEntity
 import red.tetracube.homekitred.data.api.datasource.IoTAPIDataSource
@@ -9,7 +10,6 @@ import red.tetracube.homekitred.data.api.entities.device.DeviceTelemetryResponse
 import red.tetracube.homekitred.data.api.entities.device.UPSProvisioningFields
 import red.tetracube.homekitred.data.db.datasource.DeviceDataSource
 import red.tetracube.homekitred.data.db.datasource.HubDataSource
-import red.tetracube.homekitred.data.db.entities.DeviceEntity
 import red.tetracube.homekitred.models.DeviceProvisioning
 import red.tetracube.homekitred.models.UPSProvisioning
 import red.tetracube.homekitred.models.errors.HomeKitRedError
@@ -54,29 +54,28 @@ class DeviceUseCases(
 
         val apiDeviceData = apiProvisioningResponse as DeviceData
         deviceDataSource.insert(
-            DeviceEntity(
-                id = apiDeviceData.id,
-                name = apiDeviceData.name,
-                apiDeviceData.deviceType,
-                hub.id,
-                roomId = apiDeviceData.roomId,
-            )
+            apiDeviceData.asEntity(hub.id)
         )
 
         return Result.success(Unit)
     }
 
+    suspend fun listenDevicesStreams() {
+        val hub = hubDataSource.getActiveHub()!!
+        ioTAPIDataSource.getDevicesStreaming(hub.websocketURI)
+            .map { it.asEntity(hub.id) }
+            .collect { deviceEntity ->
+                deviceDataSource.insert(deviceEntity)
+            }
+    }
 
-
-    suspend fun listenDeviceTelemetryStreams(
-        streamingHubAddress: String,
-        token: String
-    ) {
-        ioTAPIDataSource.getTelemetryStreaming(streamingHubAddress)
+    suspend fun listenDeviceTelemetryStreams() {
+        val hub = hubDataSource.getActiveHub()!!
+        ioTAPIDataSource.getTelemetryStreaming(hub.websocketURI)
             .collect {
                 if (it is UPSTelemetryData) {
                     var telemetryEntity = it.asEntity()
-                 //   upsTelemetryDatasource.insert(telemetryEntity)
+                    //   upsTelemetryDatasource.insert(telemetryEntity)
                 }
             }
     }

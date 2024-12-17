@@ -1,6 +1,5 @@
 package red.tetracube.homekitred.data.api.datasource
 
-import android.devicelock.DeviceId
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.webSocket
@@ -23,6 +22,7 @@ class IoTAPIDataSource : BaseAPIDataSource() {
     companion object {
         const val BASE_PATH = "/iot"
         const val DEVICES = "/devices"
+        const val WEBSOCKET = "/ws"
         const val PROVISIONING = "/telemetry"
         const val ROOM = "/room"
         const val TELEMETRY = "/telemetry"
@@ -56,6 +56,18 @@ class IoTAPIDataSource : BaseAPIDataSource() {
         {
             headers {
                 append("Authorization", "Bearer $token")
+            }
+        }
+
+    fun getDevicesStreaming(websocketURI: String) =
+        flow {
+            client.webSocket(
+                urlString = "$websocketURI$DEVICES$WEBSOCKET"
+            ) {
+                while (true) {
+                    val telemetry = receiveDeserialized<DeviceData>()
+                    emit(telemetry)
+                }
             }
         }
 
