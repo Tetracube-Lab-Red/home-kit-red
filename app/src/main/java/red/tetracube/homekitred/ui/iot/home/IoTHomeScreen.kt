@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -191,36 +193,38 @@ fun DashboardPane(
         initialPage = 0,
         pageCount = { ioTDashboardModel.rooms.size }
     )
-    val selectedRoom = remember(ioTDashboardModel.rooms) {
+    val selectedRoom = remember(pagerState.currentPage) {
         ioTDashboardModel.rooms[pagerState.currentPage].id
     }
-    Column(modifier = Modifier.padding(padding)) {
-        ScrollableTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            divider = {},
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            ioTDashboardModel.rooms.mapIndexed { idx, room ->
-                Tab(
-                    selected = pagerState.currentPage == idx,
-                    onClick = {
-                        screenScope.launch {
-                            pagerState.animateScrollToPage(idx)
+
+    ListDetailPaneScaffold(
+        modifier = Modifier.padding(padding),
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            AnimatedPane {
+                Column {
+                    ScrollableTabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        divider = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        ioTDashboardModel.rooms.mapIndexed { idx, room ->
+                            Tab(
+                                selected = pagerState.currentPage == idx,
+                                onClick = {
+                                    screenScope.launch {
+                                        pagerState.animateScrollToPage(idx)
+                                    }
+                                },
+                                text = {
+                                    Text(text = room.name)
+                                }
+                            )
                         }
-                    },
-                    text = {
-                        Text(text = room.name)
                     }
-                )
-            }
-        }
-        HorizontalPager(state = pagerState) { index ->
-            ListDetailPaneScaffold(
-                directive = navigator.scaffoldDirective,
-                value = navigator.scaffoldValue,
-                listPane = {
-                    AnimatedPane {
+                    HorizontalPager(state = pagerState) { index ->
                         DevicesList(
                             devices = ioTDashboardModel.devices,
                             roomId = selectedRoom,
@@ -229,17 +233,17 @@ fun DashboardPane(
                             },
                         )
                     }
-                },
-                detailPane = {
-                    AnimatedPane {
-                        navigator.currentDestination?.content?.let {
-                            MyDetails(it)
-                        }
-                    }
                 }
-            )
+            }
+        },
+        detailPane = {
+            AnimatedPane {
+                navigator.currentDestination?.content?.let {
+                    MyDetails(it)
+                }
+            }
         }
-    }
+    )
 }
 
 @Composable
@@ -248,10 +252,14 @@ fun DevicesList(
     roomId: UUID?,
     onDeviceClick: (Device) -> Unit,
 ) {
-    Card {
+    Surface(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+            .fillMaxHeight()
+    ) {
         LazyColumn {
             devices
-                .filter { room -> roomId == null || room.id == roomId }
+                .filter { device -> roomId == null || device.roomId == roomId }
                 .forEachIndexed { id, device ->
                     item {
                         when (device.type) {

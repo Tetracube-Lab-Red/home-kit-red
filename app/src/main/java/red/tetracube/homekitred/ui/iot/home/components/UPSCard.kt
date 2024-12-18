@@ -135,7 +135,7 @@ fun UPSCard(
                     Text(
                         buildAnnotatedString {
                             withStyle(style = SpanStyle()) {
-                                append("${basicTelemetry.connection} - ${basicTelemetry.telemetry}")
+                                append("${basicTelemetry.connectivityHealth} - ${basicTelemetry.telemetryHealth}")
                             }
                         },
                         style = MaterialTheme.typography.titleSmall
@@ -162,7 +162,7 @@ fun UPSCard(
                                 append(
                                     DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
                                         .withZone(ZoneId.systemDefault())
-                                        .format(basicTelemetry.timestamp)
+                                        .format(basicTelemetry.telemetryTS)
                                 )
                             }
                         },

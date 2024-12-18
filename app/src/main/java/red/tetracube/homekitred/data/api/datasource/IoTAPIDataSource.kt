@@ -62,7 +62,7 @@ class IoTAPIDataSource : BaseAPIDataSource() {
     fun getDevicesStreaming(websocketURI: String) =
         flow {
             client.webSocket(
-                urlString = "$websocketURI$DEVICES$WEBSOCKET"
+                urlString = "$websocketURI$BASE_PATH$DEVICES$WEBSOCKET"
             ) {
                 while (true) {
                     val telemetry = receiveDeserialized<DeviceData>()
@@ -74,7 +74,7 @@ class IoTAPIDataSource : BaseAPIDataSource() {
     fun getTelemetryStreaming(websocketURI: String) =
         flow {
             client.webSocket(
-                urlString = "$websocketURI$DEVICES$TELEMETRY"
+                urlString = "$websocketURI$BASE_PATH$DEVICES$TELEMETRY$WEBSOCKET"
             ) {
                 while (true) {
                     val telemetry = receiveDeserialized<DeviceTelemetryResponse>()

@@ -12,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import red.tetracube.homekitred.HomeKitRedApp
 import red.tetracube.homekitred.business.usecases.DeviceUseCases
@@ -21,6 +20,7 @@ import red.tetracube.homekitred.ui.iot.home.mappers.asBasicTelemetry
 import red.tetracube.homekitred.ui.iot.home.mappers.toUIModel
 import red.tetracube.homekitred.ui.iot.home.models.BasicTelemetry
 import red.tetracube.homekitred.ui.state.UIState
+import java.util.UUID
 
 class IoTHomeViewModel(
     private val localDataSource: HomeKitRedDatabase,
@@ -42,29 +42,34 @@ class IoTHomeViewModel(
         localDataSource.hubDataSource().getHubAndRooms()
             .map { it.toUIModel() }
             .flatMapMerge { iotData ->
-                localDataSource.deviceDataSource().getDevices(iotData.hubId)
-                    .zip(
-                        localDataSource.upsTelemetryDataSource().telemetriesLiveData()
+                devicesFlow(iotData.hubId)
+                    .flatMapMerge { devices ->
+                        upsBasicTelemetryFlow()
                             .map { telemetries ->
-                                telemetries.map { telemetry -> telemetry.asBasicTelemetry() as BasicTelemetry}
+                                val mappedDevices = devices.map { device ->
+                                    val roomName = device.roomId?.let { roomId ->
+                                        iotData.rooms.firstOrNull { room -> room.id == roomId }
+                                    }?.name
+                                    val telemetry =
+                                        telemetries.firstOrNull { telemetry -> telemetry.deviceId == device.id }
+                                    device.toUIModel(roomName, telemetry)
+                                }
+                                iotData.copy(
+                                    devices = mappedDevices
+                                )
                             }
-                    ) { devices, telemetries ->
-                        devices.map { device ->
-                            val roomName = device.roomId?.let { roomId ->
-                                iotData.rooms.firstOrNull { room -> room.id == roomId }
-                            }?.name
-                            val telemetry =
-                                telemetries.firstOrNull { telemetry -> telemetry.deviceId == device.id }
-                            device.toUIModel(roomName, telemetry)
-                        }
-                    }
-                    .map { devices ->
-                        iotData.copy(
-                            devices = devices
-                        )
                     }
             }
             .map { UIState.FinishedWithSuccessContent(it) }
+
+    private fun devicesFlow(hubId: UUID) =
+        localDataSource.deviceDataSource().getDevices(hubId)
+
+    private fun upsBasicTelemetryFlow() =
+        localDataSource.upsTelemetryDataSource().telemetriesLiveData()
+            .map { telemetries ->
+                telemetries.map { telemetry -> telemetry.asBasicTelemetry() as BasicTelemetry }
+            }
 
     fun loadHubData() {
         viewModelScope.launch(job) {

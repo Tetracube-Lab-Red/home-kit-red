@@ -73,7 +73,7 @@ class DeviceUseCases(
             .collect {
                 if (it is UPSTelemetryData) {
                     var telemetryEntity = it.asEntity()
-                    //   upsTelemetryDatasource.insert(telemetryEntity)
+                    localDataSource.upsTelemetryDataSource().insert(telemetryEntity)
                 }
             }
     }
