@@ -35,9 +35,11 @@ fun UPSCard(
     onItemClick: () -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier.clickable {
-            onItemClick()
-        }
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clickable {
+                onItemClick()
+            }
     ) {
         Column(
             modifier = Modifier.padding(8.dp),

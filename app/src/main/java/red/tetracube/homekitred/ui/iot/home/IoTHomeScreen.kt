@@ -252,29 +252,27 @@ fun DevicesList(
     roomId: UUID?,
     onDeviceClick: (Device) -> Unit,
 ) {
-    Surface(
+    LazyColumn(
         modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+            .padding(8.dp)
             .fillMaxHeight()
     ) {
-        LazyColumn {
-            devices
-                .filter { device -> roomId == null || device.roomId == roomId }
-                .forEachIndexed { id, device ->
-                    item {
-                        when (device.type) {
-                            DeviceType.UPS -> UPSCard(
-                                device,
-                                device.telemetry
-                            ) {
-                                onDeviceClick(device)
-                            }
-
-                            else -> {}
+        devices
+            .filter { device -> roomId == null || device.roomId == roomId }
+            .forEachIndexed { id, device ->
+                item {
+                    when (device.type) {
+                        DeviceType.UPS -> UPSCard(
+                            device,
+                            device.telemetry
+                        ) {
+                            onDeviceClick(device)
                         }
+
+                        else -> {}
                     }
                 }
-        }
+            }
     }
 }
 
