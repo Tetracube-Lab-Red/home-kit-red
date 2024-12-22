@@ -20,7 +20,7 @@ fun UPSTelemetryData.asEntity(): UPSTelemetryEntity =
         powerFactor = this.powerFactor,
         batteryCharge = this.batteryCharge,
         primaryStatus = this.statuses.firstOrNull() ?: UPSStatus.NULL,
-        secondaryStatus = this.statuses.lastOrNull(),
+        secondaryStatus = if (this.statuses.size == 2) this.statuses[1] else null,
         deviceId = this.deviceId,
         connectivityHealth = this.connectivityHealth,
         telemetryHealth = this.telemetryHealth

@@ -8,23 +8,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import red.tetracube.homekitred.R
 import red.tetracube.homekitred.ui.iot.home.models.BasicTelemetry
 import red.tetracube.homekitred.ui.iot.home.models.BasicTelemetry.UPSBasicTelemetry
 import red.tetracube.homekitred.ui.iot.home.models.Device
+import red.tetracube.homekitred.ui.theme.AppTypography
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -34,141 +30,69 @@ fun UPSCard(
     basicTelemetry: BasicTelemetry?,
     onItemClick: () -> Unit,
 ) {
+    val lightLabel =
+        AppTypography.labelMedium.copy(color = MaterialTheme.colorScheme.onBackground)
+    val boldBody = AppTypography.bodyMedium.copy(fontWeight = FontWeight.Bold)
     ElevatedCard(
         modifier = Modifier
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp, horizontal = 8.dp)
             .clickable {
                 onItemClick()
             }
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            Icon(
-                tint = MaterialTheme.colorScheme.onSurface,
-                painter = painterResource(R.drawable.power_48px),
-                contentDescription = null,
-            )
-        }
-
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(
-                buildAnnotatedString {
-                    withStyle(style = SpanStyle()) {
-                        append(device.name)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(device.name, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Status", style = lightLabel)
+                    (device.telemetry as? UPSBasicTelemetry)?.let { telemetry ->
+                        Text(
+                            "${telemetry.primaryStatus}\n${telemetry.secondaryStatus ?: ""}",
+                            style = boldBody,
+                            textAlign = TextAlign.Center
+                        )
                     }
-
-                    device.roomName
-                        ?.let { roomName ->
-                            withStyle(
-                                style = MaterialTheme.typography.titleSmall
-                                    .copy(color = MaterialTheme.colorScheme.onSurface)
-                                    .toSpanStyle()
-                            ) {
-                                append(" $roomName")
-                            }
-                        }
-                },
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.info_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                if (basicTelemetry is UPSBasicTelemetry) {
-                    Text(
-                        "${basicTelemetry.primaryStatus} ${basicTelemetry.secondaryStatus ?: ""}",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Notifications", style = lightLabel)
+                    (device.telemetry as? UPSBasicTelemetry)?.let { telemetry ->
+                        Text(
+                            "0",
+                            style = boldBody,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Connectivity", style = lightLabel)
+                    basicTelemetry?.let {
+                        Text(
+                            "${basicTelemetry.connectivityHealth}\n${basicTelemetry.telemetryHealth}",
+                            style = boldBody,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.notifications_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Text(
-                    buildAnnotatedString {
-                        withStyle(style = SpanStyle()) {
-                            append(device.notifications.toString())
-                        }
-                        withStyle(
-                            style = MaterialTheme.typography.labelLarge.toSpanStyle()
-                        ) {
-                            append(" notifications")
-                        }
-                    },
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.settings_ethernet_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text("Last update: ", style = lightLabel)
                 basicTelemetry?.let {
                     Text(
-                        buildAnnotatedString {
-                            withStyle(style = SpanStyle()) {
-                                append("${basicTelemetry.connectivityHealth} - ${basicTelemetry.telemetryHealth}")
-                            }
-                        },
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.schedule_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-
-                basicTelemetry?.let {
-                    Text(
-                        buildAnnotatedString {
-                            withStyle(style = SpanStyle()) {
-                                append(
-                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss")
-                                        .withZone(ZoneId.systemDefault())
-                                        .format(basicTelemetry.telemetryTS)
-                                )
-                            }
-                        },
-                        style = MaterialTheme.typography.titleSmall
+                        DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+                            .withZone(ZoneId.systemDefault())
+                            .format(basicTelemetry.telemetryTS),
+                        style = boldBody
                     )
                 }
             }
